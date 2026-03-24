@@ -695,6 +695,23 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 .cfm-btn-danger{background:rgba(240,83,83,0.15);color:#f05353;border:1px solid rgba(240,83,83,0.3);}
 .cfm-btn-danger:hover{background:rgba(240,83,83,0.25);}
 
+/* VOICE-TX LISTENING OVERLAY */
+#vtxListeningOv{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+#vtxListeningOv .vtx-mic{width:76px;height:76px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:34px;animation:voice-pulse 1.2s ease-in-out infinite;}
+#vtxListeningOv .vtx-hint{color:rgba(255,255,255,0.55);font-size:12px;font-family:var(--font-body);max-width:260px;text-align:center;}
+#vtxInterim{color:rgba(255,255,255,0.85);font-size:13px;font-family:var(--font-body);font-style:italic;max-width:290px;text-align:center;min-height:20px;}
+/* Voice TX modal — extends cfm-box */
+.vtx-field{margin-bottom:13px;}
+.vtx-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.vtx-inp{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:9px;color:var(--t);font-family:var(--font-body);font-size:13px;outline:none;box-sizing:border-box;-webkit-appearance:none;appearance:none;}
+.vtx-inp:focus{border-color:var(--focus-bd);}
+.vtx-type-btn{flex:1;padding:9px;border-radius:9px;border:1px solid var(--b2);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--m);transition:all .15s;}
+#vtxBtnExp.vtx-active{background:var(--color-negative);color:#fff;border-color:var(--color-negative);}
+#vtxBtnInc.vtx-active{background:var(--color-positive);color:#fff;border-color:var(--color-positive);}
+/* Button to trigger full voice flow */
+#vtxLaunchBtn{width:100%;padding:12px;margin-bottom:14px;background:var(--ac-bg);border:1px dashed var(--ac-bd);border-radius:11px;color:var(--color-primary);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+#vtxLaunchBtn:hover{background:var(--ac-muted);border-style:solid;}
+
 /* GASTOS FILTER */
 #gastosMonthFilter{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;}
 @media(min-width:600px){#gastosMonthFilter{width:auto;font-size:11px;padding:6px 10px;}}
@@ -809,6 +826,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
     <div class="g2" id="diarioGrid">
       <div class="card" style="border-color:var(--ac-bd)" data-module="diario" data-feature="transaction_form">
         <div class="ct">Nueva transacción</div>
+        <button id="vtxLaunchBtn" onclick="startVoiceTxFull()">🎤 <span>Crear con voz</span></button>
         <div id="txTypeToggle" style="display:flex;gap:0;margin-bottom:14px;background:var(--bg3);border-radius:10px;padding:3px">
           <button id="btnExp" class="type-btn" onclick="setType('expense')" style="background:var(--rd);color:#fff">− Gasto</button>
           <button id="btnInc" class="type-btn" onclick="setType('income')"  style="background:transparent;color:var(--m)">+ Ingreso</button>
@@ -2424,6 +2442,278 @@ function toggleVoice(){
   };
 
   _voiceRec.start();
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOICE FULL-TRANSACTION SYSTEM
+//  Listens → parses all fields → shows confirmation modal
+// ══════════════════════════════════════════════════════════
+let _vtxRec  = null;
+let _vtxType = 'expense';
+
+function startVoiceTxFull() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Tu navegador no soporta reconocimiento de voz'); return; }
+
+  const ov      = document.getElementById('vtxListeningOv');
+  const interim = document.getElementById('vtxInterim');
+  ov.style.display = 'flex';
+  interim.textContent = '';
+
+  _vtxRec = new SR();
+  _vtxRec.lang = 'es-CO';
+  _vtxRec.continuous = false;
+  _vtxRec.interimResults = true;
+  _vtxRec.maxAlternatives = 1;
+
+  _vtxRec.onresult = (e) => {
+    const txt = Array.from(e.results).map(r => r[0].transcript).join('');
+    interim.textContent = '\u201C' + txt + '\u201D';
+    if (e.results[0].isFinal) {
+      ov.style.display = 'none';
+      showVoiceTxModal(_parseVoiceTx(txt), txt);
+    }
+  };
+
+  _vtxRec.onerror = (e) => {
+    ov.style.display = 'none';
+    const msgs = { 'not-allowed':'Permiso de micrófono denegado', 'no-speech':'No se detectó voz, intenta de nuevo' };
+    alert(msgs[e.error] || 'Error: ' + e.error);
+  };
+
+  _vtxRec.onend = () => { ov.style.display = 'none'; };
+  _vtxRec.start();
+}
+
+function stopVoiceTxFull() {
+  if (_vtxRec) _vtxRec.stop();
+  document.getElementById('vtxListeningOv').style.display = 'none';
+}
+
+function _parseVoiceTx(raw) {
+  const t = raw.toLowerCase();
+
+  // ── 0. Word-number helpers ─────────────────────────────────────────────
+  // Single-word Spanish number tokens → numeric value
+  const WN = {
+    'un':1,'uno':1,'una':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,
+    'seis':6,'siete':7,'ocho':8,'nueve':9,'diez':10,'once':11,
+    'doce':12,'trece':13,'catorce':14,'quince':15,'dieciseis':16,
+    'diecisiete':17,'dieciocho':18,'diecinueve':19,'veinte':20,
+    'veintiuno':21,'veintidos':22,'veintitres':23,'veinticuatro':24,
+    'veinticinco':25,'veintiseis':26,'veintisiete':27,'veintiocho':28,
+    'veintinueve':29,'treinta':30,'cuarenta':40,'cincuenta':50,
+    'sesenta':60,'setenta':70,'ochenta':80,'noventa':90,
+    'cien':100,'ciento':100,'doscientos':200,'doscientas':200,
+    'trescientos':300,'trescientas':300,'cuatrocientos':400,'cuatrocientas':400,
+    'quinientos':500,'quinientas':500,'seiscientos':600,'seiscientas':600,
+    'setecientos':700,'setecientas':700,'ochocientos':800,'ochocientas':800,
+    'novecientos':900,'novecientas':900,
+    'medio':0.5,'media':0.5
+  };
+  // Sum a space-separated string of word-number tokens (e.g. "ciento cincuenta")
+  function _sumWN(str) {
+    const tokens = str.trim().split(/\s+/);
+    let total = 0, cur = 0;
+    for (const tok of tokens) {
+      const v = WN[tok];
+      if (v == null) continue;
+      if (v >= 100) { cur = (cur === 0 ? 1 : cur) * v; }
+      else { cur += v; }
+    }
+    total += cur;
+    return total || null;
+  }
+
+  // ── 1. Type ───────────────────────────────────────────────────────────
+  let type = 'expense';
+  if (/recib[ií]|me\s*pagar|cobr[eé]|ingres[eé]|entr[oó]\s*(?:plata|dinero)|gan[eé]|me\s*lleg[oó]|deposit/i.test(t)) {
+    type = 'income';
+  }
+
+  // ── 2. Amount ─────────────────────────────────────────────────────────
+  let amount = null;
+  const tryAmt = (rx, fn) => { if (amount != null) return; const m = t.match(rx); if (m) amount = fn(m); };
+
+  // Digit-based patterns (highest priority)
+  tryAmt(/(\d+(?:[.,]\d+)?)\s*millon(?:es)?/i, m => Math.round(parseFloat(m[1].replace(',','.')) * 1e6));
+  tryAmt(/(\d+(?:[.,]\d+)?)\s*mil\b/i,          m => Math.round(parseFloat(m[1].replace(',','.')) * 1e3));
+  tryAmt(/(\d+)\s*k\b/i,                          m => parseInt(m[1]) * 1000);
+  tryAmt(/\$\s?(\d[\d.,]*)/,                      m => parseInt(m[1].replace(/[.,]/g, '')));
+  tryAmt(/\b(\d{1,3}(?:\s\d{3})+)\b/,             m => parseInt(m[1].replace(/\s/g, '')));  // "50 000"
+  tryAmt(/\b(\d{1,3}[.,]\d{3})\b/,                m => parseInt(m[1].replace(/[.,]/g, '')));  // "50.000"
+  tryAmt(/\b(\d{5,})\b/,                           m => parseInt(m[1]));
+  tryAmt(/\b(\d{3,4})\b/,                          m => parseInt(m[1]) * 1000); // "150" → 150 000
+
+  // Word-number patterns (when no digit amount found)
+  if (amount == null) {
+    // "medio millón" / "media millón"
+    const mMillon = t.match(/\b(medio|media)\s*mill[oó]n/i);
+    if (mMillon) amount = 500000;
+  }
+  if (amount == null) {
+    // "[words] millones" — e.g. "dos millones"
+    const mMillones = t.match(/\b((?:(?:un|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecis[eé]is|diecisiete|dieciocho|diecinueve|veinte|veintiun[oa]?|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa)\s*)+)mill[oó]n(?:es)?/i);
+    if (mMillones) { const v = _sumWN(mMillones[1]); if (v) amount = Math.round(v * 1e6); }
+  }
+  if (amount == null) {
+    // "[words] mil" — e.g. "diez mil", "cien mil", "ciento cincuenta mil"
+    const mMil = t.match(/\b((?:(?:un|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecis[eé]is|diecisiete|dieciocho|diecinueve|veinte|veintiun[oa]?|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien(?:to)?|doscient[ao]s?|trescient[ao]s?|cuatrocient[ao]s?|quinient[ao]s?|seiscient[ao]s?|setecient[ao]s?|ochocient[ao]s?|novecient[ao]s?)\s*)+)mil\b/i);
+    if (mMil) { const v = _sumWN(mMil[1]); if (v) amount = Math.round(v * 1e3); }
+  }
+  if (amount == null) {
+    // bare word number "mil" alone → 1000
+    if (/\bmil\b/i.test(t) && !/\d/.test(t)) amount = 1000;
+  }
+
+  // ── 3. Category ───────────────────────────────────────────────────────
+  const catRules = [
+    { id:'transport', rx:/\buber\b|taxi|didi|bus\b|metro\b|gasolina|combustible|parqueo|parqueadero|\bmoto\b|beat\b/i },
+    { id:'housing',   rx:/arriendo|alquiler|renta\b|servicios\b|agua\b|luz\b|internet|wifi|electricidad|predial|administraci/i },
+    { id:'market',    rx:/mercado|supermercado|aseo|carulla|exito|olimpica|jumbo|hogar|limpieza|limpiar/i },
+    { id:'food',      rx:/comida|restaurante|uber\s*eats|rappi|domicilio|almuerzo|cena|desayuno|pizza|burger|mcdonald|sushi|caf[eé]|coffee|tinto|pollo|lunch/i },
+    { id:'health',    rx:/m[eé]dico|doctor|farmacia|drogu|cl[ií]nica|hospital|medicina|gym|gimnasio|salud|spa|barber[ií]|peluquer|dentista/i },
+    { id:'kids',      rx:/colegio|beb[eé]|ni[ñn]o|hijo|juguete|pa[ñn]al|escuela|guarder[ií]/i },
+    { id:'salary',    rx:/salario|sueldo|quincena|n[oó]mina|empresa\b|trabajo\b/i },
+    { id:'freelance', rx:/freelance|proyecto|honorario|consultor[ií]|cliente/i },
+    { id:'didi',      rx:/didi\s*(?:conductor|plataforma)|conductor\s*didi/i },
+    { id:'interest',  rx:/inter[eé]s|inversi[oó]n|cdt\b|rendimiento|dividendo/i },
+  ];
+  let category = null;
+  for (const r of catRules) { if (r.rx.test(t)) { category = r.id; break; } }
+  if (!category) category = type === 'expense' ? 'other' : 'other_in';
+
+  // ── 4. Date ───────────────────────────────────────────────────────────
+  let date = new Date();
+  const DAY_IDX = {
+    'domingo':0,'lunes':1,'martes':2,'miercoles':3,'jueves':4,'viernes':5,'sabado':6
+  };
+  if (/\bayer\b/i.test(t)) {
+    date.setDate(date.getDate() - 1);
+  } else if (/\bante(?:a?yer|ayer)\b/i.test(t)) {
+    date.setDate(date.getDate() - 2);
+  } else {
+    // Normalize accented vowels so "miércoles"/"sábado" match the keys
+    const tn = t.replace(/[áàä]/g,'a').replace(/[éèë]/g,'e').replace(/[íìï]/g,'i').replace(/[óòö]/g,'o').replace(/[úùü]/g,'u');
+    for (const [word, idx] of Object.entries(DAY_IDX)) {
+      if (new RegExp('\\b' + word + '\\b', 'i').test(tn)) {
+        const todayIdx = date.getDay();
+        let diff = todayIdx - idx;
+        if (diff <= 0) diff += 7;
+        date.setDate(date.getDate() - diff);
+        break;
+      }
+    }
+  }
+  const dateStr = date.toISOString().slice(0, 10);
+
+  // ── 5. Description — strip amount and date tokens ─────────────────────
+  let desc = raw
+    .replace(/\b\d{1,3}(?:\s\d{3})+\b/g, '')
+    .replace(/\b\d{1,3}[.,]\d{3}\b/g, '')
+    .replace(/\b\d+(?:[.,]\d+)?\s*(?:millones?|mil|k)\b/gi, '')
+    .replace(/\$\s?\d[\d.,]*/g, '')
+    .replace(/\b\d{4,}\b/g, '')
+    // word-number amount phrases
+    .replace(/\b(?:(?:un|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|diecis[eé]is|diecisiete|dieciocho|diecinueve|veinte|veintiun[oa]?|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien(?:to)?|doscient[ao]s?|trescient[ao]s?|cuatrocient[ao]s?|quinient[ao]s?|seiscient[ao]s?|setecient[ao]s?|ochocient[ao]s?|novecient[ao]s?|medio|media)\s*)+(?:mill[oó]n(?:es)?|mil)\b/gi, '')
+    .replace(/\bmil\b/gi, '')
+    // date words
+    .replace(/\b(?:hoy|ayer|anteayer|antier|lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)\b/gi, '')
+    // filler verbs
+    .replace(/\b(gast[eé]|pagu[eé]|compr[eé]|recib[ií]|cobr[eé]|ingres[eé]|me\s*pagar[oó]n|entr[oó]|me\s*lleg[oó])\b/gi, '')
+    .replace(/\s+/g, ' ').trim();
+  if (desc.length < 3) desc = raw.trim();
+  desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+
+  return { type, amount, category, description: desc, date: dateStr };
+}
+
+function _vtxBuildCats(type, selectedId) {
+  const cats = type === 'expense'
+    ? [...CATS_EXP, ...(customCatsExp || [])]
+    : [...CATS_INC, ...(customCatsInc || [])];
+  const sel = document.getElementById('vtxCat');
+  sel.innerHTML = cats.map(c =>
+    `<option value="${c.id}"${c.id === selectedId ? ' selected' : ''}>${c.lbl}</option>`
+  ).join('');
+}
+
+function vtxSetType(type, rebuildCats = true) {
+  _vtxType = type;
+  const btnExp = document.getElementById('vtxBtnExp');
+  const btnInc = document.getElementById('vtxBtnInc');
+  btnExp.classList.toggle('vtx-active', type === 'expense');
+  btnInc.classList.toggle('vtx-active', type === 'income');
+  if (rebuildCats) _vtxBuildCats(type, null);
+}
+
+function showVoiceTxModal(parsed, rawTranscript) {
+  _vtxType = parsed.type;
+  _vtxBuildCats(parsed.type, parsed.category);
+  document.getElementById('vtxTranscript').textContent = '\u201C' + rawTranscript + '\u201D';
+  document.getElementById('vtxAmt').value  = parsed.amount || '';
+  document.getElementById('vtxDesc').value = parsed.description || '';
+  document.getElementById('vtxDate').value = parsed.date;
+  document.getElementById('vtxErr').textContent = '';
+  const btnExp = document.getElementById('vtxBtnExp');
+  const btnInc = document.getElementById('vtxBtnInc');
+  btnExp.classList.toggle('vtx-active', parsed.type === 'expense');
+  btnInc.classList.toggle('vtx-active', parsed.type === 'income');
+  const ov = document.getElementById('vtxOverlay');
+  ov.style.display = 'flex';
+  requestAnimationFrame(() => ov.classList.add('show'));
+}
+
+function closeVoiceTxModal() {
+  const ov = document.getElementById('vtxOverlay');
+  ov.classList.remove('show');
+  setTimeout(() => { ov.style.display = 'none'; }, 200);
+}
+
+async function confirmVoiceTx() {
+  const amount = parseInt(document.getElementById('vtxAmt').value);
+  const catId  = document.getElementById('vtxCat').value;
+  const desc   = document.getElementById('vtxDesc').value.trim();
+  const date   = document.getElementById('vtxDate').value || new Date().toISOString().slice(0, 10);
+  const errEl  = document.getElementById('vtxErr');
+
+  if (!amount || amount <= 0) { errEl.textContent = 'Ingresa un monto válido'; errEl.style.color = 'var(--rd)'; return; }
+  if (!desc)                  { errEl.textContent = 'La descripción es obligatoria'; errEl.style.color = 'var(--rd)'; return; }
+
+  const btn = document.querySelector('#vtxOverlay .cfm-btn-confirm');
+  if (btn) { btn.textContent = 'Guardando…'; btn.disabled = true; }
+
+  try {
+    const allCats  = [...CATS_EXP, ...CATS_INC, ...(customCatsExp||[]), ...(customCatsInc||[])];
+    const cat      = allCats.find(c => c.id === catId);
+    const catLabel = cat ? cat.lbl.replace(/^\S+\s*/, '').trim() : catId;
+    const d        = new Date(date + 'T12:00:00');
+    const [res] = await sbPost('transactions', {
+      date, type: _vtxType, amount,
+      category:    _vtxType === 'expense' ? catLabel : 'Income',
+      subcategory: catId,
+      description: desc,
+      account:     'Rappi',
+      month:  d.toLocaleString('en', { month:'long' }),
+      year:   d.getFullYear(),
+    });
+    DB.all.unshift(res);
+    if (_vtxType === 'income') DB.income.unshift(res);
+    else { DB.expenses.unshift(res); if (!['Taxes','Transfers'].includes(res.category)) DB.real_exp.unshift(res); }
+    DB.monthly = buildMonthly(DB.all);
+    closeVoiceTxModal();
+    renderAll();
+    // Success toast
+    const toast = document.createElement('div');
+    toast.textContent = '✓ Transacción guardada';
+    toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--color-positive);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:10000;font-family:var(--font-body);pointer-events:none;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+  } catch(e) {
+    errEl.style.color = 'var(--rd)';
+    errEl.textContent = 'Error: ' + e.message;
+    if (btn) { btn.textContent = 'Confirmar y guardar'; btn.disabled = false; }
+  }
 }
 
 async function addTx(){
@@ -4241,7 +4531,7 @@ if('serviceWorker' in navigator){
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-033';
+  const CURRENT_V = '20260322-034';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
@@ -4327,6 +4617,79 @@ if('serviceWorker' in navigator){
   }
 })();
 </script>
+
+<!-- ══ VOICE TRANSACTION — LISTENING OVERLAY ══════════════════════ -->
+<div id="vtxListeningOv">
+  <div class="vtx-mic">🎤</div>
+  <div style="color:#fff;font-size:17px;font-weight:700;font-family:var(--font-body)">Escuchando…</div>
+  <div class="vtx-hint">Di tu transacción completa.<br>Ej: "Gasté 75 mil en Uber Eats"</div>
+  <div id="vtxInterim"></div>
+  <button onclick="stopVoiceTxFull()"
+    style="margin-top:6px;padding:10px 28px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.28);border-radius:10px;color:#fff;font-family:var(--font-body);font-size:13px;cursor:pointer;">
+    Detener
+  </button>
+</div>
+
+<!-- ══ VOICE TRANSACTION — CONFIRM MODAL ══════════════════════════ -->
+<div id="vtxOverlay" class="cfm-overlay" onclick="if(event.target===this)closeVoiceTxModal()" style="display:none">
+  <div class="cfm-box" style="max-width:390px;text-align:left;padding:24px 22px 20px">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span style="font-size:24px">🎤</span>
+      <div>
+        <div class="cfm-title" style="text-align:left;margin:0;font-size:15px">Confirmar transacción</div>
+        <div id="vtxTranscript" style="font-size:10px;color:var(--m);margin-top:2px;font-style:italic;line-height:1.4"></div>
+      </div>
+    </div>
+
+    <!-- Type -->
+    <div class="vtx-field">
+      <div class="vtx-label">Tipo</div>
+      <div style="display:flex;gap:8px">
+        <button id="vtxBtnExp" class="vtx-type-btn" onclick="vtxSetType('expense')">− Gasto</button>
+        <button id="vtxBtnInc" class="vtx-type-btn" onclick="vtxSetType('income')">+ Ingreso</button>
+      </div>
+    </div>
+
+    <!-- Amount -->
+    <div class="vtx-field">
+      <div class="vtx-label">Monto (COP)</div>
+      <div style="position:relative">
+        <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--m);font-size:13px">$</span>
+        <input id="vtxAmt" type="number" inputmode="numeric" class="vtx-inp"
+               style="padding-left:26px;font-family:var(--font-display);font-size:20px;font-weight:700">
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="vtx-field">
+      <div class="vtx-label">Categoría</div>
+      <select id="vtxCat" class="vtx-inp"></select>
+    </div>
+
+    <!-- Description -->
+    <div class="vtx-field">
+      <div class="vtx-label">Descripción</div>
+      <input id="vtxDesc" type="text" class="vtx-inp" placeholder="Descripción de la transacción">
+    </div>
+
+    <!-- Date -->
+    <div class="vtx-field" style="margin-bottom:18px">
+      <div class="vtx-label">Fecha</div>
+      <input id="vtxDate" type="date" class="vtx-inp">
+    </div>
+
+    <!-- Error -->
+    <div id="vtxErr" style="font-size:11px;color:var(--rd);min-height:16px;margin-bottom:10px;text-align:center"></div>
+
+    <!-- Buttons -->
+    <div class="cfm-btns">
+      <button class="cfm-btn cfm-btn-cancel" onclick="closeVoiceTxModal()">Cancelar</button>
+      <button class="cfm-btn cfm-btn-confirm" onclick="confirmVoiceTx()">Confirmar y guardar</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
