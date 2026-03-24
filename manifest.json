@@ -1,9 +1,9 @@
 {
-  "name": "Φ Finances GPC",
-  "short_name": "Φ Finances GPC",
+  "name": "Φ Finances DF",
+  "short_name": "Φ Finances DF",
   "description": "Dashboard financiero personal",
-  "start_url": "/03-21-2026-003/daniel_finance_v6.html",
-  "scope": "/03-21-2026-003/",
+  "start_url": "/03-4-2026-006-ORIGIN/daniel_finance_v6.html",
+  "scope": "/03-4-2026-006-ORIGIN/",
   "display": "standalone",
   "background_color": "#080910",
   "theme_color": "#080910",
