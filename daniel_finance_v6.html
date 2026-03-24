@@ -2798,7 +2798,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       montecarlo: M.montecarlo?.enabled !== false,
       insights:   M.insights?.enabled   !== false,
     };
-    const ALL = ['overview','flujo','gastos','perfecto','diario','proyeccion','montecarlo','insights'];
+    const ALL = ['overview','flujo','gastos','proyeccion','diario','perfecto','montecarlo','insights'];
     let inc = (sections.length ? sections : ALL).filter(s => enabled[s] !== false);
     if (!inc.length) inc = ALL;
 
@@ -3047,15 +3047,25 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     // Left accent stripe — premium report style
     doc.setFillColor(...PU); doc.rect(0, 0, STRIPE, H, 'F');
 
-    // ── PHI Φ logo — geometric (circle + vertical line) inside badge ──
+    // ── PHI Φ logo — geometric (circle + vertical line) ─────────────
     const lgX = ML + 8, lgY = 16, lgS = 30;
     const lcx = lgX + lgS/2, lcy = lgY + lgS/2, lcr = 8;
-    doc.setFillColor(...PU); doc.roundedRect(lgX, lgY, lgS, lgS, 5, 5, 'F');
-    // Circle
-    doc.setDrawColor(...WH); doc.setLineWidth(1.5);
-    doc.circle(lcx, lcy, lcr, 'S');
-    // Vertical line through circle
-    doc.line(lcx, lcy - lcr - 3.5, lcx, lcy + lcr + 3.5);
+    if (_PAL.banner === 'editorial') {
+      // Arctic: circular medallion on platinum paper — no fill, pure line art
+      // Outer ring — thin, like an engraved coin
+      doc.setDrawColor(...PU); doc.setLineWidth(0.45);
+      doc.circle(lcx, lcy, lgS/2 - 0.5, 'S');
+      // Inner PHI mark — slightly thicker for legibility
+      doc.setLineWidth(0.75);
+      doc.circle(lcx, lcy, lcr, 'S');
+      doc.line(lcx, lcy - lcr - 3.5, lcx, lcy + lcr + 3.5);
+    } else {
+      // Other themes: filled rounded badge with white PHI symbol
+      doc.setFillColor(...PU); doc.roundedRect(lgX, lgY, lgS, lgS, 5, 5, 'F');
+      doc.setDrawColor(...WH); doc.setLineWidth(1.5);
+      doc.circle(lcx, lcy, lcr, 'S');
+      doc.line(lcx, lcy - lcr - 3.5, lcx, lcy + lcr + 3.5);
+    }
 
     // ── Main title — two-line, large ─────────────────────────────────
     doc.setFont(FONT,'bold'); doc.setFontSize(40); doc.setTextColor(...NK);
@@ -3263,63 +3273,6 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     // ════════════════════════════════════════════════════════════════════
     // 06 · PERFECTO — Mes Perfecto table
     // ════════════════════════════════════════════════════════════════════
-    if (inc.includes('perfecto')) {
-      let y = newSection('perfecto');
-      const REAL = OPTIMAL_BUDGET || 232000;
-      const scoreData = DB.monthly.map(m => {
-        const exp = DB.real_exp.filter(t=>t.month===m.month&&t.year===m.year)
-                               .reduce((s,t)=>s+t.amount,0);
-        const sc  = exp > 0 ? Math.round(REAL/exp*100) : 0;
-        return { lbl:`${m.month.slice(0,3)} ${m.year}`, exp, sc, diff:exp-REAL };
-      });
-      const avgSc = scoreData.length ? Math.round(scoreData.reduce((s,r)=>s+r.sc,0)/scoreData.length) : 0;
-      const bestSc = scoreData.length ? scoreData.reduce((b,r)=>r.sc>b.sc?r:b, scoreData[0]) : null;
-      y = addKpiRow(y, [
-        { label:'Presupuesto óptimo', val:_pf(REAL) },
-        { label:'Score promedio',     val:`${avgSc} / 100` },
-        { label:'Mejor mes',          val:bestSc ? `${bestSc.lbl} (${bestSc.sc}/100)` : '-' },
-      ]);
-      addTable(y,
-        [['Mes','Gasto Real','Óptimo','Δ vs Óptimo','Score']],
-        scoreData.map(r => [
-          r.lbl,
-          cAmt(r.exp, false, true),
-          { content:_pf(REAL), styles:{halign:'right', textColor:GY} },
-          cSign(-r.diff),   // positive = spent less than optimal (good = green)
-          { content:`${r.sc}/100`, styles:{halign:'center', fontStyle:'bold',
-            textColor: r.sc>=100?GR : r.sc>=70?[245,166,35] : RD } },
-        ]),
-        { 1:{halign:'right'}, 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'center'} }
-      );
-    }
-
-    // ════════════════════════════════════════════════════════════════════
-    // 05 · DIARIO — Full transaction ledger
-    // ════════════════════════════════════════════════════════════════════
-    if (inc.includes('diario')) {
-      let y = newSection('diario');
-      const ledger = [..._all]
-        .filter(t => t.type !== 'transfer')
-        .sort((a,b) => (b.date||'').localeCompare(a.date||''));
-      y = addKpiRow(y, [
-        { label:'Total transacciones', val:String(ledger.length) },
-        { label:'Total ingresos',       val:_pf(_income.reduce((s,t)=>s+t.amount,0)),   pos:true },
-        { label:'Total gastos',         val:_pf(_expenses.reduce((s,t)=>s+t.amount,0)), neg:true },
-      ]);
-      addTable(y,
-        [['Fecha','Descripcion','Categoria','Tipo','Monto']],
-        ledger.map(t => [
-          t.date,
-          cleanTxt(t.description||t.category||'').slice(0,32),
-          { content:cleanTxt(t.category||'-').slice(0,20), styles:{fontSize:7.5, textColor:GY} },
-          cCtr(t.type==='income'?'Ingreso':'Gasto', t.type==='income'?GR:RD),
-          { content:(t.type==='income'?'+':'-')+_pf(t.amount),
-            styles:{halign:'right', fontStyle:'bold', textColor:t.type==='income'?GR:RD} },
-        ]),
-        { 0:{cellWidth:22}, 2:{cellWidth:26}, 3:{cellWidth:18,halign:'center'}, 4:{cellWidth:28,halign:'right'} }
-      );
-    }
-
     // ════════════════════════════════════════════════════════════════════
     // 04 · PROYECCIÓN — Scenario projection table
     // ════════════════════════════════════════════════════════════════════
@@ -3358,6 +3311,66 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
           ];
         }),
         { 1:{halign:'right'}, 2:{halign:'center'}, 3:{halign:'center'}, 4:{halign:'right'} }
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    // 05 · DIARIO — Full transaction ledger
+    // ════════════════════════════════════════════════════════════════════
+    if (inc.includes('diario')) {
+      let y = newSection('diario');
+      const ledger = [..._all]
+        .filter(t => t.type !== 'transfer')
+        .sort((a,b) => (b.date||'').localeCompare(a.date||''));
+      y = addKpiRow(y, [
+        { label:'Total transacciones', val:String(ledger.length) },
+        { label:'Total ingresos',       val:_pf(_income.reduce((s,t)=>s+t.amount,0)),   pos:true },
+        { label:'Total gastos',         val:_pf(_expenses.reduce((s,t)=>s+t.amount,0)), neg:true },
+      ]);
+      addTable(y,
+        [['Fecha','Descripcion','Categoria','Tipo','Monto']],
+        ledger.map(t => [
+          t.date,
+          cleanTxt(t.description||t.category||'').slice(0,32),
+          { content:cleanTxt(t.category||'-').slice(0,20), styles:{fontSize:7.5, textColor:GY} },
+          cCtr(t.type==='income'?'Ingreso':'Gasto', t.type==='income'?GR:RD),
+          { content:(t.type==='income'?'+':'-')+_pf(t.amount),
+            styles:{halign:'right', fontStyle:'bold', textColor:t.type==='income'?GR:RD} },
+        ]),
+        { 0:{cellWidth:22}, 2:{cellWidth:26}, 3:{cellWidth:18,halign:'center'}, 4:{cellWidth:28,halign:'right'} }
+      );
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    // 06 · MES PERFECTO — Optimal spending score
+    // ════════════════════════════════════════════════════════════════════
+    if (inc.includes('perfecto')) {
+      let y = newSection('perfecto');
+      const REAL = OPTIMAL_BUDGET || 232000;
+      const scoreData = DB.monthly.map(m => {
+        const exp = DB.real_exp.filter(t=>t.month===m.month&&t.year===m.year)
+                               .reduce((s,t)=>s+t.amount,0);
+        const sc  = exp > 0 ? Math.round(REAL/exp*100) : 0;
+        return { lbl:`${m.month.slice(0,3)} ${m.year}`, exp, sc, diff:exp-REAL };
+      });
+      const avgSc = scoreData.length ? Math.round(scoreData.reduce((s,r)=>s+r.sc,0)/scoreData.length) : 0;
+      const bestSc = scoreData.length ? scoreData.reduce((b,r)=>r.sc>b.sc?r:b, scoreData[0]) : null;
+      y = addKpiRow(y, [
+        { label:'Presupuesto óptimo', val:_pf(REAL) },
+        { label:'Score promedio',     val:`${avgSc} / 100` },
+        { label:'Mejor mes',          val:bestSc ? `${bestSc.lbl} (${bestSc.sc}/100)` : '-' },
+      ]);
+      addTable(y,
+        [['Mes','Gasto Real','Óptimo','Δ vs Óptimo','Score']],
+        scoreData.map(r => [
+          r.lbl,
+          cAmt(r.exp, false, true),
+          { content:_pf(REAL), styles:{halign:'right', textColor:GY} },
+          cSign(-r.diff),   // positive = spent less than optimal (good = green)
+          { content:`${r.sc}/100`, styles:{halign:'center', fontStyle:'bold',
+            textColor: r.sc>=100?GR : r.sc>=70?[245,166,35] : RD } },
+        ]),
+        { 1:{halign:'right'}, 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'center'} }
       );
     }
 
@@ -4228,7 +4241,7 @@ if('serviceWorker' in navigator){
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-032';
+  const CURRENT_V = '20260322-033';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
