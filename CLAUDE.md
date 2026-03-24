@@ -74,6 +74,33 @@ To change PIN: hash the new PIN with SHA-256 at emn178.github.io/online-tools/sh
 - **CSV export** available for transaction history
 - **Offline support** via `sw.js` Service Worker (cache-first for static assets, network-first for Supabase/Fonts)
 
+## Workflow: Task → Do → Verify
+
+When making any visual or structural change to `daniel_finance_v6.html`, follow this cycle strictly.
+
+### 1. Task
+- Understand the goal before touching any file.
+- If the task is ambiguous, ask one clarifying question before proceeding.
+
+### 2. Do
+- Make the minimal necessary changes to complete the task.
+- Do not refactor or touch unrelated sections of the file.
+
+### 3. Verify
+- After every change, use the Playwright MCP to open the file in a browser.
+- The app is a single HTML file — open it directly: `file:///absolute/path/to/daniel_finance_v6.html`
+- Take a screenshot and visually inspect the result.
+- Check for: layout breaks, missing chart renders, broken PIN screen, missing section content.
+- If something looks wrong, fix it and re-verify before declaring the task done.
+- **Never report a task as complete without a passing screenshot.**
+
+### Verification Checklist
+- PIN screen renders and accepts input
+- Target section is visible and correctly styled
+- Charts (Chart.js) render without errors
+- No JavaScript console errors
+- Mobile viewport (375px) does not break layout
+
 ## GitHub Actions
 
 - `.github/workflows/claude.yml` — responds to `@claude` mentions in issues and PRs

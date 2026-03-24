@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Φ Finances">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
 <script>
   // Update <title> and Apple meta from client.json branding.app_title
   fetch('client.json').then(r => r.json()).then(cfg => {
@@ -22,6 +23,9 @@
 <title>Φ Finances</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>/* Stamp theme on <html> before first CSS paint — prevents phantom flash */
+(function(){var t=localStorage.getItem('dfg_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <style>
 /* ════════════════════════════════════════════════════════════
    DESIGN TOKENS — canonical color + typography system
@@ -29,30 +33,28 @@
    Old shorthand aliases kept for backward compat.
    ════════════════════════════════════════════════════════════ */
 
-/* ── PHANTOM  ·  dark purple / aggressive / hacker ────────── */
+/* ── PHANTOM  ·  deep space blue / institutional / premium ── */
 :root{
   /* ══ Canonical tokens ═══════════════════════════════════ */
   --color-base:          #080910;
-  --color-surface:       #0e0f15;
-  --color-card:          #14151e;
-  --color-border:        #252630;
-  --color-primary:       #7c5cfc;
-  --color-primary-hover: #6d4de8;
-  --color-accent:        #a78bfa;
-  --color-positive:      #22d47a;
+  --color-surface:       #0c0e1a;
+  --color-card:          #111320;
+  --color-border:        #1c1f33;
+  --color-primary:       #3461ef;
+  --color-primary-hover: #2a50d8;
+  --color-accent:        #7b9ef8;
+  --color-positive:      #22c97a;
   --color-negative:      #f05353;
   --color-warning:       #f5a623;
-  --color-info:          #4d9fff;
-  --color-teal:          #2dd4bf;
-  --color-text-high:     #e8e9f0;
-  --color-text-mid:      #6b6d7e;
-  --color-text-low:      #3a3b48;
-  --color-muted-bg:      #0b0c14;
+  --color-info:          #60a5fa;
+  --color-teal:          #38bdf8;
+  --color-text-high:     #eef0fc;
+  --color-text-mid:      #535878;
+  --color-text-low:      #252840;
+  --color-muted-bg:      #07080e;
   /* ══ Typography ═════════════════════════════════════════ */
-  --font-body:    'JetBrains Mono', monospace;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
   --font-display: 'Syne', sans-serif;
-  /* figure = big monetary numbers; defaults to display font.
-     FROST overrides with Playfair Display for the premium serif touch */
   --font-figure:  var(--font-display);
   /* ══ Backward-compat aliases — all CSS rules keep working */
   --bg:  var(--color-base);
@@ -71,168 +73,405 @@
   --bl:  var(--color-info);
   --tl:  var(--color-teal);
   /* ══ Derived / computed ══════════════════════════════════ */
-  --nav-bg:    rgba(8,9,16,0.95);
-  --tab-bg:    rgba(8,9,16,0.97);
-  --ac-bg:     rgba(124,92,252,0.10);
-  --ac-bd:     rgba(124,92,252,0.20);
-  --ac-muted:  rgba(124,92,252,0.12);
-  --ac-line:   rgba(124,92,252,0.025);
-  --ac-fill:   rgba(124,92,252,0.70);
-  --ac-glow:   rgba(124,92,252,0.08);
-  --focus-bd:  rgba(124,92,252,0.50);
-  --grid-c:    rgba(255,255,255,0.04);
+  --nav-bg:    rgba(8,9,16,0.88);
+  --tab-bg:    rgba(8,9,16,0.96);
+  --ac-bg:     rgba(52,97,239,0.08);
+  --ac-bd:     rgba(52,97,239,0.20);
+  --ac-muted:  rgba(52,97,239,0.10);
+  --ac-line:   rgba(52,97,239,0.012);
+  --ac-fill:   rgba(52,97,239,0.65);
+  --ac-glow:   rgba(52,97,239,0.12);
+  --focus-bd:  rgba(52,97,239,0.50);
+  --grid-c:    rgba(255,255,255,0.022);
   --tick-c:    var(--color-text-mid);
-  --radius-card: 14px;
-  /* Row/table chrome — promoted from hardcoded rgba */
-  --row-divider: rgba(255,255,255,0.05);
-  --row-hover:   rgba(255,255,255,0.03);
-  --track-bg:    rgba(255,255,255,0.06);
+  --radius-card: 18px;
+  /* Row/table chrome */
+  --row-divider: rgba(255,255,255,0.04);
+  --row-hover:   rgba(255,255,255,0.02);
+  --track-bg:    rgba(255,255,255,0.05);
   /* ══ PIN screen ══════════════════════════════════════════ */
   --pin-bg:      var(--color-base);
   --pin-card-bg: var(--color-surface);
-  --pin-shadow:  none;
+  --pin-shadow:  0 40px 80px rgba(0,0,0,0.7), 0 8px 32px rgba(0,0,0,0.4);
 }
 
-/* ── CARBON  ·  near-black + champagne gold / old money / executive ── */
+/* ── CARBON  ·  modern private banking / Letter-inspired / light ────── */
 [data-theme="carbon"]{
-  --color-base:          #040404;
-  --color-surface:       #0d0d0d;
-  --color-card:          #171717;
-  --color-border:        #282828;
-  --color-primary:       #d4a843;
-  --color-primary-hover: #c09030;
-  --color-accent:        #f0c84a;
-  --color-positive:      #2dd186;
-  --color-negative:      #e84040;
-  /* text: near-neutral — warmth < 6%, labels are cool gray */
-  --color-text-high:     #e2dfd8;
-  --color-text-mid:      #7a7672;
-  --color-text-low:      #48443e;
-  --color-muted-bg:      #111111;
-  /* IRON: Bebas Neue condensed headers + IBM Plex Mono data columns */
-  --font-body:    'IBM Plex Mono', monospace;
-  --font-display: 'Bebas Neue', sans-serif;
-  --nav-bg:   rgba(4,4,4,0.97);
-  --tab-bg:   rgba(4,4,4,0.99);
-  --ac-bg:    rgba(212,168,67,0.10);
-  --ac-bd:    rgba(212,168,67,0.22);
-  --ac-muted: rgba(212,168,67,0.12);
-  --ac-line:  rgba(212,168,67,0.02);
-  --ac-fill:  rgba(212,168,67,0.65);
-  --ac-glow:  rgba(212,168,67,0.08);
-  --focus-bd: rgba(212,168,67,0.50);
-  --radius-card: 8px;
-  --pin-bg:      #040404;
-  --pin-card-bg: #0d0d0d;
-}
-
-/* ── FOREST  ·  deep green + mint / long-term investor / sustainable ── */
-[data-theme="forest"]{
-  --color-base:          #060d09;
-  --color-surface:       #0b1510;
-  --color-card:          #112418;
-  --color-border:        #1e3a28;
-  --color-primary:       #1db86a;
-  --color-primary-hover: #18a05c;
-  --color-accent:        #5de09b;
-  --color-positive:      #82f0b8;
-  --color-negative:      #ff6b55;
-  /* text: near-neutral — green tint < 8%, labels are muted gray-green */
-  --color-text-high:     #dde8e2;
-  --color-text-mid:      #5e7266;
-  --color-text-low:      #2c3e32;
-  --color-muted-bg:      #0d1e12;
-  /* GROVE: Cormorant Garamond editorial serif + Jost modern body */
-  --font-body:    'Jost', sans-serif;
-  --font-display: 'Cormorant Garamond', serif;
-  --nav-bg:   rgba(6,13,9,0.96);
-  --tab-bg:   rgba(6,13,9,0.98);
-  --ac-bg:    rgba(29,184,106,0.10);
-  --ac-bd:    rgba(29,184,106,0.22);
-  --ac-muted: rgba(29,184,106,0.12);
-  --ac-line:  rgba(29,184,106,0.03);
-  --ac-fill:  rgba(29,184,106,0.65);
-  --ac-glow:  rgba(29,184,106,0.08);
-  --focus-bd: rgba(29,184,106,0.50);
-  --radius-card: 18px;
-}
-
-/* ── SOLAR  ·  dark warm amber / entrepreneur / high energy ────────── */
-[data-theme="solar"]{
-  --color-base:          #0c0900;
-  --color-surface:       #141009;
-  --color-card:          #201a0e;
-  --color-border:        #302810;
-  --color-primary:       #e09030;
-  --color-primary-hover: #c87a22;
-  --color-accent:        #f0b84a;
-  --color-positive:      #48d898;
-  --color-negative:      #f05050;
-  /* text: near-neutral — warmth < 8%, labels are warm-gray not amber */
-  --color-text-high:     #e8e2d4;
-  --color-text-mid:      #7a6e58;
-  --color-text-low:      #48401e;
-  --color-muted-bg:      #181208;
-  /* EMBER: Space Grotesk quirky display + Crimson Pro readable serif body */
-  --font-body:    'Crimson Pro', serif;
-  --font-display: 'Space Grotesk', sans-serif;
-  --nav-bg:   rgba(12,9,0,0.97);
-  --tab-bg:   rgba(12,9,0,0.99);
-  --ac-bg:    rgba(224,144,48,0.10);
-  --ac-bd:    rgba(224,144,48,0.22);
-  --ac-muted: rgba(224,144,48,0.12);
-  --ac-line:  rgba(224,144,48,0.025);
-  --ac-fill:  rgba(224,144,48,0.65);
-  --ac-glow:  rgba(224,144,48,0.08);
-  --focus-bd: rgba(224,144,48,0.50);
-  --radius-card: 12px;
-}
-
-/* ── ARCTIC  ·  light frost blue / analytical / professional ──────── */
-[data-theme="arctic"]{
-  --color-base:          #f0f4fa;
-  --color-surface:       #e8eef8;
+  --color-base:          #f8f9fb;
+  --color-surface:       #ffffff;
   --color-card:          #ffffff;
-  --color-border:        #c8d8f0;
-  --color-primary:       #1a52d4;
-  --color-primary-hover: #1442b0;
-  --color-accent:        #4a80f0;
-  --color-positive:      #12a060;
-  --color-negative:      #d83030;
-  /* text: neutral on light bg — high is near-black, mid is cool gray */
-  --color-text-high:     #1a2030;
-  --color-text-mid:      #5a6880;
-  --color-text-low:      #9aacc4;
-  --color-muted-bg:      #dce8f8;
-  /* FROST: Plus Jakarta Sans for all UI; Playfair Display only for
-     key monetary figures — one serif touch gives premium banking feel */
+  --color-border:        rgba(0,0,0,0.07);
+  --color-primary:       #191b1f;
+  --color-primary-hover: #000000;
+  --color-accent:        #3748a0;
+  --color-positive:      #186f64;
+  --color-negative:      #ec3d08;
+  --color-warning:       #f8ac53;
+  --color-info:          #536eff;
+  --color-teal:          #0bb58b;
+  --color-text-high:     #191b1f;
+  --color-text-mid:      #5f6368;
+  --color-text-low:      #bfc7c9;
+  --color-muted-bg:      #f2f5fb;
+  /* LETTER: Plus Jakarta Sans clean body + Syne bold display */
   --font-body:    'Plus Jakarta Sans', sans-serif;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Syne', sans-serif;
   --font-figure:  'Playfair Display', serif;
-  --nav-bg:   rgba(240,244,250,0.96);
-  --tab-bg:   rgba(240,244,250,0.98);
-  --ac-bg:    rgba(26,82,212,0.09);
-  --ac-bd:    rgba(26,82,212,0.20);
-  --ac-muted: rgba(26,82,212,0.10);
-  --ac-line:  rgba(26,82,212,0.04);
-  --ac-fill:  rgba(26,82,212,0.60);
-  --ac-glow:  rgba(26,82,212,0.06);
-  --focus-bd: rgba(26,82,212,0.50);
-  --grid-c:   rgba(0,0,0,0.06);
-  --tick-c:   #7a90b8;
+  --nav-bg:   rgba(248,249,251,0.90);
+  --tab-bg:   rgba(248,249,251,0.97);
+  --ac-bg:    rgba(55,72,160,0.06);
+  --ac-bd:    rgba(55,72,160,0.16);
+  --ac-muted: rgba(55,72,160,0.08);
+  --ac-line:  rgba(55,72,160,0.025);
+  --ac-fill:  rgba(55,72,160,0.65);
+  --ac-glow:  rgba(55,72,160,0.06);
+  --focus-bd: rgba(55,72,160,0.40);
+  --grid-c:   rgba(0,0,0,0.028);
+  --tick-c:   #9fabad;
   --radius-card: 16px;
-  /* Light theme: row/table chrome flipped */
-  --row-divider: rgba(0,0,0,0.06);
-  --row-hover:   rgba(0,0,0,0.03);
+  --row-divider: rgba(0,0,0,0.05);
+  --row-hover:   rgba(0,0,0,0.02);
   --track-bg:    rgba(0,0,0,0.06);
-  --pin-bg:      #dce8f8;
+  --pin-bg:      #f2f5fb;
   --pin-card-bg: #ffffff;
-  --pin-shadow:  0 24px 64px rgba(26,82,212,0.13),0 4px 20px rgba(0,0,0,0.09);
+  --pin-shadow:  0px 40px 70px rgba(25,27,31,0.08), 0px 12px 24px rgba(25,27,31,0.05), 0px 2px 4px rgba(25,27,31,0.04);
+}
+
+/* ── CARBON — light-mode structural overrides ─────────────────────── */
+/* Clear phantom dark atmosphere; show only a faint paper grid */
+[data-theme="carbon"] body::before{
+  background-image:
+    linear-gradient(var(--grid-c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-c) 1px,transparent 1px);
+  background-size:52px 52px,52px 52px;
+}
+/* Nav + tab-bar: swap invisible white borders for visible dark ones */
+[data-theme="carbon"] nav{border-bottom:1px solid rgba(0,0,0,0.08);}
+[data-theme="carbon"] .tab-bar{border-top:1px solid rgba(0,0,0,0.08);}
+/* Nav links: visible hover / active on white bg */
+[data-theme="carbon"] .nl:hover{background:rgba(0,0,0,0.05);color:var(--color-text-high);}
+[data-theme="carbon"] .nl.active{background:rgba(55,72,160,0.08);color:var(--color-accent);}
+/* Cards: layered light-shadow system (Letter-inspired) */
+[data-theme="carbon"] .card{
+  box-shadow:
+    0px 1px 1px  rgba(25,27,31,0.05),
+    0px 4px 8px  rgba(25,27,31,0.04),
+    0px 12px 24px rgba(25,27,31,0.04),
+    0px 32px 40px rgba(25,27,31,0.03);
+}
+[data-theme="carbon"] .card:hover{
+  border-color:rgba(0,0,0,0.11);
+  box-shadow:
+    0px 1px 2px  rgba(25,27,31,0.07),
+    0px 8px 20px rgba(25,27,31,0.07),
+    0px 32px 48px rgba(25,27,31,0.06),
+    0px 60px 70px rgba(25,27,31,0.04);
+}
+/* KPI tiles: softer elevation + thicker accent stripe */
+[data-theme="carbon"] .kpi{
+  box-shadow:
+    0px 1px 1px  rgba(25,27,31,0.05),
+    0px 4px 12px rgba(25,27,31,0.06);
+}
+[data-theme="carbon"] .kpi::after{height:3px;}
+/* Score / calc / scenario cards */
+[data-theme="carbon"] .score-card,
+[data-theme="carbon"] .calc-panel,
+[data-theme="carbon"] .scenario{
+  box-shadow:
+    0px 1px 1px  rgba(25,27,31,0.04),
+    0px 4px 12px rgba(25,27,31,0.05);
+}
+/* Confirm modal */
+[data-theme="carbon"] .cfm-box{
+  box-shadow:
+    0px 4px 12px rgba(25,27,31,0.08),
+    0px 20px 48px rgba(25,27,31,0.10);
+}
+/* Insight cards: subtle cobalt tint on light bg */
+[data-theme="carbon"] .insight{background:rgba(55,72,160,0.04);}
+/* Hero: soft blue-tinted gradient anchors the page top like Letter's dark band */
+[data-theme="carbon"] #home{
+  background:linear-gradient(175deg,#eef3ff 0%,var(--color-base) 58%);
+}
+
+/* ── FOREST  ·  organic nature / Seed-inspired / warm light ── */
+[data-theme="forest"]{
+  --color-base:          #fcfcf7;
+  --color-surface:       #ffffff;
+  --color-card:          #ffffff;
+  --color-border:        rgba(28,58,19,0.10);
+  --color-primary:       #1c3a13;
+  --color-primary-hover: #142f0c;
+  --color-accent:        #3d5b34;
+  --color-positive:      #466b22;
+  --color-negative:      #be6140;
+  --color-warning:       #ad9f61;
+  --color-info:          #4d628d;
+  --color-teal:          #71aa89;
+  /* text: warm deep-green on cream — organic, not stark */
+  --color-text-high:     #1c3a13;
+  --color-text-mid:      #61735e;
+  --color-text-low:      #a4b0a1;
+  --color-muted-bg:      #f6f7ef;
+  /* SEED: Jost clean organic grotesque — one font for everything */
+  --font-body:    'Jost', sans-serif;
+  --font-display: 'Jost', sans-serif;
+  --font-figure:  'Jost', sans-serif;
+  --nav-bg:   rgba(252,252,247,0.92);
+  --tab-bg:   rgba(252,252,247,0.97);
+  --ac-bg:    rgba(28,58,19,0.06);
+  --ac-bd:    rgba(28,58,19,0.16);
+  --ac-muted: rgba(28,58,19,0.08);
+  --ac-line:  rgba(28,58,19,0.025);
+  --ac-fill:  rgba(28,58,19,0.65);
+  --ac-glow:  rgba(28,58,19,0.06);
+  --focus-bd: rgba(28,58,19,0.40);
+  --grid-c:   rgba(28,58,19,0.025);
+  --tick-c:   #a4b0a1;
+  --radius-card: 16px;
+  --row-divider: rgba(28,58,19,0.06);
+  --row-hover:   rgba(28,58,19,0.03);
+  --track-bg:    rgba(28,58,19,0.08);
+  --pin-bg:      #f6f7ef;
+  --pin-card-bg: #ffffff;
+  --pin-shadow:  0px 40px 70px rgba(28,58,19,0.08), 0px 12px 24px rgba(28,58,19,0.05), 0px 2px 4px rgba(28,58,19,0.04);
+}
+
+/* ── FOREST — light-mode structural overrides ─────────────────────── */
+/* Clear dark atmosphere; only faint seed-green grid */
+[data-theme="forest"] body::before{
+  background-image:
+    linear-gradient(var(--grid-c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-c) 1px,transparent 1px);
+  background-size:52px 52px,52px 52px;
+}
+/* Nav + tab-bar: green-tinted visible borders */
+[data-theme="forest"] nav{border-bottom:1px solid rgba(28,58,19,0.10);}
+[data-theme="forest"] .tab-bar{border-top:1px solid rgba(28,58,19,0.10);}
+/* Nav links */
+[data-theme="forest"] .nl:hover{background:rgba(28,58,19,0.06);color:var(--color-text-high);}
+[data-theme="forest"] .nl.active{background:rgba(28,58,19,0.08);color:var(--color-accent);}
+/* Cards: layered organic shadow */
+[data-theme="forest"] .card{
+  box-shadow:
+    0px 1px 1px  rgba(28,58,19,0.05),
+    0px 4px 8px  rgba(28,58,19,0.04),
+    0px 12px 24px rgba(28,58,19,0.04),
+    0px 32px 40px rgba(28,58,19,0.03);
+}
+[data-theme="forest"] .card:hover{
+  border-color:rgba(28,58,19,0.16);
+  box-shadow:
+    0px 1px 2px  rgba(28,58,19,0.07),
+    0px 8px 20px rgba(28,58,19,0.07),
+    0px 32px 48px rgba(28,58,19,0.06),
+    0px 60px 70px rgba(28,58,19,0.04);
+}
+/* KPI tiles */
+[data-theme="forest"] .kpi{
+  box-shadow:
+    0px 1px 1px  rgba(28,58,19,0.05),
+    0px 4px 12px rgba(28,58,19,0.06);
+}
+[data-theme="forest"] .kpi::after{height:3px;}
+/* Score / calc / scenario */
+[data-theme="forest"] .score-card,
+[data-theme="forest"] .calc-panel,
+[data-theme="forest"] .scenario{
+  box-shadow:
+    0px 1px 1px  rgba(28,58,19,0.04),
+    0px 4px 12px rgba(28,58,19,0.05);
+}
+/* Modal */
+[data-theme="forest"] .cfm-box{
+  box-shadow:
+    0px 4px 12px rgba(28,58,19,0.08),
+    0px 20px 48px rgba(28,58,19,0.10);
+}
+/* Insight: seed-green tint */
+[data-theme="forest"] .insight{background:rgba(28,58,19,0.04);}
+/* Hero: botanical foam-white gradient — Seed's warm nature top band */
+[data-theme="forest"] #home{
+  background:linear-gradient(175deg,#eff1e4 0%,var(--color-base) 60%);
+}
+
+/* ── SOLAR  ·  SpaceX dark / cinematic / warm-space ─────────────── */
+[data-theme="solar"]{
+  --color-base:          #080806;
+  --color-surface:       #100f0b;
+  --color-card:          #181510;
+  --color-border:        rgba(220,120,40,0.09);
+  --color-primary:       #c45c18;
+  --color-primary-hover: #a84c12;
+  --color-accent:        #e0773a;
+  --color-positive:      #4ec994;
+  --color-negative:      #f05a40;
+  --color-warning:       #e09030;
+  --color-info:          #7eaed4;
+  --color-teal:          #5ab8d0;
+  /* text: warm off-white — SpaceX feel but with orange warmth, not blue */
+  --color-text-high:     rgba(255,248,238,1);
+  --color-text-mid:      rgba(190,170,140,0.70);
+  --color-text-low:      rgba(120,100,70,0.45);
+  --color-muted-bg:      #060504;
+  /* SPACEX: Bebas Neue condensed caps display + Space Grotesk clean tech body */
+  --font-body:    'Space Grotesk', sans-serif;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-figure:  'Space Grotesk', sans-serif;
+  --nav-bg:   rgba(8,8,6,0.92);
+  --tab-bg:   rgba(8,8,6,0.97);
+  --ac-bg:    rgba(196,92,24,0.10);
+  --ac-bd:    rgba(196,92,24,0.22);
+  --ac-muted: rgba(196,92,24,0.12);
+  --ac-line:  rgba(196,92,24,0.022);
+  --ac-fill:  rgba(196,92,24,0.65);
+  --ac-glow:  rgba(196,92,24,0.12);
+  --focus-bd: rgba(196,92,24,0.50);
+  --grid-c:   rgba(255,180,80,0.018);
+  --tick-c:   rgba(190,170,140,0.45);
+  --radius-card: 4px;
+  --row-divider: rgba(255,180,80,0.05);
+  --row-hover:   rgba(255,180,80,0.03);
+  --track-bg:    rgba(255,180,80,0.07);
+  --pin-bg:      #060504;
+  --pin-card-bg: #100f0b;
+  --pin-shadow:  0 40px 80px rgba(0,0,0,0.85), 0 8px 32px rgba(196,92,24,0.15);
+}
+
+/* ── SOLAR — atmospheric overrides ────────────────────────────────── */
+/* Orange atmospheric glow — rocket-fire warmth from top-left */
+[data-theme="solar"] body::before{
+  background-image:
+    radial-gradient(ellipse 65% 50% at 10% -5%, rgba(180,70,0,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 40% at 88% 105%, rgba(220,100,20,0.05) 0%,transparent 50%),
+    linear-gradient(var(--grid-c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-c) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,52px 52px,52px 52px;
+}
+/* Nav/tab borders: very faint warm line like SpaceX's minimal chrome */
+[data-theme="solar"] nav{border-bottom:1px solid rgba(255,180,80,0.08);}
+[data-theme="solar"] .tab-bar{border-top:1px solid rgba(255,180,80,0.08);}
+/* Nav links */
+[data-theme="solar"] .nl:hover{background:rgba(255,180,80,0.06);color:var(--color-text-high);}
+[data-theme="solar"] .nl.active{background:rgba(196,92,24,0.12);color:var(--color-accent);}
+/* Bebas Neue section titles: loosen tracking (condensed font needs breathing room) */
+[data-theme="solar"] .stitle{letter-spacing:.04em;}
+/* Hero: faint orange upper-glow like launch pad at night */
+[data-theme="solar"] #home{
+  background:radial-gradient(ellipse 100% 80% at 30% -20%,rgba(180,70,0,0.07) 0%,transparent 60%);
+}
+
+/* ── ARCTIC  ·  JP Morgan prestige / platinum private banking ──────── */
+[data-theme="arctic"]{
+  --color-base:          #fafaf8;
+  --color-surface:       #f5f5f3;
+  --color-card:          #ffffff;
+  --color-border:        rgba(0,0,0,0.07);
+  --color-primary:       #0d0d0b;
+  --color-primary-hover: #2a2a28;
+  --color-accent:        #0e1f3d;
+  --color-positive:      #1a5c3a;
+  --color-negative:      #c42b2b;
+  --color-warning:       #8b6914;
+  --color-info:          #1a3a6b;
+  --color-teal:          #2a7a5a;
+  /* text: near-black on platinum — authority through contrast */
+  --color-text-high:     #0d0d0b;
+  --color-text-mid:      #5a5a56;
+  --color-text-low:      #9a9a94;
+  --color-muted-bg:      #f5f5f3;
+  /* JP MORGAN: Cormorant Garamond display + figures (luxury editorial serif);
+     Plus Jakarta Sans for body (clean institutional sans) */
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-figure:  'Cormorant Garamond', serif;
+  --nav-bg:   rgba(250,250,248,0.97);
+  --tab-bg:   rgba(250,250,248,0.99);
+  --ac-bg:    rgba(14,31,61,0.05);
+  --ac-bd:    rgba(14,31,61,0.15);
+  --ac-muted: rgba(14,31,61,0.07);
+  --ac-line:  rgba(0,0,0,0.018);
+  --ac-fill:  rgba(14,31,61,0.65);
+  --ac-glow:  rgba(14,31,61,0.05);
+  --focus-bd: rgba(14,31,61,0.40);
+  --grid-c:   rgba(0,0,0,0.018);
+  --tick-c:   #9a9a94;
+  --radius-card: 2px;
+  --row-divider: rgba(0,0,0,0.06);
+  --row-hover:   rgba(0,0,0,0.025);
+  --track-bg:    rgba(0,0,0,0.06);
+  --pin-bg:      #f5f5f3;
+  --pin-card-bg: #ffffff;
+  --pin-shadow:  0 60px 100px rgba(0,0,0,0.07), 0 12px 32px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+}
+
+/* ── ARCTIC — platinum prestige structural overrides ──────────────── */
+/* No atmospheric gradients — restraint IS the luxury. Pure grid only. */
+[data-theme="arctic"] body::before{
+  background-image:
+    linear-gradient(var(--grid-c) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-c) 1px,transparent 1px);
+  background-size:52px 52px,52px 52px;
+}
+/* Nav + tab: hairline black borders, institutional */
+[data-theme="arctic"] nav{border-bottom:1px solid rgba(0,0,0,0.08);}
+[data-theme="arctic"] .tab-bar{border-top:1px solid rgba(0,0,0,0.08);}
+/* Nav links: barely-there hover, deep navy active */
+[data-theme="arctic"] .nl:hover{background:rgba(0,0,0,0.04);color:var(--color-text-high);}
+[data-theme="arctic"] .nl.active{background:rgba(14,31,61,0.07);color:var(--color-accent);}
+/* Cards: featherlight layered shadows — prestigious not showy */
+[data-theme="arctic"] .card{
+  box-shadow:
+    0px 1px 1px  rgba(0,0,0,0.03),
+    0px 4px 8px  rgba(0,0,0,0.03),
+    0px 12px 24px rgba(0,0,0,0.025),
+    0px 32px 40px rgba(0,0,0,0.018);
+}
+[data-theme="arctic"] .card:hover{
+  border-color:rgba(0,0,0,0.10);
+  box-shadow:
+    0px 1px 2px  rgba(0,0,0,0.05),
+    0px 8px 20px rgba(0,0,0,0.05),
+    0px 32px 48px rgba(0,0,0,0.04),
+    0px 60px 70px rgba(0,0,0,0.025);
+}
+/* KPI tiles */
+[data-theme="arctic"] .kpi{
+  box-shadow:
+    0px 1px 1px  rgba(0,0,0,0.03),
+    0px 4px 12px rgba(0,0,0,0.04);
+}
+[data-theme="arctic"] .kpi::after{height:3px;}
+/* Score / calc / scenario panels */
+[data-theme="arctic"] .score-card,
+[data-theme="arctic"] .calc-panel,
+[data-theme="arctic"] .scenario{
+  box-shadow:
+    0px 1px 1px  rgba(0,0,0,0.03),
+    0px 4px 12px rgba(0,0,0,0.04);
+}
+/* Confirm modal */
+[data-theme="arctic"] .cfm-box{
+  box-shadow:
+    0px 4px 12px rgba(0,0,0,0.06),
+    0px 20px 48px rgba(0,0,0,0.08);
+}
+/* Insight cards: barely-there navy tint */
+[data-theme="arctic"] .insight{background:rgba(14,31,61,0.03);}
+/* Hero: platinum-to-white, nothing more */
+[data-theme="arctic"] #home{
+  background:linear-gradient(175deg,#f0f0ec 0%,var(--color-base) 60%);
+}
+/* Cormorant section titles: open tracking, medium weight — editorial luxury */
+[data-theme="arctic"] .stitle{
+  letter-spacing:.08em;
+  font-weight:600;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
-body{background:var(--bg);color:var(--t);font-family:var(--font-body);font-size:13px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--ac-line) 1px,transparent 1px),linear-gradient(90deg,var(--ac-line) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;}
+body{background:var(--bg);color:var(--t);font-family:var(--font-body);font-size:14px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;letter-spacing:.01em;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse 70% 55% at 8% 0%,rgba(52,97,239,0.05) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 92% 100%,rgba(123,158,248,0.04) 0%,transparent 50%),linear-gradient(var(--ac-line) 1px,transparent 1px),linear-gradient(90deg,var(--ac-line) 1px,transparent 1px);background-size:100% 100%,100% 100%,52px 52px,52px 52px;pointer-events:none;z-index:0;}
 .wrap{max-width:1300px;margin:0 auto;padding:0 16px;position:relative;z-index:1;}
 @media(min-width:768px){.wrap{padding:0 24px;}}
 
@@ -294,52 +533,52 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .pin-hint{font-size:10px;color:var(--m);margin-top:16px;font-family:var(--font-body);opacity:.7;}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--b);}
-.nav-inner{max-width:1300px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:52px;gap:8px;}
+nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(28px) saturate(1.5);border-bottom:1px solid rgba(255,255,255,0.05);}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;gap:8px;}
 @media(min-width:768px){.nav-inner{padding:0 24px;}}
-.nav-logo{font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:.06em;color:var(--ac2);white-space:nowrap;flex-shrink:0;}
-.nav-logo span{color:var(--m);font-weight:400;}
+.nav-logo{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.04em;color:var(--t);white-space:nowrap;flex-shrink:0;}
+.nav-logo span{color:var(--ac2);font-weight:400;}
 
 /* Bottom tab bar for mobile */
-.tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--tab-bg);backdrop-filter:blur(20px);border-top:1px solid var(--b);padding:8px 0 calc(8px + env(safe-area-inset-bottom));justify-content:space-around;scrollbar-width:none;}
+.tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--tab-bg);backdrop-filter:blur(28px) saturate(1.5);border-top:1px solid rgba(255,255,255,0.05);padding:8px 0 calc(8px + env(safe-area-inset-bottom));justify-content:space-around;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
 /* When more tabs than fit comfortably, scroll horizontally */
 .tab-bar.overflow{justify-content:flex-start;overflow-x:auto;padding-left:8px;padding-right:8px;gap:0;}
 @media(max-width:767px){.tab-bar{display:flex;} body{padding-bottom:72px;} nav .nav-links{display:none;}}
-.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 10px;cursor:pointer;border:none;background:none;color:var(--m);font-family:var(--font-body);font-size:9px;letter-spacing:.04em;text-transform:uppercase;min-width:52px;flex-shrink:0;transition:color .15s;}
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 10px;cursor:pointer;border:none;background:none;color:var(--m);font-family:var(--font-body);font-size:9px;letter-spacing:.06em;text-transform:uppercase;min-width:52px;flex-shrink:0;transition:color .2s;}
 .tab-item.active{color:var(--ac2);}
-.tab-icon{font-size:18px;line-height:1;}
+.tab-icon{font-size:19px;line-height:1;}
 
 /* Desktop nav links */
 .nav-links{display:flex;gap:2px;flex-wrap:nowrap;overflow-x:auto;}
-.nl{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:500;color:var(--m);cursor:pointer;transition:all .15s;border:none;background:none;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
-.nl:hover{color:var(--t);background:var(--bg3);}
+.nl{padding:6px 12px;border-radius:8px;font-size:10px;font-weight:600;color:var(--m);cursor:pointer;transition:all .2s;border:none;background:none;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+.nl:hover{color:var(--t);background:rgba(255,255,255,0.05);}
 .nl.active{color:var(--ac2);background:var(--ac-muted);}
 .nb{background:var(--gr);color:#000;font-size:9px;padding:1px 4px;border-radius:3px;margin-left:3px;font-weight:700;}
 
 /* SECTIONS */
-.section{padding:40px 0;border-bottom:1px solid var(--b);}
-@media(min-width:768px){.section{padding:52px 0;}}
-.section-header{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
-.snum{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ac2);background:var(--ac-bg);border:1px solid var(--ac-bd);padding:3px 9px;border-radius:4px;flex-shrink:0;}
-.stitle{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.01em;}
-@media(min-width:768px){.stitle{font-size:21px;}}
-.ssub{font-size:11px;color:var(--m);margin-bottom:18px;}
+.section{padding:52px 0;border-bottom:1px solid var(--b);}
+@media(min-width:768px){.section{padding:72px 0;}}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:8px;}
+.snum{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ac2);background:var(--ac-bg);border:1px solid var(--ac-bd);padding:4px 10px;border-radius:20px;flex-shrink:0;}
+.stitle{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;}
+@media(min-width:768px){.stitle{font-size:32px;letter-spacing:-.03em;}}
+.ssub{font-size:12px;color:var(--m);margin-bottom:22px;letter-spacing:.01em;}
 
 /* CARDS */
-.card{background:var(--bg2);border:1px solid var(--b);border-radius:14px;padding:16px;transition:border-color .2s;}
-@media(min-width:768px){.card{padding:22px;}}
-.card:hover{border-color:var(--b2);}
-.ct{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--m);margin-bottom:12px;}
+.card{background:var(--bg2);border:1px solid var(--b);border-radius:20px;padding:20px;transition:border-color .25s,box-shadow .25s;box-shadow:0 2px 12px rgba(0,0,0,0.3),0 1px 3px rgba(0,0,0,0.2);}
+@media(min-width:768px){.card{padding:24px;}}
+.card:hover{border-color:rgba(255,255,255,0.09);box-shadow:0 4px 24px rgba(0,0,0,0.4),0 1px 4px rgba(0,0,0,0.3);}
+.ct{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--m);margin-bottom:14px;font-weight:600;}
 
 /* KPI */
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-@media(min-width:600px){.kpi-grid{grid-template-columns:repeat(4,1fr);gap:10px;}}
-.kpi{background:var(--bg2);border:1px solid var(--b);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:all .2s;}
-.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--ac));border-radius:12px 12px 0 0;}
-.kpi-l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);margin-bottom:5px;}
-.kpi-v{font-family:var(--font-figure);font-size:20px;font-weight:700;color:var(--t);line-height:1;margin-bottom:4px;}
-@media(min-width:768px){.kpi-v{font-size:26px;}}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(min-width:600px){.kpi-grid{grid-template-columns:repeat(4,1fr);gap:12px;}}
+.kpi{background:var(--bg2);border:1px solid var(--b);border-radius:18px;padding:18px 16px;position:relative;overflow:hidden;transition:all .25s;box-shadow:0 2px 8px rgba(0,0,0,0.25);}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--kc,var(--ac)),transparent);border-radius:18px 18px 0 0;}
+.kpi-l{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin-bottom:8px;font-weight:600;}
+.kpi-v{font-family:var(--font-figure);font-size:22px;font-weight:800;color:var(--t);line-height:1;margin-bottom:5px;}
+@media(min-width:768px){.kpi-v{font-size:30px;}}
 .kpi-s{font-size:10px;color:var(--m);}
 .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;margin-top:3px;}
 .bg{background:rgba(34,212,122,0.12);color:var(--gr);}
@@ -352,9 +591,11 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 @media(min-width:768px){.g2{grid-template-columns:1fr 1fr;gap:14px;}}
 .g3{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 @media(min-width:900px){.g3{grid-template-columns:1fr 1fr 1fr;}}
+.mc-sliders-row{display:flex;gap:10px;margin-bottom:14px;}
 .g64{display:grid;grid-template-columns:1fr;gap:12px;}
 @media(min-width:900px){.g64{grid-template-columns:1.5fr 1fr;gap:14px;}}
-.chart-wrap{position:relative;width:100%;}
+.g2>*,.g3>*,.g64>*,.calc-grid>*{min-width:0;}
+.chart-wrap{position:relative;width:100%;overflow:hidden;}
 
 /* NW BAR */
 .nw-track{height:8px;background:var(--track-bg);border-radius:4px;overflow:hidden;margin:8px 0 5px;}
@@ -400,7 +641,7 @@ tbody tr td{padding:9px 10px;font-size:12px;white-space:nowrap;}
 
 /* CALCULATOR */
 .calc-grid{display:grid;grid-template-columns:1fr;gap:16px;}
-@media(min-width:768px){.calc-grid{grid-template-columns:1fr 1fr;gap:20px;}}
+@media(min-width:900px){.calc-grid{grid-template-columns:1fr 1fr;gap:20px;}}
 .calc-panel{background:var(--bg3);border:1px solid var(--b);border-radius:14px;padding:16px;}
 @media(min-width:768px){.calc-panel{padding:20px;}}
 .sl-group{margin-bottom:16px;}
@@ -479,7 +720,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 <!-- PIN LOCK SCREEN -->
 <div id="pinScreen" style="position:fixed;inset:0;background:var(--pin-bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;">
   <div class="pin-card fu">
-    <div class="pin-title" id="pinTitle">DFG Finance</div>
+    <div class="pin-title" id="pinTitle"><span style="font-weight:400;margin-right:6px">Φ</span>DF</div>
     <div class="pin-sub">Ingresa tu PIN para continuar</div>
     <div id="pinDots" class="pin-dots-row">
       <div class="pin-dot"></div><div class="pin-dot"></div>
@@ -511,14 +752,14 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 
 <nav>
   <div class="nav-inner">
-    <div class="nav-logo" id="navLogo">DFG<span>.finance</span></div>
+    <div class="nav-logo" id="navLogo"><span style="opacity:0.75;margin-right:3px">Φ</span>Finanzas<span style="opacity:0.6;margin-left:5px">DF</span></div>
     <div class="nav-links">
       <button class="nl active" data-nav-module="home" onclick="goTo('home')">Inicio</button>
       <button class="nl" data-nav-module="diario" onclick="goTo('diario')">Diario <span class="nb">VIVO</span></button>
-      <button class="nl" data-nav-module="historial" onclick="goTo('historial')">Historial</button>
       <button class="nl" data-nav-module="overview" onclick="goTo('overview')">Resumen</button>
       <button class="nl" data-nav-module="flujo" onclick="goTo('flujo')">Flujo</button>
       <button class="nl" data-nav-module="gastos" onclick="goTo('gastos')">Gastos</button>
+      <button class="nl" data-nav-module="historial" onclick="goTo('historial')">Historial</button>
       <button class="nl" data-nav-module="proyeccion" onclick="goTo('proyeccion')">50M</button>
       <button class="nl" data-nav-module="mes_perfecto" onclick="goTo('perfecto')">Mes Perfecto</button>
       <button class="nl" data-nav-module="montecarlo" onclick="goTo('montecarlo')">Portafolios</button>
@@ -856,16 +1097,16 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
     </div>
 
     <!-- Controls -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" data-module="montecarlo" data-feature="sliders">
-      <div style="background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
+    <div class="mc-sliders-row" data-module="montecarlo" data-feature="sliders">
+      <div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
         <label style="font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px">Capital inicial <span id="mcCapV" style="color:var(--ac2);font-family:var(--font-display);font-size:14px;font-weight:700">$5M</span></label>
         <input type="range" min="1000000" max="30000000" step="500000" value="5000000" id="mcCap" oninput="updateMC()" style="width:100%;accent-color:var(--ac2)">
       </div>
-      <div style="background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
+      <div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
         <label style="font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px">Aporte mensual <span id="mcAporteV" style="color:var(--ac2);font-family:var(--font-display);font-size:14px;font-weight:700">$500K</span></label>
         <input type="range" min="0" max="10000000" step="100000" value="500000" id="mcAporte" oninput="updateMC()" style="width:100%;accent-color:var(--ac2)">
       </div>
-      <div style="background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
+      <div style="flex:1;min-width:0;background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:14px">
         <label style="font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px">Horizonte <span id="mcYearsV" style="color:var(--ac2);font-family:var(--font-display);font-size:14px;font-weight:700">5 años</span></label>
         <input type="range" min="1" max="20" step="1" value="5" id="mcYears" oninput="updateMC()" style="width:100%;accent-color:var(--ac2)">
       </div>
@@ -974,7 +1215,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 
 <footer style="padding:24px 0;text-align:center;font-size:11px;color:var(--m);border-top:1px solid var(--b);">
   <div class="wrap">
-    <div style="margin-bottom:5px"><span id="footerApp">DFG Finance OS</span> · <span id="footerTs"></span></div>
+    <div style="margin-bottom:5px"><span id="footerApp">Φ Finanzas DF</span> · <span id="footerTs"></span></div>
     <div style="color:var(--m2)">Supabase PostgreSQL · Datos en tiempo real</div>
   </div>
 </footer>
@@ -1014,8 +1255,8 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 // ══════════════════════════════════════════════════════════
 //  CONFIG — Supabase hardcoded
 // ══════════════════════════════════════════════════════════
-const SB_URL = 'https://sdtfvwfsqscqdrydauyq.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkdGZ2d2ZzcXNjcWRyeWRhdXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNzI0NjQsImV4cCI6MjA4OTg0ODQ2NH0.6KEZtxdomalt1ybRKKA88jXPqZ0XyvbOwlJykIPtXU8';
+const SB_URL = 'https://vfhqrbadrnwmlncvlirn.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaHFyYmFkcm53bWxuY3ZsaXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NTI1MzksImV4cCI6MjA4OTEyODUzOX0.eQI1Qy2oxjqiC_YV7NzGX4OIkk2MZ9DzkW3mn0qEwgs';
 
 // ══════════════════════════════════════════════════════════
 //  SUPABASE CLIENT
@@ -1172,7 +1413,7 @@ const DEFAULT_CFG = {
     multi_currency:{enabled:false},
     ai_summary:{enabled:false},
   },
-  nav:{mobile_tabs:['home','flujo','diario','mes_perfecto','montecarlo','predictor']},
+  nav:{mobile_tabs:['home','overview','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','insights']},
 };
 
 // Feature flag helper — returns true unless explicitly set to false
@@ -1314,11 +1555,13 @@ function buildTabBar(cfg){
   bar.innerHTML='';
   const mods=cfg.modules||{};
 
-  // Build ordered key list: home first · diario second · insights always last
+  // Build ordered key list: respect nav.mobile_tabs if configured, else all enabled
+  const allowedTabs = cfg.nav?.mobile_tabs;
   const FIRST  = ['home','diario'];
   const LAST   = ['insights'];
   const middle = Object.keys(mods).filter(k=>![...FIRST,...LAST].includes(k));
-  const ordered = [...FIRST, ...middle, ...LAST];
+  const allOrdered = [...FIRST, ...middle, ...LAST];
+  const ordered = allowedTabs ? allOrdered.filter(k=>allowedTabs.includes(k)) : allOrdered;
 
   ordered.forEach(key=>{
     const mod=mods[key];
@@ -1570,7 +1813,7 @@ function renderGastos() {
   if(feat('gastos','category_donut')){
     const pieWrap=document.getElementById('cPieWrap');
     if(pieWrap) pieWrap.style.height=isMobile?'220px':'160px';
-    mkCh('cPie',{type:'doughnut',data:{labels:cats.map(c=>c[0]),datasets:[{data:cats.map(c=>c[1]),backgroundColor:cats.map(c=>resolveCatColor(c[0])),borderColor:cssVar('--color-surface')||'#0e0f15',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:isMobile?'bottom':'right',labels:{boxWidth:9,font:{size:10},padding:isMobile?6:10}}}}});
+    mkCh('cPie',{type:'doughnut',data:{labels:cats.map(c=>c[0]),datasets:[{data:cats.map(c=>c[1]),backgroundColor:cats.map(c=>resolveCatColor(c[0])),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:isMobile?'bottom':'right',labels:{boxWidth:9,font:{size:10},padding:isMobile?6:10}}}}});
   }
   const m=DB.monthly;
   if(feat('gastos','monthly_limit_chart')){
@@ -1916,20 +2159,11 @@ function renderPerfecto() {
   const MONTHLY_RATE_CF = USER_APY/12;
   const curReal = DB.curBal;
 
-  // DEBUG: log exactly what buildMonthly sees for each month
-  console.log('=== COUNTERFACTUAL DEBUG ===');
-  DB.monthly.forEach(m=>{
-    console.log(`${m.month} ${m.year}: income=${m.income.toLocaleString()} expenses=${m.expenses.toLocaleString()} overspend=${Math.max(0,m.expenses-REALISTIC).toLocaleString()}`);
-  });
-  console.log('DB.all count:', DB.all.length);
-  console.log('DB.expenses count:', DB.expenses.length);
   const expByMonth={};
   DB.expenses.forEach(t=>{
     const k=`${t.year}-${t.month}`;
     expByMonth[k]=(expByMonth[k]||0)+t.amount;
   });
-  console.log('Raw expenses from DB.expenses:');
-  Object.entries(expByMonth).sort().forEach(([k,v])=>console.log(` ${k}: ${v.toLocaleString()}`));
 
   // Start from actual opening balance (Nov 2025 snapshot)
   const OPENING_BAL = DB.balances.length ? DB.balances[0].balance : 0;
@@ -2577,46 +2811,59 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     const pdfTheme = liveCFG?.client?.branding?.theme ||
                      document.documentElement.getAttribute('data-theme') || 'phantom';
     const PDF_THEMES = {
+      // ── PHANTOM · deep violet / midnight ─────────────────────────────
       phantom: {
         PU:[124, 92,252], DK:[  8,  9, 16], DK2:[ 20, 22, 38],
-        NK:[220,218,240], GY:[ 96,100,140], LG:[ 40, 44, 80],
-        AL:[ 14, 16, 30], WH:[255,255,255], TL:[124, 92,252],
-        AU:[ 96,100,140], PB:[ 14, 16, 32],
-        GR:[ 34,180,100], RD:[220, 65, 65], EXP:[229,213,192], dark:true,
+        NK:[220,218,240], GY:[ 96,100,140], LG:[ 36, 40, 76],
+        AL:[ 13, 15, 28], WH:[255,255,255], TL:[100,200,255],
+        AU:[ 80, 85,120], PB:[ 14, 16, 32],
+        GR:[ 34,180,100], RD:[220, 65, 65], EXP:[190,175,240],
+        dark:true, font:'helvetica', stripe:4,   banner:'solid',
       },
+      // ── CARBON · Letter.co light / cobalt private banking ────────────
       carbon: {
-        PU:[212,168, 67], DK:[  4,  4,  4], DK2:[ 23, 23, 23],
-        NK:[226,223,216], GY:[122,118,114], LG:[ 50, 46, 30],
-        AL:[ 18, 17, 14], WH:[255,255,255], TL:[240,200, 74],
-        AU:[100, 95, 90], PB:[ 20, 19, 15],
-        GR:[ 45,209,134], RD:[232, 64, 64], EXP:[229,213,192], dark:true,
+        PU:[ 55, 72,160],  DK:[255,255,255], DK2:[248,249,251],
+        NK:[ 25, 27, 31],  GY:[ 95, 99,108], LG:[210,215,225],
+        AL:[243,245,248],  WH:[255,255,255], TL:[ 11,181,139],
+        AU:[150,155,165],  PB:[248,249,251],
+        GR:[ 24,111,100],  RD:[236, 61,  8], EXP:[180, 60, 20],
+        dark:false, font:'helvetica', stripe:3.5, banner:'solid',
       },
+      // ── FOREST · Seed.com organic / warm cream + deep green ──────────
       forest: {
-        PU:[ 29,184,106], DK:[  6, 13,  9], DK2:[ 17, 36, 24],
-        NK:[221,232,226], GY:[ 94,114,102], LG:[ 30, 58, 40],
-        AL:[ 13, 28, 18], WH:[255,255,255], TL:[ 93,224,155],
-        AU:[ 80,100, 88], PB:[ 13, 30, 20],
-        GR:[ 93,224,155], RD:[255,107, 85], EXP:[200,240,215], dark:true,
+        PU:[ 61, 91, 52],  DK:[252,252,247], DK2:[246,247,239],
+        NK:[ 28, 58, 19],  GY:[ 97,115, 94], LG:[196,212,196],
+        AL:[242,244,236],  WH:[255,255,255], TL:[113,170,137],
+        AU:[160,175,157],  PB:[246,247,239],
+        GR:[ 70,107, 34],  RD:[190, 97, 64], EXP:[160, 75, 45],
+        dark:false, font:'helvetica', stripe:3.5, banner:'solid',
       },
+      // ── SOLAR · SpaceX cinematic / near-black + warm orange ──────────
       solar: {
-        PU:[224,144, 48], DK:[ 12,  9,  0], DK2:[ 32, 26, 14],
-        NK:[232,226,212], GY:[122,110, 88], LG:[ 50, 40, 16],
-        AL:[ 20, 16,  8], WH:[255,255,255], TL:[240,184, 74],
-        AU:[100, 88, 65], PB:[ 24, 18,  8],
-        GR:[ 72,216,152], RD:[240, 80, 80], EXP:[229,213,192], dark:true,
+        PU:[196, 92, 24],  DK:[  8,  8,  6], DK2:[ 24, 20, 14],
+        NK:[240,234,222],  GY:[150,130,100], LG:[ 48, 38, 22],
+        AL:[ 14, 12,  8],  WH:[255,248,238], TL:[ 90,184,208],
+        AU:[ 95, 80, 58],  PB:[ 16, 14,  8],
+        GR:[ 78,201,148],  RD:[240, 90, 64], EXP:[224,119, 58],
+        dark:true, font:'helvetica', stripe:4,   banner:'solid',
       },
+      // ── ARCTIC · JP Morgan prestige / platinum white + midnight navy ──
+      // Serif (times), hairline stripe, editorial section headers
       arctic: {
-        PU:[ 26, 82,212], DK:[255,255,255], DK2:[232,238,248],
-        NK:[ 26, 32, 48], GY:[ 90,104,128], LG:[200,216,240],
-        AL:[235,244,255], WH:[255,255,255], TL:[ 74,128,240],
-        AU:[120,130,150], PB:[245,250,255],
-        GR:[ 18,160, 96], RD:[216, 48, 48], EXP:[216, 48, 48], dark:false,
+        PU:[ 14, 31, 61],  DK:[250,250,248], DK2:[245,245,243],
+        NK:[ 13, 13, 11],  GY:[ 88, 88, 84], LG:[208,208,203],
+        AL:[238,238,235],  WH:[255,255,255], TL:[ 42,122, 90],
+        AU:[148,148,142],  PB:[245,245,243],
+        GR:[ 26, 92, 58],  RD:[196, 43, 43], EXP:[160, 32, 32],
+        dark:false, font:'times', stripe:1.2, banner:'editorial',
       },
     };
     const _PAL = PDF_THEMES[pdfTheme] || PDF_THEMES.phantom;
     const PU=_PAL.PU, DK=_PAL.DK, DK2=_PAL.DK2, NK=_PAL.NK, GY=_PAL.GY;
     const LG=_PAL.LG, AL=_PAL.AL, WH=_PAL.WH, TL=_PAL.TL, AU=_PAL.AU, PB=_PAL.PB;
     const GR=_PAL.GR, RD=_PAL.RD;
+    const FONT   = _PAL.font   || 'helvetica'; // 'times' for arctic, 'helvetica' for others
+    const STRIPE = _PAL.stripe ?? 3.5;         // left accent bar width in mm
 
     // Date helpers
     const genDate = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
@@ -2643,12 +2890,12 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       // Fill page background — critical for dark themes (arctic DK=white = no-op)
       doc.setFillColor(...DK); doc.rect(0, 0, W, H, 'F');
       // Left accent stripe — matches cover
-      doc.setFillColor(...PU); doc.rect(0, 0, 3.5, H, 'F');
+      doc.setFillColor(...PU); doc.rect(0, 0, STRIPE, H, 'F');
       doc.setDrawColor(...PU); doc.setLineWidth(0.7);
       doc.line(ML, 7, W-MR, 7);
-      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...PU);
+      doc.setFont(FONT,'bold'); doc.setFontSize(7.5); doc.setTextColor(...PU);
       doc.text(appTitle, ML, 12.5);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...GY);
+      doc.setFont(FONT,'normal'); doc.setFontSize(7.5); doc.setTextColor(...GY);
       doc.text(genDate, W-MR, 12.5, {align:'right'});
       doc.setDrawColor(...LG); doc.setLineWidth(0.25);
       doc.line(ML, H-9, W-MR, H-9);
@@ -2674,18 +2921,28 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     // Open a new section page, return y cursor after banner
     function newSection(key) {
       doc.addPage(); pageN++;
-      addHF(); // fills full-page bg + left stripe (0→3.5mm)
-      // Banner starts at 3.5 (after stripe) so it never overlaps the accent bar
-      // Dark themes: DK2 is clearly distinct from DK — light themes: use PU so WH text is visible
-      const bannerBg = _PAL.dark ? DK2 : PU;
-      doc.setFillColor(...bannerBg); doc.rect(3.5, 15, W - 3.5, 21, 'F');
-      // Redraw stripe on top to keep it sharp over the banner seam
-      doc.setFillColor(...PU); doc.rect(0, 15, 3.5, 21, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...WH);
-      doc.text(SLBL[key] || key.toUpperCase(), ML + 7, 28.5);
-      // Icon color: WH on PU banner (arctic) or PU on DK2 banner (dark themes)
-      doc.setFontSize(12); doc.setTextColor(...(_PAL.dark ? PU : WH));
-      doc.text(SICO[key]||'·', W - MR, 28.5, {align:'right'});
+      addHF();
+
+      if (_PAL.banner === 'editorial') {
+        // Arctic: editorial style — large serif section marker + thin rule
+        const lbl = SLBL[key] || key.toUpperCase();
+        const [numPart, ...rest] = lbl.split(' \xB7 ');
+        doc.setFont(FONT,'italic'); doc.setFontSize(22); doc.setTextColor(...PU);
+        doc.text(numPart.trim(), ML + STRIPE + 3, 25);
+        doc.setFont(FONT,'normal'); doc.setFontSize(9); doc.setTextColor(...GY);
+        doc.text((rest.join(' \xB7 ')||'').toUpperCase(), ML + STRIPE + 3, 33);
+        doc.setDrawColor(...LG); doc.setLineWidth(0.35);
+        doc.line(ML, 37, W - MR, 37);
+      } else {
+        // All other themes: filled banner bar
+        const bannerBg = _PAL.dark ? DK2 : PU;
+        doc.setFillColor(...bannerBg); doc.rect(STRIPE, 15, W - STRIPE, 21, 'F');
+        doc.setFillColor(...PU); doc.rect(0, 15, STRIPE, 21, 'F');
+        doc.setFont(FONT,'bold'); doc.setFontSize(11); doc.setTextColor(...WH);
+        doc.text(SLBL[key] || key.toUpperCase(), ML + 7, 28.5);
+        doc.setFontSize(12); doc.setTextColor(...(_PAL.dark ? PU : WH));
+        doc.text(SICO[key]||'·', W - MR, 28.5, {align:'right'});
+      }
       return 44;
     }
 
@@ -2699,9 +2956,9 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
         doc.roundedRect(x, y, bw, 22, 2, 2, 'FD');
         // top gold accent bar (full width, thin)
         doc.setFillColor(...PU); doc.rect(x, y, bw, 2, 'F');
-        doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(...GY);
+        doc.setFont(FONT,'normal'); doc.setFontSize(6.5); doc.setTextColor(...GY);
         doc.text((k.label||'').toUpperCase(), cx, y+9, {align:'center'});
-        doc.setFont('helvetica','bold'); doc.setFontSize(12);
+        doc.setFont(FONT,'bold'); doc.setFontSize(12);
         doc.setTextColor(...(k.neg ? RD : k.pos ? GR : PU));
         doc.text(String(k.val), cx, y+18, {align:'center'});
       });
@@ -2714,17 +2971,48 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
         startY, head, body,
         margin: { left:ML, right:MR, top:19, bottom:14 },
         styles: {
-          font:'helvetica', fontSize:8.5,
+          font:FONT, fontSize:8.5,
           cellPadding:{top:3.5, right:5, bottom:3.5, left:5},
-          textColor:NK, lineColor:LG, lineWidth:0.2,
-          fillColor:DK2,  // explicit bg on every row — prevents white default on dark themes
+          textColor:NK, lineWidth:0,  // no cell borders — cleaner, avoids rendering artefacts
+          fillColor:DK2,
         },
         headStyles: { fillColor:PU, textColor:WH, fontStyle:'bold', fontSize:9 },
         alternateRowStyles: { fillColor:AL },
         columnStyles: colStyles,
-        didAddPage: () => { pageN++; addHF(); },
+        didAddPage: () => {
+          pageN++;
+          // Fill page background before cells — critical for dark themes
+          doc.setFillColor(...DK); doc.rect(0, 0, W, H, 'F');
+        },
+        // Redraw ALL header + footer decorations AFTER cells on every page.
+        // Safe because header (y ≤ 13) and footer (y ≥ H-9) never overlap
+        // the cell zone (margin.top=19 → margin.bottom=14).
+        // This guarantees decorations are always visible regardless of whether
+        // didAddPage fired correctly.
+        didDrawPage: (data) => {
+          const fy = (data.cursor && data.cursor.y != null) ? data.cursor.y : H - 14;
+          // Fill tail below last row with page background
+          if (fy < H - 1) {
+            doc.setFillColor(...DK); doc.rect(0, fy, W, H - fy, 'F');
+          }
+          // Left accent stripe — full height, safe to overdraw (no cells at x < 14)
+          doc.setFillColor(...PU); doc.rect(0, 0, STRIPE, H, 'F');
+          // Header line + branding
+          doc.setDrawColor(...PU); doc.setLineWidth(0.7);
+          doc.line(ML, 7, W-MR, 7);
+          doc.setFont(FONT,'bold'); doc.setFontSize(7.5); doc.setTextColor(...PU);
+          doc.text(appTitle, ML, 12.5);
+          doc.setFont(FONT,'normal'); doc.setFontSize(7.5); doc.setTextColor(...GY);
+          doc.text(genDate, W-MR, 12.5, {align:'right'});
+          // Footer line + page number
+          doc.setDrawColor(...LG); doc.setLineWidth(0.25);
+          doc.line(ML, H-9, W-MR, H-9);
+          doc.setFontSize(7.5); doc.setTextColor(...GY);
+          doc.text(String(pageN), W/2, H-5, {align:'center'});
+          doc.text(`Confidencial \xB7 ${clientName}`, W-MR, H-5, {align:'right'});
+        },
         didDrawCell: (d) => {
-          // Purple left accent on header rows
+          // Accent bar on first header column
           if (d.row.section==='head' && d.column.index===0) {
             doc.setFillColor(...PU);
             doc.rect(d.cell.x, d.cell.y, 2.5, d.cell.height, 'F');
@@ -2757,7 +3045,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     doc.setFillColor(...DK); doc.rect(0, 0, W, H, 'F');
 
     // Left accent stripe — premium report style
-    doc.setFillColor(...PU); doc.rect(0, 0, 3.5, H, 'F');
+    doc.setFillColor(...PU); doc.rect(0, 0, STRIPE, H, 'F');
 
     // ── PHI Φ logo — geometric (circle + vertical line) inside badge ──
     const lgX = ML + 8, lgY = 16, lgS = 30;
@@ -2770,20 +3058,20 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     doc.line(lcx, lcy - lcr - 3.5, lcx, lcy + lcr + 3.5);
 
     // ── Main title — two-line, large ─────────────────────────────────
-    doc.setFont('helvetica','bold'); doc.setFontSize(40); doc.setTextColor(...NK);
+    doc.setFont(FONT,'bold'); doc.setFontSize(40); doc.setTextColor(...NK);
     doc.text('Estado', ML + 8, 82);
     doc.text('Financiero', ML + 8, 97);
 
-    // Thin rule under title
-    doc.setDrawColor(...PU); doc.setLineWidth(0.9);
+    // Rule under title — hairline for editorial themes, bolder for others
+    doc.setDrawColor(...PU); doc.setLineWidth(_PAL.banner === 'editorial' ? 0.4 : 0.9);
     doc.line(ML + 8, 102, W - MR, 102);
 
     // Client name — prominent headline
-    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...PU);
+    doc.setFont(FONT,'bold'); doc.setFontSize(16); doc.setTextColor(...PU);
     doc.text(clientName, ML + 8, 113);
 
     // Period
-    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(...GY);
+    doc.setFont(FONT,'normal'); doc.setFontSize(9.5); doc.setTextColor(...GY);
     doc.text(period, ML + 8, 121);
 
     // ── KPI cards row (3) — aligned to ML+8 / W-MR ───────────────────
@@ -2803,12 +3091,12 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       // Top accent bar
       doc.setFillColor(...k.color); doc.roundedRect(x, 129, ckw, 3, 1.5, 1.5, 'F');
       // Label
-      doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(...GY);
+      doc.setFont(FONT,'normal'); doc.setFontSize(6); doc.setTextColor(...GY);
       doc.text(k.label, cx, 140, {align:'center'});
       // Value
       const valStr = String(k.val);
       const valFs  = valStr.length > 12 ? 8 : 13;
-      doc.setFont('helvetica','bold'); doc.setFontSize(valFs); doc.setTextColor(...k.color);
+      doc.setFont(FONT,'bold'); doc.setFontSize(valFs); doc.setTextColor(...k.color);
       doc.text(valStr, cx, 154, {align:'center'});
     });
 
@@ -2825,21 +3113,21 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       const cx = x + ckw2/2;
       doc.setFillColor(...DK2); doc.roundedRect(x, 171, ckw2, 30, 3, 3, 'F');
       doc.setFillColor(...k.color); doc.roundedRect(x, 171, ckw2, 3, 1.5, 1.5, 'F');
-      doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(...GY);
+      doc.setFont(FONT,'normal'); doc.setFontSize(6); doc.setTextColor(...GY);
       doc.text(k.label, cx, 182, {align:'center'});
-      doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...k.color);
+      doc.setFont(FONT,'bold'); doc.setFontSize(13); doc.setTextColor(...k.color);
       doc.text(k.val, cx, 194, {align:'center'});
     });
 
     // ── Sections list ─────────────────────────────────────────────────
-    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.setTextColor(...PU);
+    doc.setFont(FONT,'bold'); doc.setFontSize(6.5); doc.setTextColor(...PU);
     doc.text('SECCIONES INCLUIDAS', ML + 8, 214);
     doc.setDrawColor(...LG); doc.setLineWidth(0.25);
     doc.line(ML + 8, 217, W - MR, 217);
     inc.forEach((s, i) => {
       const col = i%2===0 ? ML+8 : ML+CW/2+4;
       const row = Math.floor(i/2);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...AU);
+      doc.setFont(FONT,'normal'); doc.setFontSize(8); doc.setTextColor(...AU);
       doc.text('\xBB  '+(SLBL[s]||s), col, 225 + row*9);
     });
 
@@ -2847,9 +3135,9 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     // Thin rule before footer
     doc.setDrawColor(...LG); doc.setLineWidth(0.2);
     doc.line(ML + 8, H-20, W-MR, H-20);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...AU);
+    doc.setFont(FONT,'normal'); doc.setFontSize(7); doc.setTextColor(...AU);
     doc.text(`Generado el ${genDate}  \xB7  ${cleanTxt(appTitle)}  \xB7  Supabase PostgreSQL`, W/2, H-13, {align:'center'});
-    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...GY);
+    doc.setFont(FONT,'bold'); doc.setFontSize(7.5); doc.setTextColor(...GY);
     doc.text('C O N F I D E N C I A L', W/2, H-7, {align:'center'});
 
     // ════════════════════════════════════════════════════════════════════
@@ -2917,7 +3205,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       DB.income.forEach(t => { const k = t.subcategory||'Otro'; srcMap[k]=(srcMap[k]||0)+t.amount; });
       let srcY = flujoFY + 9;
       if (srcY > H-65) { doc.addPage(); pageN++; addHF(); srcY = 22; }
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...PU);
+      doc.setFont(FONT,'bold'); doc.setFontSize(9); doc.setTextColor(...PU);
       doc.text('FUENTES DE INGRESO', ML, srcY);
       addTable(srcY+4,
         [['Fuente', 'Total Período', '% del Total']],
@@ -2957,7 +3245,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
       // Top 10 transactions
       let t10Y = catFY + 9;
       if (t10Y > H-85) { doc.addPage(); pageN++; addHF(); t10Y = 22; }
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...PU);
+      doc.setFont(FONT,'bold'); doc.setFontSize(9); doc.setTextColor(...PU);
       doc.text('TOP 10 TRANSACCIONES INDIVIDUALES', ML, t10Y);
       addTable(t10Y+4,
         [['#','Fecha','Descripción','Categoría','Monto']],
@@ -3170,9 +3458,9 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
         doc.setFillColor(245,245,255); doc.setDrawColor(...LG); doc.setLineWidth(0.25);
         doc.roundedRect(ML, y, CW, 28, 1.5, 1.5, 'FD');
         doc.setFillColor(...c.col); doc.rect(ML, y, 3, 28, 'F');
-        doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...c.col);
+        doc.setFont(FONT,'bold'); doc.setFontSize(9.5); doc.setTextColor(...c.col);
         doc.text(c.flag, ML+6, y+10);
-        doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(50,50,70);
+        doc.setFont(FONT,'normal'); doc.setFontSize(8.5); doc.setTextColor(50,50,70);
         const lines = doc.splitTextToSize(c.body, CW-12);
         doc.text(lines.slice(0,2), ML+6, y+19);
         y += 33;
@@ -3707,16 +3995,16 @@ window.addEventListener('scroll',()=>{
   // Map section element ID → data-nav-module key (handles perfecto ≠ mes_perfecto)
   const SNAV={
     home:'home',diario:'diario',overview:'overview',flujo:'flujo',
-    gastos:'gastos',proyeccion:'proyeccion',perfecto:'mes_perfecto',
+    gastos:'gastos',historial:'historial',proyeccion:'proyeccion',perfecto:'mes_perfecto',
     montecarlo:'montecarlo',calculator:'calculator',
     predictor:'predictor',insights:'insights'
   };
-  const DOM_ORDER=['home','diario','overview','flujo','gastos','proyeccion',
+  const DOM_ORDER=['home','diario','overview','flujo','gastos','historial','proyeccion',
                    'perfecto','montecarlo','calculator','predictor','insights'];
   let activeId='home';
   DOM_ORDER.forEach(id=>{
     const el=document.getElementById(id);
-    if(el&&el.getBoundingClientRect().top<130) activeId=id;
+    if(el&&el.offsetHeight>0&&el.getBoundingClientRect().top<130) activeId=id;
   });
   const activeKey=SNAV[activeId]||activeId;
   // Desktop nav
@@ -3873,7 +4161,7 @@ document.getElementById('txDate').value=new Date().toISOString().slice(0,10);
 //  PIN LOCK — SHA-256 hash of access PIN
 //  To change: hash your new PIN at emn178.github.io/online-tools/sha256.html
 // ══════════════════════════════════════════════════════════
-const PIN_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+const PIN_HASH = '2cec8cf0e321c284fa0c2ebef804aac18bf1cbb85546f89e7e3d0b6aa8b9d2cf';
 
 async function sha256(str){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));

@@ -1,9 +1,9 @@
 {
   "client": {
-    "id": "dfg-Andrea",
-    "name": "Andrea Marcela ceron García",
+    "id": "dfg-daniel",
+    "name": "Daniel Enrique Figueredo Gutierrez",
     "repo": "03-21-2026-003",
-    "email": "",
+    "email": "lefantsauvage998@gmail.com",
     "emailjs": {
       "service_id": "service_s60d3lv",
       "template_id": "template_45jqud9",
@@ -13,9 +13,9 @@
       "storage_bucket": "statements"
     },
     "branding": {
-      "app_title": "Φ Finanzas AC",
-      "initials": "AC",
-      "hero_name": "Andrea Ceron",
+      "app_title": "Φ Finanzas DF",
+      "initials": "DF",
+      "hero_name": "Daniel Figueredo",
       "goal_amount": 50000000,
       "goal_label": "Meta 50M",
       "budget_limit": 400000,
@@ -31,15 +31,15 @@
       "enabled": true,
       "label": "Home",
       "features": {
-        "kpi_networth": false,
-        "kpi_salary": false,
-        "kpi_interests": false,
-        "kpi_shopping": false,
-        "goal_progress_bar": false
+        "kpi_networth": true,
+        "kpi_salary": true,
+        "kpi_interests": true,
+        "kpi_shopping": true,
+        "goal_progress_bar": true
       }
     },
     "overview": {
-      "enabled": false,
+      "enabled": true,
       "label": "Overview",
       "features": {
         "networth_chart": true,
@@ -47,12 +47,12 @@
       }
     },
     "flujo": {
-      "enabled": false,
+      "enabled": true,
       "label": "Flujo",
       "features": {
         "cashflow_chart": true,
-        "income_sources_chart": false,
-        "interest_yield_grid": false
+        "income_sources_chart": true,
+        "interest_yield_grid": true
       }
     },
     "gastos": {
@@ -67,8 +67,16 @@
         "top10_table": false
       }
     },
+    "historial": {
+      "enabled": true,
+      "label": "History",
+      "features": {
+        "history": true,
+        "csv_export": true
+      }
+    },
     "proyeccion": {
-      "enabled": false,
+      "enabled": true,
       "label": "Proyección",
       "features": {
         "goal_slider": true,
@@ -88,16 +96,8 @@
         "csv_export": false
       }
     },
-    "historial": {
-      "enabled": true,
-      "label": "History",
-      "features": {
-        "history": true,
-        "csv_export": true
-      }
-    },
     "mes_perfecto": {
-      "enabled": false,
+      "enabled": true,
       "label": "Mes Perfecto",
       "features": {
         "kpi_cards": true,
@@ -109,7 +109,7 @@
       }
     },
     "montecarlo": {
-      "enabled": false,
+      "enabled": true,
       "label": "Portafolios",
       "features": {
         "portfolio_selector": true,
@@ -120,7 +120,7 @@
       }
     },
     "calculator": {
-      "enabled": false,
+      "enabled": true,
       "label": "Calculadora",
       "features": {
         "capital_summary": true,
@@ -131,7 +131,7 @@
       }
     },
     "insights": {
-      "enabled": false,
+      "enabled": true,
       "label": "Insights"
     },
     "predictor": {
@@ -160,6 +160,6 @@
   },
 
   "nav": {
-    "mobile_tabs": ["home", "flujo", "diario", "historial", "mes_perfecto", "montecarlo", "predictor"]
+    "mobile_tabs": ["home", "overview", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "insights"]
   }
 }
