@@ -131,7 +131,7 @@
       }
     },
     "insights": {
-      "enabled": false,
+      "enabled": true,
       "label": "Insights"
     },
     "predictor": {
