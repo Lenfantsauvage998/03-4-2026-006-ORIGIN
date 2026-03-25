@@ -20,7 +20,7 @@
   script-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
   style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src    https://fonts.gstatic.com;
-  connect-src 'self' https://*.supabase.co;
+  connect-src 'self' https://*.supabase.co https://api.emailjs.com;
   img-src     'self' data:;
   object-src  'none';
   base-uri    'self';
@@ -3878,44 +3878,34 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
     }
 
     // ── Deliver ───────────────────────────────────────────────────────────
-    const fileName = `Estado_Financiero_${new Date().toISOString().slice(0,10)}.pdf`;
+    const _now = new Date();
+    const fileName = `Estado_Financiero_${_now.toISOString().slice(0,10)}_${_now.getTime()}.pdf`;
     const ejsCfg   = CFG?.client?.emailjs;
     const toEmail  = CFG?.client?.email;
     const ejsReady = sendEmail && toEmail
                   && ejsCfg?.public_key && ejsCfg?.service_id && ejsCfg?.template_id;
 
     if (ejsReady) {
-      // ── 1. Upload PDF blob to Supabase Storage ────────────────────────
+      // ── 1. Upload PDF blob to Supabase Storage (via SDK — handles auth automatically) ─
       btns.forEach(b => { b.textContent = '⬆ Subiendo...'; });
       const bucket   = CFG?.client?.supabase?.storage_bucket || 'statements';
       const filePath = `${CFG?.client?.id || 'client'}/${fileName}`;
-      const uploadRes = await fetch(`${SB_URL}/storage/v1/object/${bucket}/${filePath}`, {
-        method:  'POST',
-        headers: {
-          'apikey':        SB_KEY,
-          'Authorization': `Bearer ${_authToken}`,
-          'Content-Type':  'application/pdf',
-          'x-upsert':      'true',
-        },
-        body: doc.output('blob'),
-      });
-      if (!uploadRes.ok) {
-        const errText = await uploadRes.text();
-        throw new Error(`Supabase Storage: ${uploadRes.status} — ${errText}`);
-      }
+      const { error: uploadErr } = await sb.storage
+        .from(bucket)
+        .upload(filePath, doc.output('blob'), { contentType: 'application/pdf' });
+      if (uploadErr) throw new Error(`Supabase Storage: ${uploadErr.message}`);
 
-      // ── 2. Build signed download URL (requires authenticated session) ─
-      const signRes = await fetch(`${SB_URL}/storage/v1/object/sign/${bucket}/${filePath}`, {
-        method:  'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${_authToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expiresIn: 3600 })
-      });
-      const { signedURL } = await signRes.json();
-      const downloadUrl = `${SB_URL}/storage/v1${signedURL}`;
+      // ── 2. Build signed download URL (via SDK) ────────────────────────
+      const { data: signData, error: signErr } = await sb.storage
+        .from(bucket)
+        .createSignedUrl(filePath, 3600);
+      if (signErr) throw new Error(`Signed URL: ${signErr.message}`);
+      const downloadUrl = signData.signedUrl;
 
       // ── 3. Send EmailJS with link (no attachment = no size limit) ─────
       btns.forEach(b => { b.textContent = '✉ Enviando...'; });
       await _loadEmailJs();
+      emailjs.init({ publicKey: ejsCfg.public_key });
       try {
         await emailjs.send(
           ejsCfg.service_id,
@@ -3927,8 +3917,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
             subject:      `Estado Financiero · ${genDate}`,
             message:      `Estimado/a ${clientName}, adjunto encontrará su estado financiero personal correspondiente al período ${period}. Generado el ${genDate}.`,
             download_url: downloadUrl,
-          },
-          ejsCfg.public_key
+          }
         );
         await phiNotify({icon:'✅',title:'¡Enviado exitosamente!',msg:`Tu extracto financiero fue enviado a <strong>${toEmail}</strong>.`,btnText:'Perfecto'});
       } catch (emailErr) {
@@ -4780,6 +4769,15 @@ window.stopVoiceTxFull   = stopVoiceTxFull;
 window.closeVoiceTxModal = closeVoiceTxModal;
 window.confirmVoiceTx    = confirmVoiceTx;
 window.vtxSetType        = vtxSetType;
+// ── Interactive module handlers (oninput / onchange from HTML) ────────────
+window.updateMC          = updateMC;
+window.updateTarget      = updateTarget;
+window.updateAPY         = updateAPY;
+window.renderDiario      = renderDiario;
+window.renderGastos      = renderGastos;
+window.renderHistorial   = renderHistorial;
+window.calcUpdate        = calcUpdate;
+window.liveAmt           = liveAmt;
 // ─────────────────────────────────────────────────────────────────────────
 
 })(); // end IIFE
@@ -4787,7 +4785,7 @@ window.vtxSetType        = vtxSetType;
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-035';
+  const CURRENT_V = '20260322-036';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update

@@ -1,5 +1,5 @@
 // Bump version whenever static assets change
-const CACHE = 'dfg-v18';
+const CACHE = 'dfg-v19';
 
 // Derive base path from SW location so any GitHub Pages repo name works
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '');
