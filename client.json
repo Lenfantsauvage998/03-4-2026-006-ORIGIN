@@ -21,7 +21,7 @@
       "budget_limit": 400000,
       "optimal_budget": 1000000,
       "currency": "COP",
-      "theme": "arctic",
+      "theme": "forest",
       "_theme_options": ["phantom","carbon","forest","solar","arctic"]
     }
   },
@@ -131,7 +131,7 @@
       }
     },
     "insights": {
-      "enabled": true,
+      "enabled": false,
       "label": "Insights"
     },
     "predictor": {

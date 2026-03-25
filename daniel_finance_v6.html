@@ -8,6 +8,32 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Φ Finances">
+<!-- ══ SECURITY: Content Security Policy ══════════════════════════════
+     Restricts script/style/font/connect sources to known-good domains.
+     'unsafe-inline' is required because all JS/CSS lives in this single
+     HTML file. Inline XSS protection is handled via esc() on all DB data.
+     frame-ancestors 'none' prevents clickjacking (honoured as HTTP header;
+     migrate to Cloudflare Pages / Netlify to enforce it server-side).
+  ════════════════════════════════════════════════════════════════════ -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+  style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src    https://fonts.gstatic.com;
+  connect-src 'self' https://*.supabase.co;
+  img-src     'self' data:;
+  object-src  'none';
+  base-uri    'self';
+">
+<!-- NOTE: frame-ancestors 'none' (clickjacking) CANNOT be set via meta tag per spec.
+     To enforce it, add the X-Frame-Options: DENY header on the server side.
+     Migrate hosting to Cloudflare Pages / Netlify and add a _headers file. -->
+<!-- Referrer policy: never leak URL in Referer header -->
+<meta name="referrer" content="no-referrer">
+<!-- X-Content-Type-Options via meta (belt-and-suspenders) -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<!-- Frame-busting: prevents clickjacking when X-Frame-Options header is unavailable (static host) -->
+<script>if(window!==window.top){window.top.location.replace(window.location.href);}</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png" type="image/png">
 <script>
@@ -23,6 +49,7 @@
 <title>Φ Finances</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>/* Stamp theme on <html> before first CSS paint — prevents phantom flash */
 (function(){var t=localStorage.getItem('dfg_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
 </script>
@@ -531,6 +558,38 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .pin-ok:active{filter:brightness(0.84);}
 .pin-error{font-size:11px;color:var(--rd);min-height:16px;margin-top:6px;font-family:var(--font-body);}
 .pin-hint{font-size:10px;color:var(--m);margin-top:16px;font-family:var(--font-body);opacity:.7;}
+/* ── LOCKOUT SCREEN ──────────────────────────────────────────── */
+.lock-icon{font-size:44px;margin-bottom:12px;cursor:pointer;user-select:none;display:inline-block;transition:transform .12s;}
+.lock-icon:active{transform:scale(.88);}
+.lock-title{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--rd);margin-bottom:6px;letter-spacing:-.01em;}
+.lock-sub{font-size:11px;color:var(--m);margin-bottom:20px;font-family:var(--font-body);line-height:1.55;max-width:220px;margin-left:auto;margin-right:auto;}
+.lock-attempts{font-size:10px;color:var(--rd);opacity:.7;margin-top:4px;font-family:var(--font-body);}
+.admin-unlock{display:none;margin-top:16px;border-top:1px solid var(--b2);padding-top:16px;animation:fadeUp .3s ease both;}
+.admin-unlock.visible{display:block;}
+.admin-unlock input{
+  width:100%;padding:10px 12px;font-size:12px;font-family:var(--font-body);
+  background:var(--bg2);color:var(--t);border:1px solid var(--b2);border-radius:8px;
+  outline:none;text-align:center;letter-spacing:.08em;
+  transition:border-color .2s;
+}
+.admin-unlock input:focus{border-color:var(--ac2);}
+.admin-unlock-btn{
+  margin-top:8px;width:100%;padding:10px;font-size:12px;font-family:var(--font-body);
+  background:var(--ac);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;
+  transition:filter .15s;
+}
+.admin-unlock-btn:hover{filter:brightness(1.1);}
+.admin-unlock-err{font-size:10px;color:var(--rd);min-height:14px;margin-top:4px;font-family:var(--font-body);}
+/* PIN loading bar — indeterminate, theme-aware */
+.pin-load-bar{height:2px;background:var(--ac-bd);border-radius:2px;overflow:hidden;margin-top:14px;opacity:0;transition:opacity .2s;}
+.pin-load-bar.active{opacity:1;}
+.pin-load-bar::after{content:'';display:block;height:100%;width:32%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:2px;animation:pinBarSlide 1s ease-in-out infinite;}
+@keyframes pinBarSlide{0%{transform:translateX(-200%);}100%{transform:translateX(430%);}}
+/* Disabled keypad while verifying */
+.pin-card.loading .pin-btn{opacity:.35;pointer-events:none;transition:opacity .15s;}
+/* Pulsing dots while verifying */
+.pin-card.loading .pin-dot.filled{animation:pinDotPulse .85s ease-in-out infinite;}
+@keyframes pinDotPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(.82);}}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(28px) saturate(1.5);border-bottom:1px solid rgba(255,255,255,0.05);}
@@ -758,7 +817,23 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <button class="pin-btn pin-ok" onclick="pinSubmit()">✓</button>
     </div>
     <div id="pinError" class="pin-error"></div>
-    <div class="pin-hint">¿Olvidaste el PIN? Edita el archivo HTML</div>
+    <div id="pinLoadBar" class="pin-load-bar"></div>
+    <div class="pin-hint">¿Olvidaste el PIN? Cámbialo en Supabase → Authentication → Users</div>
+  </div>
+</div>
+
+<!-- LOCKOUT SCREEN -->
+<div id="lockedScreen" style="position:fixed;inset:0;background:var(--pin-bg);z-index:1001;display:none;align-items:center;justify-content:center;padding:16px;">
+  <div class="pin-card fu" style="text-align:center;">
+    <div class="lock-icon" id="lockIcon" onclick="adminTap()">🔒</div>
+    <div class="lock-title">Acceso Bloqueado</div>
+    <div class="lock-sub">Demasiados intentos fallidos.<br>Contacta a tu administrador para restablecer el acceso.</div>
+    <div class="lock-attempts" id="lockAttemptsMsg"></div>
+    <div class="admin-unlock" id="adminUnlock">
+      <input type="password" id="adminCodeInput" placeholder="Código de administrador" autocomplete="off" onkeydown="if(event.key==='Enter')adminSubmit()"/>
+      <button class="admin-unlock-btn" onclick="adminSubmit()">Desbloquear</button>
+      <div class="admin-unlock-err" id="adminErr"></div>
+    </div>
   </div>
 </div>
 
@@ -771,6 +846,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
   <div class="nav-inner">
     <div class="nav-logo" id="navLogo"><span style="opacity:0.75;margin-right:3px">Φ</span>Finanzas<span style="opacity:0.6;margin-left:5px">DF</span></div>
     <div class="nav-links">
+      <button onclick="signOut()" title="Cerrar sesión" style="background:none;border:none;color:var(--color-text-mid);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;margin-right:4px;opacity:0.6;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">⏻</button>
       <button class="nl active" data-nav-module="home" onclick="goTo('home')">Inicio</button>
       <button class="nl" data-nav-module="diario" onclick="goTo('diario')">Diario <span class="nb">VIVO</span></button>
       <button class="nl" data-nav-module="overview" onclick="goTo('overview')">Resumen</button>
@@ -1242,6 +1318,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 <div class="tab-bar" id="tabBar"><!-- populated by buildTabBar() in applyConfig --></div>
 
 <script>
+(function(){
 // ══════════════════════════════════════════════════════════
 //  EARLY THEME — runs before PIN screen so the lock screen
 //  is already branded when the user sees it.
@@ -1257,6 +1334,8 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
     const r = await fetch('client.json');
     if(r.ok){
       const cfg = await r.json();
+      // ── Auth email (used by pinSubmit for Supabase Auth) ───────────────
+      _clientEmail = cfg?.client?.email || null;
       // ── Theme ──────────────────────────────────────────
       const theme = cfg?.client?.branding?.theme || 'phantom';
       document.documentElement.setAttribute('data-theme', theme);
@@ -1271,17 +1350,33 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 })();
 
 // ══════════════════════════════════════════════════════════
-//  CONFIG — Supabase hardcoded
+//  CONFIG — Supabase
 // ══════════════════════════════════════════════════════════
 const SB_URL = 'https://vfhqrbadrnwmlncvlirn.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmaHFyYmFkcm53bWxuY3ZsaXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NTI1MzksImV4cCI6MjA4OTEyODUzOX0.eQI1Qy2oxjqiC_YV7NzGX4OIkk2MZ9DzkW3mn0qEwgs';
 
+// ── Auth state ─────────────────────────────────────────────────────────────
+// _authToken starts as the anon key and is swapped for the user's JWT on login.
+// All API calls use this token so RLS policies apply to the authenticated user.
+let _authToken  = SB_KEY;
+let _clientEmail = null; // loaded from client.json before first PIN entry
+
+// ── Supabase JS client (handles session persistence + token auto-refresh) ──
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
+
+// Keep _authToken current whenever the session is created, refreshed or cleared
+sb.auth.onAuthStateChange((_event, session) => {
+  _authToken = session?.access_token || SB_KEY;
+});
+
 // ══════════════════════════════════════════════════════════
-//  SUPABASE CLIENT
+//  SUPABASE REST HELPERS
 // ══════════════════════════════════════════════════════════
 const SBH = () => ({
   'apikey': SB_KEY,
-  'Authorization': 'Bearer ' + SB_KEY,
+  'Authorization': 'Bearer ' + _authToken,
   'Content-Type': 'application/json',
   'Prefer': 'return=representation',
 });
@@ -1305,6 +1400,18 @@ async function sbDelete(table, id) {
     method:'DELETE', headers: SBH()
   });
   return r.ok;
+}
+
+// ── Security: HTML escape — use on ALL user/DB strings in innerHTML ──────────
+// Prevents stored XSS: if an attacker writes <script> into a transaction
+// description via the exposed API key, esc() neutralises it before DOM insert.
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ── Custom confirm modal ──
@@ -1737,8 +1844,8 @@ function renderOverview() {
     const cols=['#6b7280','#4d9fff','#a78bfa','#f5a623','#22d47a'];
     document.getElementById('salaryList').innerHTML=salTx.map((t,i)=>`
       <div class="tl-item"><div class="tl-dot" style="background:${cols[i%cols.length]}"></div>
-      <div class="tl-date">${t.date}</div>
-      <div style="font-size:11px;color:var(--m);margin-bottom:2px">${t.description||'Salario'}</div>
+      <div class="tl-date">${esc(t.date)}</div>
+      <div style="font-size:11px;color:var(--m);margin-bottom:2px">${esc(t.description||'Salario')}</div>
       <div class="tl-amount" style="color:${cols[i%cols.length]}">${fmtF(t.amount)}</div></div>`).join('');
   }
 }
@@ -1826,7 +1933,7 @@ function renderGastos() {
   re.forEach(t=>{catMap[t.category]=(catMap[t.category]||0)+t.amount;});
   const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
   const maxC=cats[0]?.[1]||1;
-  if(feat('gastos','category_bars')) document.getElementById('catBars').innerHTML=cats.map(([c,v])=>{const col=resolveCatColor(c);return`<div class="hb-row"><span class="hb-lbl">${c}</span><div class="hb-track"><div class="hb-fill" style="width:${(v/maxC*100).toFixed(0)}%;background:${col}"></div></div><span class="hb-val" style="color:${col}">${fmt(v)}</span></div>`;}).join('');
+  if(feat('gastos','category_bars')) document.getElementById('catBars').innerHTML=cats.map(([c,v])=>{const col=resolveCatColor(c);return`<div class="hb-row"><span class="hb-lbl">${esc(c)}</span><div class="hb-track"><div class="hb-fill" style="width:${(v/maxC*100).toFixed(0)}%;background:${col}"></div></div><span class="hb-val" style="color:${col}">${fmt(v)}</span></div>`;}).join('');
   const isMobile=window.innerWidth<600;
   if(feat('gastos','category_donut')){
     const pieWrap=document.getElementById('cPieWrap');
@@ -1856,7 +1963,7 @@ function renderGastos() {
       if(filterVal==='all') titleEl.textContent='Top 10 gastos individuales — Todos los meses';
       else{ const [y,mo]=filterVal.split('-'); const lbl=new Date(+y,+mo-1,1).toLocaleString('es',{month:'long',year:'numeric'}); titleEl.textContent='Top 10 gastos — '+lbl; }
     }
-    document.getElementById('topTbl').innerHTML=top.map((t,i)=>{const col=resolveCatColor(t.category);return`<tr><td style="color:var(--m)">${i+1}</td><td style="color:var(--m)">${t.date}</td><td style="font-weight:500">${t.description||t.category}</td><td><span class="cpill" style="background:${col}22;color:${col}">${t.category}</span></td><td class="td-neg" style="text-align:right;font-family:var(--font-display);font-weight:600">-${fmtF(t.amount)}</td></tr>`;}).join('');
+    document.getElementById('topTbl').innerHTML=top.map((t,i)=>{const col=resolveCatColor(t.category);return`<tr><td style="color:var(--m)">${i+1}</td><td style="color:var(--m)">${esc(t.date)}</td><td style="font-weight:500">${esc(t.description||t.category)}</td><td><span class="cpill" style="background:${col}22;color:${col}">${esc(t.category)}</span></td><td class="td-neg" style="text-align:right;font-family:var(--font-display);font-weight:600">-${fmtF(t.amount)}</td></tr>`;}).join('');
   }
 }
 
@@ -2021,7 +2128,7 @@ function renderPerfectBreakdown() {
       return `
         <div style="margin-bottom:13px">
           <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;align-items:baseline">
-            <span style="color:var(--t);font-weight:500">${cat}</span>
+            <span style="color:var(--t);font-weight:500">${esc(cat)}</span>
             <span style="color:var(--m)">
               ${fmt(avg)}
               <span style="margin:0 4px;color:var(--m2)">→</span>
@@ -2905,8 +3012,8 @@ function renderDiario(){
       <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
         <div style="width:7px;height:7px;border-radius:50%;background:${catC};flex-shrink:0"></div>
         <div style="min-width:0">
-          <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.description||t.category}</div>
-          <div style="font-size:10px;color:var(--m);margin-top:1px">${t.date} · <span style="color:${catC}">${t.category}</span></div>
+          <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.description||t.category)}</div>
+          <div style="font-size:10px;color:var(--m);margin-top:1px">${esc(t.date)} · <span style="color:${catC}">${esc(t.category)}</span></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -2988,8 +3095,8 @@ function renderHistorial(){
       <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
         <div style="width:7px;height:7px;border-radius:50%;background:${catC};flex-shrink:0"></div>
         <div style="min-width:0">
-          <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.description||t.category}</div>
-          <div style="font-size:10px;color:var(--m);margin-top:1px">${t.date} · <span style="color:${catC}">${t.category}</span></div>
+          <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.description||t.category)}</div>
+          <div style="font-size:10px;color:var(--m);margin-top:1px">${esc(t.date)} · <span style="color:${catC}">${esc(t.category)}</span></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -3786,7 +3893,7 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
         method:  'POST',
         headers: {
           'apikey':        SB_KEY,
-          'Authorization': `Bearer ${SB_KEY}`,
+          'Authorization': `Bearer ${_authToken}`,
           'Content-Type':  'application/pdf',
           'x-upsert':      'true',
         },
@@ -3797,8 +3904,14 @@ async function exportStatement(sections = [], sendEmail = false, stmtYM = null) 
         throw new Error(`Supabase Storage: ${uploadRes.status} — ${errText}`);
       }
 
-      // ── 2. Build public download URL ──────────────────────────────────
-      const downloadUrl = `${SB_URL}/storage/v1/object/public/${bucket}/${filePath}`;
+      // ── 2. Build signed download URL (requires authenticated session) ─
+      const signRes = await fetch(`${SB_URL}/storage/v1/object/sign/${bucket}/${filePath}`, {
+        method:  'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${_authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expiresIn: 3600 })
+      });
+      const { signedURL } = await signRes.json();
+      const downloadUrl = `${SB_URL}/storage/v1${signedURL}`;
 
       // ── 3. Send EmailJS with link (no attachment = no size limit) ─────
       btns.forEach(b => { b.textContent = '✉ Enviando...'; });
@@ -4459,17 +4572,75 @@ Chart.defaults.color=cssVar('--tick-c')||'#6b6d7e';
 Chart.defaults.font.family=cssVar('--font-body')||'JetBrains Mono';
 Chart.defaults.font.size=10;
 document.getElementById('txDate').value=new Date().toISOString().slice(0,10);
+checkLockout(); // enforce lockout on every page load
 
 // ══════════════════════════════════════════════════════════
-//  PIN LOCK — SHA-256 hash of access PIN
-//  To change: hash your new PIN at emn178.github.io/online-tools/sha256.html
+//  PIN LOCK — validated server-side via Supabase Auth
+//  The 4-digit PIN is the Supabase Auth password for this
+//  client's account (email from client.json).
+//  To change the PIN: update the password in Supabase →
+//  Authentication → Users → Edit user.
 // ══════════════════════════════════════════════════════════
-const PIN_HASH = '2cec8cf0e321c284fa0c2ebef804aac18bf1cbb85546f89e7e3d0b6aa8b9d2cf';
 
-async function sha256(str){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+// ── LOCKOUT CONFIG ─────────────────────────────────────────
+//  ADMIN_HASH is the SHA-256 of your admin unlock code.
+//  The plain-text code is NEVER stored here — only its hash.
+//  To change the code: hash your new value with SHA-256 and
+//  replace ADMIN_HASH below.
+//  Current code hashed: DFG-ADMIN-2026 (change this in prod!)
+const MAX_PIN_FAILS  = 4;
+const ADMIN_HASH     = 'ad03124a47ee6df13eb90e723eb724c677c769c4be28283c971b0db6b9d60207';
+const LK_KEY         = 'dfg_lk';
+let   _adminTaps     = 0;
+let   _adminTapTimer = null;
+
+function _getLK(){ try{ return JSON.parse(localStorage.getItem(LK_KEY))||{n:0,locked:false}; }catch(e){ return {n:0,locked:false}; } }
+function _saveLK(o){ localStorage.setItem(LK_KEY, JSON.stringify(o)); }
+
+function checkLockout(){
+  const lk = _getLK();
+  if(lk.locked) _showLocked(lk.n);
 }
+
+function _showLocked(n){
+  document.getElementById('pinScreen').style.display    = 'none';
+  document.getElementById('lockedScreen').style.display = 'flex';
+  const msg = document.getElementById('lockAttemptsMsg');
+  if(msg) msg.textContent = `${n} intentos fallidos registrados`;
+}
+
+function adminTap(){
+  clearTimeout(_adminTapTimer);
+  _adminTaps++;
+  if(_adminTaps >= 5){
+    _adminTaps = 0;
+    document.getElementById('adminUnlock').classList.add('visible');
+    document.getElementById('adminCodeInput').focus();
+  } else {
+    _adminTapTimer = setTimeout(()=>{ _adminTaps = 0; }, 2000);
+  }
+}
+
+async function adminSubmit(){
+  const val    = (document.getElementById('adminCodeInput').value || '').trim();
+  const errEl  = document.getElementById('adminErr');
+  const enc    = new TextEncoder();
+  const buf    = await crypto.subtle.digest('SHA-256', enc.encode(val));
+  const hash   = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hash === ADMIN_HASH){
+    _saveLK({n:0, locked:false});
+    document.getElementById('lockedScreen').style.display = 'none';
+    document.getElementById('adminUnlock').classList.remove('visible');
+    document.getElementById('adminCodeInput').value = '';
+    document.getElementById('pinScreen').style.display = 'flex';
+    errEl.textContent = '';
+  } else {
+    errEl.textContent = 'Código incorrecto';
+    document.getElementById('adminCodeInput').value = '';
+    setTimeout(()=>{ errEl.textContent=''; }, 1500);
+  }
+}
+// ───────────────────────────────────────────────────────────
 
 let pinEntry = '';
 
@@ -4495,17 +4666,79 @@ function pinClear(){
 
 async function pinSubmit(){
   if(!pinEntry) return;
-  const hash = await sha256(pinEntry);
-  if(hash === PIN_HASH){
-    document.getElementById('pinScreen').style.display='none';
-    document.getElementById('splashScreen').style.display='flex';
-    sessionStorage.setItem('dfg_auth','1');
-    loadAll();
-  } else {
-    document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));
-    document.getElementById('pinError').textContent='PIN incorrecto';
-    setTimeout(()=>{ pinEntry=''; updatePinDots(); document.getElementById('pinError').textContent=''; }, 800);
+  const errEl   = document.getElementById('pinError');
+  const loadBar = document.getElementById('pinLoadBar');
+  const card    = document.querySelector('.pin-card');
+
+  if(!_clientEmail){
+    errEl.textContent = 'Error de configuración';
+    setTimeout(()=>{ pinEntry=''; updatePinDots(); errEl.textContent=''; }, 1500);
+    return;
   }
+
+  // ── show loading state ──────────────────────────────────
+  card.classList.add('loading');
+  loadBar.classList.add('active');
+  errEl.textContent = '';
+  errEl.style.color = '';
+  setProgress(30);
+  // ────────────────────────────────────────────────────────
+
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: _clientEmail,
+    password: pinEntry
+  });
+
+  // ── clear loading state ─────────────────────────────────
+  card.classList.remove('loading');
+  loadBar.classList.remove('active');
+  setProgress(0);
+  // ────────────────────────────────────────────────────────
+
+  if(error){
+    // ── track failures ────────────────────────────────────
+    const lk = _getLK();
+    lk.n++;
+    if(lk.n >= MAX_PIN_FAILS){
+      lk.locked = true;
+      _saveLK(lk);
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));
+      setTimeout(()=>{ pinEntry=''; updatePinDots(); _showLocked(lk.n); }, 700);
+    } else {
+      _saveLK(lk);
+      const left = MAX_PIN_FAILS - lk.n;
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));
+      errEl.textContent = `PIN incorrecto · ${left} intento${left===1?'':'s'} restante${left===1?'':'s'}`;
+      errEl.style.color = 'var(--rd)';
+      setTimeout(()=>{ pinEntry=''; updatePinDots(); errEl.textContent=''; errEl.style.color=''; }, 1000);
+    }
+    // ─────────────────────────────────────────────────────
+  } else {
+    // success — reset fail counter
+    _saveLK({n:0, locked:false});
+    // _authToken already updated by onAuthStateChange
+    _showApp();
+  }
+  pinEntry = '';
+}
+
+async function _showApp(){
+  // Guard: only open the app if Supabase has a valid authenticated session.
+  // This makes calling _showApp() from the console useless without a real JWT.
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    console.warn('[DFG] _showApp blocked: no authenticated session');
+    return;
+  }
+  document.getElementById('pinScreen').style.display='none';
+  document.getElementById('splashScreen').style.display='flex';
+  loadAll();
+}
+
+async function signOut(){
+  await sb.auth.signOut();
+  _authToken = SB_KEY;
+  document.getElementById('pinScreen').style.display='flex';
 }
 
 document.addEventListener('keydown', e=>{
@@ -4515,23 +4748,46 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='Enter') pinSubmit();
 });
 
-if(sessionStorage.getItem('dfg_auth')==='1'){
-  document.getElementById('pinScreen').style.display='none';
-  document.getElementById('splashScreen').style.display='flex';
-  loadAll();
-}
+// ── Session note ───────────────────────────────────────────
+// Supabase persists the session for token auto-refresh, but
+// the PIN screen is ALWAYS shown on page load — the session
+// is never used to skip authentication. Security first.
 buildCatGrid();
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 
-// loadAll() called by PIN auth above
+// ── Expose ONLY the functions that HTML onclick attributes call ──────────
+// Everything else (sb, _authToken, _clientEmail, sbPost, sbDelete, sbGet,
+// DB, ADMIN_HASH, SB_KEY, SB_URL, loadAll, ...) stays private in this IIFE.
+window.pinPress          = pinPress;
+window.pinClear          = pinClear;
+window.pinSubmit         = pinSubmit;
+window.adminTap          = adminTap;
+window.adminSubmit       = adminSubmit;
+window.signOut           = signOut;
+window.goTo              = goTo;
+window.setType           = setType;
+window.addCustomCat      = addCustomCat;
+window.toggleVoice       = toggleVoice;
+window.addTx             = addTx;
+window.exportStatement   = exportStatement;
+window.selectPort        = selectPort;
+window.deleteTx          = deleteTx;
+window.startVoiceTxFull  = startVoiceTxFull;
+window.stopVoiceTxFull   = stopVoiceTxFull;
+window.closeVoiceTxModal = closeVoiceTxModal;
+window.confirmVoiceTx    = confirmVoiceTx;
+window.vtxSetType        = vtxSetType;
+// ─────────────────────────────────────────────────────────────────────────
+
+})(); // end IIFE
 </script>
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-034';
+  const CURRENT_V = '20260322-035';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
