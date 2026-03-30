@@ -738,10 +738,10 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 .cap-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;}
 
 /* CONFIRM MODAL */
-.cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s ease;padding:20px;}
+.cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s ease;padding:20px;}
 .cfm-overlay.show{opacity:1;}
-.cfm-box{background:var(--bg2);border:1px solid var(--b);border-radius:16px;padding:28px 24px 20px;max-width:340px;width:100%;text-align:center;transform:scale(0.92);transition:transform .2s ease;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-.cfm-overlay.show .cfm-box{transform:scale(1);}
+.cfm-box{background:var(--bg2);border:1px solid var(--b);border-radius:16px;padding:28px 24px 20px;max-width:340px;width:100%;text-align:center;transform:translateY(24px) scale(0.93);opacity:0;transition:transform .35s cubic-bezier(0.34,1.15,0.64,1),opacity .25s ease;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.cfm-overlay.show .cfm-box{transform:translateY(0) scale(1);opacity:1;}
 .cfm-icon{font-size:32px;margin-bottom:12px;}
 .cfm-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--t);margin-bottom:6px;}
 .cfm-msg{font-family:var(--font-body);font-size:12px;color:var(--m);line-height:1.5;margin-bottom:20px;}
@@ -910,9 +910,12 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
         <div class="fi"><label>Fecha</label><input id="txDate" type="date" class="fi"></div>
         <div class="fi">
           <label>Monto (COP)</label>
-          <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--m)">$</span>
-            <input id="txAmt" type="number" inputmode="numeric" class="fi amount-inp" placeholder="0" oninput="liveAmt(this)" style="padding-left:28px">
+          <div id="txAmtWrap" style="display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px;transition:border-color .15s">
+            <span style="padding-left:12px;color:var(--m);font-family:var(--font-display);font-size:24px;font-weight:700;pointer-events:none;flex-shrink:0;line-height:1">$</span>
+            <input id="txAmt" type="number" inputmode="numeric" placeholder="0" oninput="liveAmt(this)"
+              onfocus="document.getElementById('txAmtWrap').style.borderColor='var(--focus-bd)'"
+              onblur="document.getElementById('txAmtWrap').style.borderColor='var(--b2)'"
+              style="flex:1;border:none;background:transparent;padding:10px 12px;font-family:var(--font-body);font-size:13px;color:var(--t);outline:none;-webkit-appearance:none;width:100%;min-width:0">
           </div>
           <div id="txFmt" style="font-size:11px;color:var(--ac2);margin-top:4px;min-height:15px"></div>
         </div>
@@ -930,6 +933,21 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
             <div style="display:flex;gap:6px">
               <button onclick="addCustomCat()" style="flex:1;padding:8px;background:var(--ac2);border:none;border-radius:8px;color:#000;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer">Guardar</button>
               <button onclick="document.getElementById('catAddForm').style.display='none'" style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--m);font-family:var(--font-body);font-size:11px;cursor:pointer">Cancelar</button>
+            </div>
+          </div>
+        </div>
+        <div class="fi">
+          <label>¿Cómo se realizó?</label>
+          <div id="payGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px"></div>
+          <div id="payAddForm" style="display:none;margin-top:8px;padding:11px;background:var(--bg2);border:1px solid var(--ac-bd);border-radius:10px">
+            <div style="font-size:10px;color:var(--ac2);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:9px">Nuevo método</div>
+            <div style="display:grid;grid-template-columns:44px 1fr;gap:6px;margin-bottom:8px;align-items:center">
+              <input id="newPayEmoji" type="text" maxlength="2" placeholder="💳" style="padding:7px 4px;text-align:center;font-size:16px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);outline:none;width:100%">
+              <input id="newPayName"  type="text" placeholder="Ej: Daviplata..." style="padding:7px 10px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;width:100%">
+            </div>
+            <div style="display:flex;gap:6px">
+              <button onclick="addCustomPay()" style="flex:1;padding:8px;background:var(--ac2);border:none;border-radius:8px;color:#000;font-family:var(--font-body);font-size:11px;font-weight:700;cursor:pointer">Guardar</button>
+              <button onclick="document.getElementById('payAddForm').style.display='none'" style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--m);font-family:var(--font-body);font-size:11px;cursor:pointer">Cancelar</button>
             </div>
           </div>
         </div>
@@ -1012,6 +1030,13 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
         <span class="snum">03</span><h2 class="stitle" style="display:inline">Análisis de Gastos</h2>
       </div>
       <select id="gastosMonthFilter" data-module="gastos" data-feature="month_filter" onchange="renderGastos()"></select>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button data-gpf="all"      onclick="setGastosPayFilter('all')"      style="background:var(--ac);color:var(--bg);border:1px solid var(--ac);border-radius:20px;padding:4px 12px;font-family:var(--font-body);font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">Todos</button>
+        <button data-gpf="efectivo" onclick="setGastosPayFilter('efectivo')" style="background:var(--bg3);color:var(--m);border:1px solid var(--b2);border-radius:20px;padding:4px 12px;font-family:var(--font-body);font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">💸 Efectivo</button>
+        <button data-gpf="nequi"    onclick="setGastosPayFilter('nequi')"    style="background:var(--bg3);color:var(--m);border:1px solid var(--b2);border-radius:20px;padding:4px 12px;font-family:var(--font-body);font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">📱 Nequi</button>
+        <button data-gpf="debito"   onclick="setGastosPayFilter('debito')"   style="background:var(--bg3);color:var(--m);border:1px solid var(--b2);border-radius:20px;padding:4px 12px;font-family:var(--font-body);font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">💳 Débito</button>
+        <button data-gpf="credito"  onclick="setGastosPayFilter('credito')"  style="background:var(--bg3);color:var(--m);border:1px solid var(--b2);border-radius:20px;padding:4px 12px;font-family:var(--font-body);font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent">💰 Crédito</button>
+      </div>
     </div>
     <p class="ssub">Gastos reales — excluye transfers e impuestos</p>
     <div class="g64" id="gastosGrid" style="margin-bottom:12px">
@@ -1903,6 +1928,18 @@ function renderFlujo() {
     </div>`:'');
 }
 
+let gastosPayFilter='all';
+function setGastosPayFilter(val){
+  gastosPayFilter=val;
+  document.querySelectorAll('[data-gpf]').forEach(b=>{
+    const active=b.dataset.gpf===val;
+    b.style.background=active?'var(--ac)':'var(--bg3)';
+    b.style.color=active?'var(--bg)':'var(--m)';
+    b.style.borderColor=active?'var(--ac)':'var(--b2)';
+  });
+  renderGastos();
+}
+
 function renderGastos() {
   // Populate month filter options (once, or keep in sync)
   const sel=document.getElementById('gastosMonthFilter');
@@ -1921,7 +1958,10 @@ function renderGastos() {
     else if(!curVal||curVal==='') sel.value=ymSorted.length?ymSorted[ymSorted.length-1]:'all';
   }
   const filterVal=sel?sel.value:'all';
-  const re=filterVal==='all'?DB.real_exp:DB.real_exp.filter(t=>t.date&&t.date.startsWith(filterVal));
+  const payNorm=t=>(t.account||'Efectivo').trim()||'Efectivo';
+  const PAY_MATCH={'efectivo':v=>v==='Efectivo','nequi':v=>v==='Nequi','debito':v=>v.startsWith('Débito'),'credito':v=>v==='Crédito'};
+  let re=filterVal==='all'?DB.real_exp:DB.real_exp.filter(t=>t.date&&t.date.startsWith(filterVal));
+  if(gastosPayFilter!=='all'&&PAY_MATCH[gastosPayFilter]) re=re.filter(t=>PAY_MATCH[gastosPayFilter](payNorm(t)));
   // Resolve color: CAT_COL map → CATS_EXP/INC label match → custom cats → gray fallback
   const resolveCatColor = name => {
     if (CAT_COL[name]) return CAT_COL[name];
@@ -2375,21 +2415,94 @@ function saveCustomCats(){
   localStorage.setItem('dfg_custom_inc', JSON.stringify(customCatsInc));
 }
 
-// Devuelve predefinidas + personalizadas según el tipo activo
+let hiddenDefaultCats=new Set(JSON.parse(localStorage.getItem('dfg_hidden_cats')||'[]'));
+function saveHiddenCats(){ localStorage.setItem('dfg_hidden_cats',JSON.stringify([...hiddenDefaultCats])); }
+
+// Devuelve predefinidas (no ocultas) + personalizadas según el tipo activo
 function getActiveCats(){
-  return txType==='expense' ? [...CATS_EXP,...customCatsExp] : [...CATS_INC,...customCatsInc];
+  const base=txType==='expense'?CATS_EXP:CATS_INC;
+  const custom=txType==='expense'?customCatsExp:customCatsInc;
+  return [...base.filter(c=>!hiddenDefaultCats.has(c.id)),...custom];
 }
 
 function getCatById(id){
   return [...CATS_EXP,...CATS_INC,...customCatsExp,...customCatsInc].find(c=>c.id===id);
 }
 
-async function deleteCustomCat(id){
-  const ok=await phiConfirm({icon:'🗑️',title:'Eliminar categoría',msg:'¿Estás seguro de que deseas eliminar esta categoría personalizada?',confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
+// ── Métodos de pago ──────────────────────────────────────────────────────────
+const PAY_METHODS=[
+  {id:'efectivo',lbl:'💸 Efectivo'},
+  {id:'nequi',   lbl:'📱 Nequi'},
+  {id:'debito',  lbl:'💳 Débito/Nómina'},
+  {id:'credito', lbl:'💰 Crédito'},
+];
+let customPayMethods=JSON.parse(localStorage.getItem('dfg_custom_pay')||'[]');
+let hiddenDefaultPay=new Set(JSON.parse(localStorage.getItem('dfg_hidden_pay')||'[]'));
+let selPayment='';
+function saveCustomPay(){ localStorage.setItem('dfg_custom_pay',JSON.stringify(customPayMethods)); }
+function saveHiddenPay(){ localStorage.setItem('dfg_hidden_pay',JSON.stringify([...hiddenDefaultPay])); }
+function getAllPayMethods(){ return [...PAY_METHODS.filter(p=>!hiddenDefaultPay.has(p.id)),...customPayMethods]; }
+
+async function deletePay(p){
+  const ok=await phiConfirm({icon:'🗑️',title:'Eliminar método',msg:`¿Eliminar "${p.lbl}"?`,confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
   if(!ok) return;
-  if(txType==='expense') customCatsExp=customCatsExp.filter(c=>c.id!==id);
-  else                   customCatsInc=customCatsInc.filter(c=>c.id!==id);
-  saveCustomCats();
+  if(p.custom){
+    customPayMethods=customPayMethods.filter(x=>x.id!==p.id);
+    saveCustomPay();
+  } else {
+    hiddenDefaultPay.add(p.id);
+    saveHiddenPay();
+  }
+  if(selPayment===p.id) selPayment='';
+  buildPayGrid();
+}
+function addCustomPay(){
+  const nameEl=document.getElementById('newPayName');
+  const emojiEl=document.getElementById('newPayEmoji');
+  const name=(nameEl.value||'').trim();
+  const emoji=(emojiEl.value||'').trim()||'💳';
+  if(!name){ nameEl.focus(); return; }
+  customPayMethods.push({id:'pay_cust_'+Date.now(),lbl:`${emoji} ${name}`,custom:true});
+  saveCustomPay(); nameEl.value=''; emojiEl.value='';
+  document.getElementById('payAddForm').style.display='none';
+  buildPayGrid();
+}
+function selectPay(id){ selPayment=selPayment===id?'':id; buildPayGrid(); }
+function buildPayGrid(){
+  const el=document.getElementById('payGrid'); if(!el) return; el.innerHTML='';
+  getAllPayMethods().forEach(p=>{
+    const wrap=document.createElement('div'); wrap.style.cssText='position:relative';
+    const b=document.createElement('button');
+    b.textContent=p.lbl; b.onclick=()=>selectPay(p.id);
+    const sel=p.id===selPayment;
+    b.style.cssText=`width:100%;padding:7px 3px;border:1px solid ${sel?'rgba(184,155,106,0.6)':'var(--b2)'};border-radius:8px;background:${sel?'rgba(184,155,106,0.15)':'var(--bg3)'};color:${sel?'var(--ac2)':'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent`;
+    let _pt;
+    const _start=()=>{ b.style.border='1px solid var(--rd)'; _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deletePay(p); },500); };
+    const _cancel=()=>{ clearTimeout(_pt); const s=p.id===selPayment; b.style.border=s?'1px solid rgba(184,155,106,0.6)':'1px solid var(--b2)'; b.style.background=s?'rgba(184,155,106,0.15)':'var(--bg3)'; };
+    b.addEventListener('touchstart',_start,{passive:true});
+    b.addEventListener('touchend',_cancel); b.addEventListener('touchcancel',_cancel);
+    b.addEventListener('mousedown',_start); b.addEventListener('mouseup',_cancel); b.addEventListener('mouseleave',_cancel);
+    b.addEventListener('contextmenu',e=>e.preventDefault());
+    wrap.appendChild(b); el.appendChild(wrap);
+  });
+  const addBtn=document.createElement('button'); addBtn.textContent='＋ Nuevo';
+  addBtn.onclick=()=>{ const f=document.getElementById('payAddForm'); const open=f.style.display!=='none'; f.style.display=open?'none':'block'; if(!open) document.getElementById('newPayName').focus(); };
+  addBtn.style.cssText='padding:7px 3px;border:1px dashed rgba(184,155,106,0.4);border-radius:8px;background:rgba(184,155,106,0.06);color:rgba(184,155,106,0.8);font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent';
+  el.appendChild(addBtn);
+}
+
+async function deleteCat(c){
+  const ok=await phiConfirm({icon:'🗑️',title:'Eliminar categoría',msg:`¿Eliminar "${c.lbl}"?`,confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
+  if(!ok) return;
+  if(c.custom){
+    if(txType==='expense') customCatsExp=customCatsExp.filter(x=>x.id!==c.id);
+    else                   customCatsInc=customCatsInc.filter(x=>x.id!==c.id);
+    saveCustomCats();
+  } else {
+    hiddenDefaultCats.add(c.id);
+    saveHiddenCats();
+  }
+  if(selCat===c.id) selCat='';
   buildCatGrid();
 }
 
@@ -2441,15 +2554,25 @@ function buildCatGrid(){
     b.style.cssText = `width:100%;padding:7px 3px;border:1px solid ${sel?c.col+'66':'var(--b2)'};border-radius:8px;background:${sel?c.col+'22':'var(--bg3)'};color:${sel?c.col:'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent`;
     wrap.appendChild(b);
 
-    // Botón eliminar solo en categorías personalizadas
-    if(c.custom){
-      const del = document.createElement('button');
-      del.textContent = '×';
-      del.title = 'Eliminar';
-      del.onclick = e=>{ e.stopPropagation(); deleteCustomCat(c.id); };
-      del.style.cssText = 'position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--rd);color:#fff;border:none;font-size:11px;line-height:16px;text-align:center;cursor:pointer;padding:0;z-index:2;display:flex;align-items:center;justify-content:center';
-      wrap.appendChild(del);
-    }
+    // Mantén presionado 2s para eliminar (funciona en todas, default y custom)
+    let _pt;
+    const _start=()=>{
+      b.style.border='1px solid var(--rd)';
+      _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deleteCat(c); },500);
+    };
+    const _cancel=()=>{
+      clearTimeout(_pt);
+      const isSel=c.id===selCat;
+      b.style.border=`1px solid ${isSel?c.col+'66':'var(--b2)'}`;
+      b.style.background=isSel?c.col+'22':'var(--bg3)';
+    };
+    b.addEventListener('touchstart',_start,{passive:true});
+    b.addEventListener('touchend',_cancel);
+    b.addEventListener('touchcancel',_cancel);
+    b.addEventListener('mousedown',_start);
+    b.addEventListener('mouseup',_cancel);
+    b.addEventListener('mouseleave',_cancel);
+    b.addEventListener('contextmenu',e=>e.preventDefault());
     el.appendChild(wrap);
   });
 
@@ -2839,17 +2962,24 @@ async function addTx(){
     setTimeout(()=>{el.style.borderColor='';},2000);
     return;
   }
+  if(!selPayment){
+    msgEl.textContent='Selecciona cómo se realizó el pago';msgEl.style.color='var(--rd)';
+    const pg=document.getElementById('payGrid');
+    if(pg){pg.style.outline='1.5px solid var(--rd)';pg.style.borderRadius='8px';setTimeout(()=>{pg.style.outline='';},2000);}
+    return;
+  }
   msgEl.textContent='Guardando...';msgEl.style.color='var(--m)';
   try {
     const d=new Date(date+'T12:00:00');
     // Extraer nombre limpio (sin emoji) para la columna category
     const catLabel = activeCat?.lbl.replace(/^\S+\s*/,'').trim() || selCat;
+    const payLbl = getAllPayMethods().find(p=>p.id===selPayment)?.lbl.replace(/^\S+\s*/,'').trim() || 'Efectivo';
     const [res]=await sbPost('transactions',{
       date,type:txType,amount,
       category:txType==='expense'? catLabel :'Income',
       subcategory:selCat,
       description:desc,
-      account:'Rappi',
+      account:payLbl,
       month:d.toLocaleString('en',{month:'long'}),
       year:d.getFullYear(),
     });
@@ -2860,6 +2990,7 @@ async function addTx(){
     document.getElementById('txAmt').value='';
     document.getElementById('txFmt').textContent='';
     document.getElementById('txDesc').value='';
+    selPayment=''; buildPayGrid();
     msgEl.textContent='✓ Guardado en Supabase';
     msgEl.style.color=txType==='expense'?'var(--rd)':'var(--gr)';
     setTimeout(()=>{msgEl.textContent='';},3000);
@@ -4741,7 +4872,7 @@ document.addEventListener('keydown', e=>{
 // Supabase persists the session for token auto-refresh, but
 // the PIN screen is ALWAYS shown on page load — the session
 // is never used to skip authentication. Security first.
-buildCatGrid();
+buildCatGrid(); buildPayGrid();
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -4759,6 +4890,8 @@ window.signOut           = signOut;
 window.goTo              = goTo;
 window.setType           = setType;
 window.addCustomCat      = addCustomCat;
+window.addCustomPay      = addCustomPay;
+window.setGastosPayFilter= setGastosPayFilter;
 window.toggleVoice       = toggleVoice;
 window.addTx             = addTx;
 window.exportStatement   = exportStatement;
@@ -4785,7 +4918,7 @@ window.liveAmt           = liveAmt;
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-037';
+  const CURRENT_V = '20260322-038';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
