@@ -2475,7 +2475,7 @@ function buildPayGrid(){
     const b=document.createElement('button');
     b.textContent=p.lbl; b.onclick=()=>selectPay(p.id);
     const sel=p.id===selPayment;
-    b.style.cssText=`width:100%;padding:7px 3px;border:1px solid ${sel?'rgba(184,155,106,0.6)':'var(--b2)'};border-radius:8px;background:${sel?'rgba(184,155,106,0.15)':'var(--bg3)'};color:${sel?'var(--ac2)':'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent`;
+    b.style.cssText=`width:100%;padding:7px 3px;border:1px solid ${sel?'rgba(184,155,106,0.6)':'var(--b2)'};border-radius:8px;background:${sel?'rgba(184,155,106,0.15)':'var(--bg3)'};color:${sel?'var(--ac2)':'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none`;
     let _pt;
     const _start=()=>{ b.style.border='1px solid var(--rd)'; _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deletePay(p); },500); };
     const _cancel=()=>{ clearTimeout(_pt); const s=p.id===selPayment; b.style.border=s?'1px solid rgba(184,155,106,0.6)':'1px solid var(--b2)'; b.style.background=s?'rgba(184,155,106,0.15)':'var(--bg3)'; };
@@ -2551,7 +2551,7 @@ function buildCatGrid(){
     b.textContent = c.lbl;
     b.onclick = ()=>selectCat(c.id);
     const sel = c.id===selCat;
-    b.style.cssText = `width:100%;padding:7px 3px;border:1px solid ${sel?c.col+'66':'var(--b2)'};border-radius:8px;background:${sel?c.col+'22':'var(--bg3)'};color:${sel?c.col:'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent`;
+    b.style.cssText = `width:100%;padding:7px 3px;border:1px solid ${sel?c.col+'66':'var(--b2)'};border-radius:8px;background:${sel?c.col+'22':'var(--bg3)'};color:${sel?c.col:'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none`;
     wrap.appendChild(b);
 
     // Mantén presionado 2s para eliminar (funciona en todas, default y custom)
@@ -4918,7 +4918,7 @@ window.liveAmt           = liveAmt;
 
 <script>
 (function(){
-  const CURRENT_V = '20260322-038';
+  const CURRENT_V = '20260322-039';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
