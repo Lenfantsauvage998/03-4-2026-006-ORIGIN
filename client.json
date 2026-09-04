@@ -172,6 +172,10 @@
     "ai_summary": {
       "enabled": false,
       "description": "Resumen financiero mensual generado por IA"
+    },
+    "ai_assistant": {
+      "enabled": true,
+      "description": "Asistente IA local (WebLLM en el navegador u Ollama en el PC): voz/texto a transacciones y comandos"
     }
   },
 

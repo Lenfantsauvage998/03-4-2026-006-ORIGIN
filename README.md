@@ -97,6 +97,31 @@ Compares your actual monthly spending against an optimal $232K/month budget. Sho
 ### Offline First
 Works without internet. The Service Worker caches the app shell. Supabase syncs when connectivity returns.
 
+### Command Palette (`Ctrl/⌘ + K`)
+One box to jump to any section, run an action (new expense, voice entry, PDF export, theme, sign out) or find a transaction by description, category, amount or date — a transaction hit opens it for editing. Press `N` anywhere to start a new expense, `Esc` to close anything.
+
+### Edit & Undo
+Every transaction row has ✎ edit and ✕ delete. Editing keeps linked credit-card balances in sync. Deleting shows a 6-second **Deshacer** toast that restores the row.
+
+### Daily Cockpit
+At the top of Diario: what you spent today, how much you can spend per remaining day of the month, and two streaks — consecutive days logging and consecutive no-spend days. Frequent transactions appear as chips: one tap prefills amount, category, payment method and description.
+
+### Spending Heatmap & Month Compare
+Gastos shows a 16-week calendar heatmap of daily spend and a category-by-category comparison with the previous month (month-to-date while the month is in progress, so day 4 isn't compared against 31 days).
+
+### Themes
+Five visual themes (Phantom, Carbon, Forest, Solar, Arctic) switchable from the 🎨 button; the choice persists on the device and overrides `client.json`.
+
+### Local AI Assistant (🧠)
+Turns free text or voice — *"ayer pagué 32 mil de taxi con nequi"*, *"muéstrame los gastos de agosto en efectivo"*, *"cambia al tema solar"* — into a transaction proposal (always confirmed by you), a navigation, a Gastos filter, a theme change or a search. Nothing leaves the device. Two interchangeable backends, picked in the 🧠 panel:
+
+| Backend | Where it runs | Model | Notes |
+|---|---|---|---|
+| **WebLLM** | In the browser (WebGPU) | Qwen2.5-1.5B-Instruct from Hugging Face, ~1 GB one-time download, cached offline | Works on phone and desktop; picks the f16 or f32 build by GPU capability |
+| **Ollama** | On your PC at `http://localhost:11434` | Any pulled model, e.g. `qwen2.5:1.5b`, `llama3.2:1b`, `gemma3:1b` | Desktop only. Allow the app origin once: `[System.Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS','<app origin>','User')`, restart Ollama |
+
+The model only proposes JSON; the app validates amounts, categories, dates and payment methods, and falls back to the built-in rules parser if the model is unavailable or answers badly.
+
 ---
 
 ## Security

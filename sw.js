@@ -1,5 +1,5 @@
 // Bump version whenever static assets change
-const CACHE = 'dfg-v22';
+const CACHE = 'dfg-v24';
 
 // Derive base path from SW location so any GitHub Pages repo name works
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '');
@@ -40,6 +40,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   // Let Supabase and Google Fonts go straight to network — never cache
   if (e.request.url.includes('supabase.co') || e.request.url.includes('fonts.googleapis')) return;
+  // AI assistant traffic: WebLLM keeps model weights in its own Cache (GBs) — never double-cache them here.
+  // Ollama (localhost:11434) is a live local API.
+  if (/huggingface\.co|hf\.co|raw\.githubusercontent\.com|localhost:11434|127\.0\.0\.1:11434|@mlc-ai/.test(e.request.url)) return;
 
   // version.json: ALWAYS bypass SW — never cache, never intercept.
   // This is the heartbeat of the auto-update system; it must always be fresh.
