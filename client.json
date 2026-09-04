@@ -46,6 +46,22 @@
         "salary_timeline": true
       }
     },
+    "tarjetas": {
+      "enabled": true,
+      "label": "Tarjetas",
+      "features": {
+        "card_form": true,
+        "card_list": true
+      }
+    },
+    "deudas": {
+      "enabled": true,
+      "label": "Deudas",
+      "features": {
+        "debt_form": true,
+        "debt_list": true
+      }
+    },
     "flujo": {
       "enabled": true,
       "label": "Flujo",
@@ -160,6 +176,6 @@
   },
 
   "nav": {
-    "mobile_tabs": ["home", "overview", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "insights"]
+    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "insights"]
   }
 }

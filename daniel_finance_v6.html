@@ -850,6 +850,8 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <button class="nl active" data-nav-module="home" onclick="goTo('home')">Inicio</button>
       <button class="nl" data-nav-module="diario" onclick="goTo('diario')">Diario <span class="nb">VIVO</span></button>
       <button class="nl" data-nav-module="overview" onclick="goTo('overview')">Resumen</button>
+      <button class="nl" data-nav-module="tarjetas" onclick="goTo('tarjetas')">Tarjetas</button>
+      <button class="nl" data-nav-module="deudas" onclick="goTo('deudas')">Deudas</button>
       <button class="nl" data-nav-module="flujo" onclick="goTo('flujo')">Flujo</button>
       <button class="nl" data-nav-module="gastos" onclick="goTo('gastos')">Gastos</button>
       <button class="nl" data-nav-module="historial" onclick="goTo('historial')">Historial</button>
@@ -1005,6 +1007,92 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
     <div class="g64">
       <div class="card" data-module="overview" data-feature="networth_chart"><div class="ct">Patrimonio mes a mes</div><div class="chart-wrap" style="height:220px"><canvas id="cNW"></canvas></div></div>
       <div class="card" data-module="overview" data-feature="salary_timeline"><div class="ct">Últimos salarios</div><div id="salaryList" class="tl" style="margin-top:6px"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TARJETAS -->
+<div class="section" id="tarjetas">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">02</span><h2 class="stitle">Mis Tarjetas</h2></div>
+    <p class="ssub">Registra cada tarjeta una sola vez — después solo la seleccionas al gastar</p>
+    <div class="card" data-module="tarjetas" data-feature="card_list">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+        <div class="ct" style="margin:0">Tarjetas registradas</div>
+        <button class="btn-sm" id="cardFormToggle" data-module="tarjetas" data-feature="card_form" onclick="toggleCardForm()">＋ Agregar tarjeta</button>
+      </div>
+      <div id="cardTiles" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px"></div>
+
+      <div id="cardForm" data-module="tarjetas" data-feature="card_form" style="display:none;margin-top:14px;padding:15px;background:var(--bg2);border:1px solid var(--ac-bd);border-radius:12px">
+        <div style="font-size:10px;color:var(--ac2);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:11px">Nueva tarjeta de crédito</div>
+        <div class="fi" style="display:grid;grid-template-columns:44px 1fr;gap:6px;align-items:end">
+          <div><label>Emoji</label><input id="cardEmoji" type="text" maxlength="2" placeholder="💳" style="padding:7px 4px;text-align:center;font-size:16px;background:var(--bg3);border:1px solid var(--b2);border-radius:10px;color:var(--t);font-family:var(--font-body);outline:none;width:100%"></div>
+          <div><label>Nombre</label><input id="cardName" type="text" placeholder="ej: Visa Bancolombia"></div>
+        </div>
+        <div class="fi"><label>Últimos 4 dígitos</label><input id="cardLast4" type="text" inputmode="numeric" maxlength="4" placeholder="1234"></div>
+        <div class="fi">
+          <label>Deuda actual (COP)</label>
+          <div style="display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px">
+            <span style="padding-left:12px;color:var(--m);font-family:var(--font-display);font-size:24px;font-weight:700;pointer-events:none;flex-shrink:0;line-height:1">$</span>
+            <input id="cardAmt" type="number" inputmode="numeric" placeholder="0"
+              style="flex:1;border:none;background:transparent;padding:10px 12px;font-family:var(--font-body);font-size:13px;color:var(--t);outline:none;-webkit-appearance:none;width:100%;min-width:0">
+          </div>
+        </div>
+        <div class="fi">
+          <label>Cupo disponible (COP)</label>
+          <div style="display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px">
+            <span style="padding-left:12px;color:var(--m);font-family:var(--font-display);font-size:24px;font-weight:700;pointer-events:none;flex-shrink:0;line-height:1">$</span>
+            <input id="cardAvailable" type="number" inputmode="numeric" placeholder="0"
+              style="flex:1;border:none;background:transparent;padding:10px 12px;font-family:var(--font-body);font-size:13px;color:var(--t);outline:none;-webkit-appearance:none;width:100%;min-width:0">
+          </div>
+        </div>
+        <div class="fi"><label>Fecha de corte</label><input id="cardCut" type="date"></div>
+        <div class="fi"><label>Fecha de pago</label><input id="cardPay" type="date"></div>
+        <button class="btn-p" onclick="addCard()">Guardar tarjeta</button>
+        <div id="cardMsg" style="margin-top:10px;font-size:11px;text-align:center;min-height:16px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEUDAS -->
+<div class="section" id="deudas">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">03</span><h2 class="stitle">Deudas</h2></div>
+    <p class="ssub">Préstamos y otras deudas — todo se resta de tu patrimonio neto</p>
+    <div class="g2">
+      <div class="card" style="border-color:var(--ac-bd)" data-module="deudas" data-feature="debt_form">
+        <div class="ct">Nueva deuda</div>
+        <div class="fi" style="display:grid;grid-template-columns:44px 1fr;gap:6px;align-items:end">
+          <div><label>Emoji</label><input id="debtEmoji" type="text" maxlength="2" placeholder="🏦" style="padding:7px 4px;text-align:center;font-size:16px;background:var(--bg3);border:1px solid var(--b2);border-radius:10px;color:var(--t);font-family:var(--font-body);outline:none;width:100%"></div>
+          <div><label>Nombre</label><input id="debtName" type="text" placeholder="ej: Préstamo carro, Deuda Gabriela..."></div>
+        </div>
+        <div class="fi">
+          <label>Tipo</label>
+          <select id="debtType">
+            <option value="loan">Préstamo</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <div class="fi"><label>Fecha (¿cuándo ocurrió?)</label><input id="debtDate" type="date"></div>
+        <div class="fi">
+          <label>Monto (COP)</label>
+          <div style="display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px">
+            <span style="padding-left:12px;color:var(--m);font-family:var(--font-display);font-size:24px;font-weight:700;pointer-events:none;flex-shrink:0;line-height:1">$</span>
+            <input id="debtAmt" type="number" inputmode="numeric" placeholder="0"
+              style="flex:1;border:none;background:transparent;padding:10px 12px;font-family:var(--font-body);font-size:13px;color:var(--t);outline:none;-webkit-appearance:none;width:100%;min-width:0">
+          </div>
+        </div>
+        <div class="fi"><label>Fecha de pago</label><input id="debtPayDay" type="date"></div>
+        <button class="btn-p" onclick="addDebt()">Registrar deuda</button>
+        <div id="debtMsg" style="margin-top:10px;font-size:11px;text-align:center;min-height:16px"></div>
+      </div>
+      <div class="card" data-module="deudas" data-feature="debt_list">
+        <div class="ct">Deuda total</div>
+        <div id="debtTotal" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--rd)">$0</div>
+        <div id="debtBreakdown" style="font-size:10px;color:var(--m);margin:4px 0 14px"></div>
+        <div id="debtList" style="max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1171,6 +1259,30 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
   <div class="wrap">
     <div class="section-header"><span class="snum">07</span><h2 class="stitle">Modelos Probabilísticos</h2></div>
     <p class="ssub">Simulación Monte Carlo · 800 trayectorias · retornos históricos reales</p>
+
+    <!-- Account Distribution -->
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="ct" style="margin:0">Mis Cuentas</div>
+        <button onclick="showAddAcct()" style="padding:4px 12px;border:1px solid var(--b2);border-radius:20px;background:transparent;color:var(--m);font-size:11px;font-family:var(--font-body);cursor:pointer;-webkit-tap-highlight-color:transparent">+ Cuenta</button>
+      </div>
+      <div id="acctList"></div>
+      <div id="acctAddForm" style="display:none;margin-top:8px;padding:12px;background:var(--bg2);border:1px solid var(--ac-bd);border-radius:10px">
+        <div style="font-size:10px;color:var(--ac2);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:9px">Nueva cuenta</div>
+        <div style="display:grid;grid-template-columns:44px 1fr;gap:6px;margin-bottom:8px;align-items:center">
+          <input id="newAcctEmoji" type="text" maxlength="2" placeholder="🏦" style="padding:8px;text-align:center;font-size:18px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);outline:none;width:100%;box-sizing:border-box">
+          <input id="newAcctName" type="text" placeholder="Ej: Nu Banco..." style="padding:8px 10px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;width:100%;box-sizing:border-box">
+        </div>
+        <div style="margin-bottom:8px">
+          <input id="newAcctAmt" type="number" inputmode="numeric" placeholder="Saldo inicial (COP)" style="padding:8px 10px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;width:100%;box-sizing:border-box;-webkit-appearance:none">
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="saveNewAcct()" style="flex:1;padding:8px;background:var(--ac);color:var(--bg);border:none;border-radius:8px;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer">Guardar</button>
+          <button onclick="document.getElementById('acctAddForm').style.display='none'" style="padding:8px 14px;background:var(--bg3);color:var(--m);border:1px solid var(--b2);border-radius:8px;font-family:var(--font-body);font-size:12px;cursor:pointer">Cancelar</button>
+        </div>
+      </div>
+      <div id="acctSummary" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b2)"></div>
+    </div>
 
     <!-- Portfolio selector -->
     <div class="g3" style="margin-bottom:14px" id="portSelector" data-module="montecarlo" data-feature="portfolio_selector">
@@ -1427,6 +1539,14 @@ async function sbDelete(table, id) {
   return r.ok;
 }
 
+async function sbPatch(table, id, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method:'PATCH', headers: SBH(), body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  return r.json();
+}
+
 // ── Security: HTML escape — use on ALL user/DB strings in innerHTML ──────────
 // Prevents stored XSS: if an attacker writes <script> into a transaction
 // description via the exposed API key, esc() neutralises it before DOM insert.
@@ -1518,7 +1638,7 @@ let BUDGET_LIMIT = 400000;    // monthly expense limit  — set by client.json
 let OPTIMAL_BUDGET = 232000;  // perfect-month budget   — set by client.json
 
 const MODULE_SECTION = {
-  home:'home', overview:'overview', flujo:'flujo', gastos:'gastos',
+  home:'home', overview:'overview', tarjetas:'tarjetas', deudas:'deudas', flujo:'flujo', gastos:'gastos',
   proyeccion:'proyeccion', diario:'diario', mes_perfecto:'perfecto',
   montecarlo:'montecarlo', calculator:'calculator', insights:'insights',
   predictor:'predictor', historial:'historial',
@@ -1529,6 +1649,8 @@ const MODULE_SECTION = {
 const TAB_META = {
   home:         { icon:'⌂',  label:'Inicio',     to:'home'        },
   overview:     { icon:'◎',  label:'Resumen',    to:'overview'    },
+  tarjetas:     { icon:'▭',  label:'Tarjetas',   to:'tarjetas'    },
+  deudas:       { icon:'▼',  label:'Deudas',     to:'deudas'      },
   flujo:        { icon:'↕',  label:'Flujo',      to:'flujo'       },
   gastos:       { icon:'$',  label:'Gastos',     to:'gastos'      },
   proyeccion:   { icon:'⬆', label:'Meta',       to:'proyeccion'  },
@@ -1546,6 +1668,8 @@ const DEFAULT_CFG = {
   modules:{
     home:{enabled:true,features:{kpi_networth:true,kpi_salary:true,kpi_interests:true,kpi_shopping:true,goal_progress_bar:true}},
     overview:{enabled:true,features:{networth_chart:true,salary_timeline:true}},
+    tarjetas:{enabled:true,features:{card_form:true,card_list:true}},
+    deudas:{enabled:true,features:{debt_form:true,debt_list:true}},
     flujo:{enabled:true,features:{cashflow_chart:true,income_sources_chart:true,interest_yield_grid:true}},
     gastos:{enabled:true,features:{month_filter:true,category_bars:true,category_donut:true,monthly_limit_chart:true,day_of_week_grid:true,top10_table:true}},
     proyeccion:{enabled:true,features:{goal_slider:true,apy_slider:true,scenario_cards:true,projection_chart:true}},
@@ -1563,7 +1687,7 @@ const DEFAULT_CFG = {
     multi_currency:{enabled:false},
     ai_summary:{enabled:false},
   },
-  nav:{mobile_tabs:['home','overview','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','insights']},
+  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','insights']},
 };
 
 // Feature flag helper — returns true unless explicitly set to false
@@ -1746,9 +1870,10 @@ async function loadAll() {
   setProgress(10);
   try {
     setSplash('Cargando transacciones...');
-    const [balances, allTx] = await Promise.all([
+    const [balances, allTx, debts] = await Promise.all([
       sbGet('monthly_balance','select=*'),
       sbGet('transactions','select=*&order=date.desc&limit=600'),
+      sbGet('debts','select=*&order=created_at.desc'),
     ]);
     setProgress(75);
     setSplash('Procesando datos...');
@@ -1756,6 +1881,7 @@ async function loadAll() {
     DB.balances      = sortChrono(balances);
     DB._realBalances = sortChrono(balances); // immutable copy — never touched after this
     DB.all           = allTx;
+    DB.debts         = debts;
     DB.income    = allTx.filter(t=>t.type==='income');
     DB.expenses  = allTx.filter(t=>t.type==='expense');
     DB.real_exp  = allTx.filter(t=>t.type==='expense'&&!['Taxes','Transfers'].includes(t.category));
@@ -1812,11 +1938,13 @@ function renderAll() {
   const M=CFG?.modules||{};
   if(M.home?.enabled!==false)         renderHero();
   if(M.overview?.enabled!==false)     renderOverview();
+  if(M.tarjetas?.enabled!==false)     renderTarjetas();
+  if(M.deudas?.enabled!==false)       renderDeudas();
   if(M.flujo?.enabled!==false)        renderFlujo();
   if(M.gastos?.enabled!==false)       renderGastos();
   if(M.proyeccion?.enabled!==false)   renderProyeccion();
   if(M.mes_perfecto?.enabled!==false) renderPerfecto();   // must run before diario to set OPTIMAL_BUDGET
-  if(M.diario?.enabled!==false)       renderDiario();
+  if(M.diario?.enabled!==false)     { renderDiario(); buildPayGrid(); } // keeps credit-card payment options in sync with Deudas
   if(M.historial?.enabled!==false)    renderHistorial();
   if(M.calculator?.enabled!==false)   renderCalculadora();
   if(M.insights?.enabled!==false)     renderInsights();
@@ -1831,8 +1959,11 @@ function renderAll() {
 function renderHero() {
   const cur=DB.curBal, target=USER_TARGET;
   const p=(cur/target*100).toFixed(1);
-  // Ingreso Avg: promedio mensual de TODOS los ingresos (no solo salario)
-  const avgSal=DB.monthly.length?DB.monthly.reduce((s,m)=>s+m.income,0)/DB.monthly.length:0;
+  // Ingreso Avg: todos los ingresos, solo meses COMPLETOS (excluye el mes en curso)
+  const _curYM=new Date().toISOString().slice(0,7);
+  const _pastInc=DB.income.filter(t=>t.date&&t.date.slice(0,7)!==_curYM);
+  const _incMonths=new Set(_pastInc.map(t=>t.date.slice(0,7)));
+  const avgSal=_incMonths.size?_pastInc.reduce((s,t)=>s+t.amount,0)/_incMonths.size:0;
   const interest=DB.income.filter(t=>(t.subcategory||'').toLowerCase()==='interest').reduce((s,t)=>s+t.amount,0);
   const shopping=DB.real_exp.filter(t=>t.category==='Shopping').reduce((s,t)=>s+t.amount,0);
   // Compute top expense category dynamically
@@ -1872,6 +2003,248 @@ function renderOverview() {
       <div class="tl-date">${esc(t.date)}</div>
       <div style="font-size:11px;color:var(--m);margin-bottom:2px">${esc(t.description||'Salario')}</div>
       <div class="tl-amount" style="color:${cols[i%cols.length]}">${fmtF(t.amount)}</div></div>`).join('');
+  }
+}
+
+const DEBT_TYPE_LABEL = { credit_card:'Tarjeta de crédito', loan:'Préstamo', other:'Otro' };
+const DEBT_TYPE_EMOJI = { credit_card:'💳', loan:'🏦', other:'📄' };
+
+const isCardDebt = d => d.type==='credit_card';
+
+// ── SECTION: Mis Tarjetas — the card registry ─────────────────────────────
+// Cards are registered once here; the add-form stays collapsed while at least
+// one card exists so the normal flow is "pick an existing card", not "re-type it".
+let _cardFormOpen = false;
+
+function toggleCardForm(force){
+  const form=document.getElementById('cardForm');
+  const btn=document.getElementById('cardFormToggle');
+  if(!form || !feat('tarjetas','card_form')) return;   // never override a disabled feature
+  _cardFormOpen = (force===undefined) ? !_cardFormOpen : !!force;
+  form.style.display = _cardFormOpen ? '' : 'none';
+  if(btn) btn.textContent = _cardFormOpen ? '✕ Cancelar' : '＋ Agregar tarjeta';
+  if(_cardFormOpen) setTimeout(()=>document.getElementById('cardName')?.focus(),80);
+}
+
+// Card tiles whose linked-transactions list is currently expanded.
+let expandedCardIds = new Set();
+function toggleCardTx(id){
+  if(expandedCardIds.has(id)) expandedCardIds.delete(id); else expandedCardIds.add(id);
+  renderTarjetas();
+}
+
+function renderTarjetas(){
+  const tiles=document.getElementById('cardTiles');
+  if(!tiles) return;
+  const cards=(DB.debts||[]).filter(isCardDebt);
+  if(!cards.length){
+    tiles.innerHTML='<div style="color:var(--m);font-size:12px;padding:14px 0">Sin tarjetas registradas — agrega una para poder vincular tus gastos a crédito.</div>';
+    toggleCardForm(true);   // nothing to select yet, so open the form straight away
+    return;
+  }
+  tiles.innerHTML=cards.map(c=>{
+    const dates=[];
+    if(c.cut_date) dates.push('Corte '+c.cut_date);
+    if(c.pay_day)  dates.push('Pago '+c.pay_day);
+    const cardTx=(DB.all||[]).filter(t=>t.debt_id===c.id).sort((a,b)=>b.date.localeCompare(a.date));
+    const expanded=expandedCardIds.has(c.id);
+    const txRows=cardTx.map(t=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--b)">
+        <div style="min-width:0">
+          <div style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${esc(t.description||t.category)}</div>
+          <div style="font-size:9px;color:var(--m)">${esc(t.date)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <div style="font-size:11px;font-weight:700;color:var(--rd)">${fmtF(t.amount)}</div>
+          <button onclick="deleteTx(${t.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:12px;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
+        </div>
+      </div>`).join('');
+    const txBlock=cardTx.length?`
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b)">
+        <button onclick="toggleCardTx(${c.id})" style="background:none;border:none;color:var(--ac2);cursor:pointer;font-size:10px;padding:0;-webkit-tap-highlight-color:transparent">
+          ${expanded?'▾':'▸'} ${cardTx.length} transacci${cardTx.length===1?'ón':'ones'}
+        </button>
+        ${expanded?`<div style="margin-top:2px">${txRows}</div>`:''}
+      </div>`:'';
+    return `
+    <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:13px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:9px">
+        <div style="min-width:0">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.emoji||'💳')} ${esc(c.name)}</div>
+          <div style="font-size:10px;color:var(--m);margin-top:2px;letter-spacing:.06em">···· ${esc(c.last4||'••••')}</div>
+        </div>
+        <button onclick="deleteDebt(${c.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:13px;flex-shrink:0;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <div>
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Deuda</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--rd)">${fmtF(c.amount)}</div>
+        </div>
+        ${c.available_amount!=null?`<div style="text-align:right">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Cupo</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--gr)">${fmtF(c.available_amount)}</div>
+        </div>`:''}
+      </div>
+      ${dates.length?`<div style="font-size:10px;color:var(--m);margin-top:8px;padding-top:8px;border-top:1px solid var(--b)">${esc(dates.join(' · '))}</div>`:''}
+      ${txBlock}
+    </div>`;
+  }).join('');
+  toggleCardForm(false);    // cards exist → collapse the form, selecting is the default
+}
+
+async function addCard(){
+  const name=document.getElementById('cardName').value.trim();
+  const emoji=document.getElementById('cardEmoji').value.trim()||'💳';
+  const last4=document.getElementById('cardLast4').value.trim();
+  const amount=parseInt(document.getElementById('cardAmt').value)||0;
+  const availableRaw=document.getElementById('cardAvailable').value;
+  const available=availableRaw?parseInt(availableRaw):null;
+  const cutDate=document.getElementById('cardCut').value||null;
+  const payDay=document.getElementById('cardPay').value||null;
+  const msgEl=document.getElementById('cardMsg');
+  if(!name){msgEl.textContent='Ingresa el nombre de la tarjeta';msgEl.style.color='var(--rd)';return;}
+  if(!/^\d{4}$/.test(last4)){msgEl.textContent='Ingresa los últimos 4 dígitos';msgEl.style.color='var(--rd)';return;}
+  msgEl.textContent='Guardando...';msgEl.style.color='var(--m)';
+  try {
+    const [res]=await sbPost('debts',{
+      name,type:'credit_card',emoji,last4,amount,
+      date:new Date().toISOString().slice(0,10),
+      cut_date:cutDate, pay_day:payDay,
+      available_amount:available,
+    });
+    DB.debts.unshift(res);
+    ['cardName','cardEmoji','cardLast4','cardAmt','cardAvailable','cardCut','cardPay'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    msgEl.textContent='✓ Tarjeta guardada';msgEl.style.color='var(--gr)';
+    setTimeout(()=>{msgEl.textContent='';},3000);
+    renderAll();   // renderTarjetas collapses the form and rebuilds the payment grid
+  } catch(e){ msgEl.textContent='Error: '+e.message; msgEl.style.color='var(--rd)'; }
+}
+
+// ── SECTION: Deudas — loans and everything that is not a card ─────────────
+function renderDeudas() {
+  const cards=(DB.debts||[]).filter(isCardDebt);
+  const others=(DB.debts||[]).filter(d=>!isCardDebt(d));
+  const cardTotal =cards.reduce((s,d)=>s+(d.amount||0),0);
+  const otherTotal=others.reduce((s,d)=>s+(d.amount||0),0);
+
+  const totalEl=document.getElementById('debtTotal');
+  if(totalEl) totalEl.textContent=fmtF(DB.totalDebt||0);
+  const brEl=document.getElementById('debtBreakdown');
+  if(brEl) brEl.textContent=`Tarjetas ${fmtF(cardTotal)} · Préstamos y otros ${fmtF(otherTotal)}`;
+
+  const listEl=document.getElementById('debtList');
+  if(!listEl) return;
+  if(!others.length){
+    listEl.innerHTML='<div style="text-align:center;color:var(--m);font-size:12px;padding:20px 0">Sin préstamos ni otras deudas registradas</div>';
+    return;
+  }
+  listEl.innerHTML=others.map(d=>{
+    const metaParts=[DEBT_TYPE_LABEL[d.type]||d.type];
+    if(d.date)     metaParts.push('Desde '+d.date);
+    if(d.pay_day)  metaParts.push('Pago '+d.pay_day);
+    return `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b)">
+      <div style="min-width:0">
+        <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.emoji||DEBT_TYPE_EMOJI[d.type]||'📄')} ${esc(d.name)}</div>
+        <div style="font-size:10px;color:var(--m);margin-top:1px">${esc(metaParts.join(' · '))}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--rd)">${fmtF(d.amount)}</div>
+        <button onclick="deleteDebt(${d.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:3px 6px;font-size:14px;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addDebt(){
+  const name=document.getElementById('debtName').value.trim();
+  const type=document.getElementById('debtType').value;
+  const emoji=document.getElementById('debtEmoji').value.trim()||DEBT_TYPE_EMOJI[type]||'📄';
+  const amount=parseInt(document.getElementById('debtAmt').value);
+  const date=document.getElementById('debtDate').value||new Date().toISOString().slice(0,10);
+  const payDay=document.getElementById('debtPayDay').value||null;
+  const msgEl=document.getElementById('debtMsg');
+  if(!name){msgEl.textContent='Ingresa un nombre';msgEl.style.color='var(--rd)';return;}
+  if(!amount||amount<=0){msgEl.textContent='Ingresa un monto válido';msgEl.style.color='var(--rd)';return;}
+  msgEl.textContent='Guardando...';msgEl.style.color='var(--m)';
+  try {
+    const [res]=await sbPost('debts',{
+      name,type,emoji,amount,date,
+      pay_day:payDay,
+      cut_date:null, available_amount:null, last4:null,
+    });
+    DB.debts.unshift(res);
+    document.getElementById('debtName').value='';
+    document.getElementById('debtEmoji').value='';
+    document.getElementById('debtAmt').value='';
+    document.getElementById('debtPayDay').value='';
+    msgEl.textContent='✓ Guardado en Supabase';msgEl.style.color='var(--gr)';
+    setTimeout(()=>{msgEl.textContent='';},3000);
+    renderAll();
+  } catch(e){ msgEl.textContent='Error: '+e.message; msgEl.style.color='var(--rd)'; }
+}
+
+async function deleteDebt(id){
+  const ok=await phiConfirm({icon:'🗑️',title:'Eliminar deuda',msg:'¿Estás seguro de que deseas eliminar esta deuda? Esta acción no se puede deshacer.',confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
+  if(!ok)return;
+  const deleted=await sbDelete('debts',id);
+  if(deleted){
+    DB.debts=DB.debts.filter(d=>d.id!==id);
+    if(selPayment==='debt_'+id) selPayment='';
+    expandedCardIds.delete(id);
+    renderAll();
+  }
+}
+
+// ── Quick "no card yet" prompt, launched from the Diario payment grid ──────
+// Lets the user register a credit card on the spot (name, last 4, balance,
+// cut/pay dates) and immediately links the in-progress transaction to it.
+function openCardPrompt(){
+  ['ccName','ccLast4','ccAmt','ccCut','ccPay'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('ccErr').textContent='';
+  const btn=document.querySelector('#cardPromptOverlay .cfm-btn-confirm');
+  if(btn){ btn.textContent='Guardar y usar'; btn.disabled=false; }
+  const ov=document.getElementById('cardPromptOverlay');
+  ov.style.display='flex';
+  requestAnimationFrame(()=>ov.classList.add('show'));
+  setTimeout(()=>document.getElementById('ccName').focus(),150);
+}
+
+function closeCardPrompt(){
+  const ov=document.getElementById('cardPromptOverlay');
+  ov.classList.remove('show');
+  setTimeout(()=>{ ov.style.display='none'; },200);
+}
+
+async function confirmCardPrompt(){
+  const name=document.getElementById('ccName').value.trim();
+  const last4=document.getElementById('ccLast4').value.trim();
+  const amount=parseInt(document.getElementById('ccAmt').value);
+  const cutDate=document.getElementById('ccCut').value||null;
+  const payDay=document.getElementById('ccPay').value||null;
+  const errEl=document.getElementById('ccErr');
+  if(!name){errEl.textContent='Ingresa el nombre de la tarjeta';errEl.style.color='var(--rd)';return;}
+  if(!/^\d{4}$/.test(last4)){errEl.textContent='Ingresa los últimos 4 dígitos';errEl.style.color='var(--rd)';return;}
+  if(!amount||amount<=0){errEl.textContent='Ingresa un monto válido';errEl.style.color='var(--rd)';return;}
+  errEl.textContent='';
+  const btn=document.querySelector('#cardPromptOverlay .cfm-btn-confirm');
+  if(btn){ btn.textContent='Guardando…'; btn.disabled=true; }
+  try {
+    const [res]=await sbPost('debts',{
+      name,type:'credit_card',emoji:'💳',last4,amount,
+      date:new Date().toISOString().slice(0,10),
+      cut_date:cutDate, pay_day:payDay,
+      available_amount:null,
+    });
+    DB.debts.unshift(res);
+    closeCardPrompt();
+    selPayment='debt_'+res.id; // auto-link the transaction currently being filled out
+    renderAll();
+  } catch(e){
+    errEl.textContent='Error: '+e.message; errEl.style.color='var(--rd)';
+    if(btn){ btn.textContent='Guardar y usar'; btn.disabled=false; }
   }
 }
 
@@ -2441,7 +2814,17 @@ let hiddenDefaultPay=new Set(JSON.parse(localStorage.getItem('dfg_hidden_pay')||
 let selPayment='';
 function saveCustomPay(){ localStorage.setItem('dfg_custom_pay',JSON.stringify(customPayMethods)); }
 function saveHiddenPay(){ localStorage.setItem('dfg_hidden_pay',JSON.stringify([...hiddenDefaultPay])); }
-function getAllPayMethods(){ return [...PAY_METHODS.filter(p=>!hiddenDefaultPay.has(p.id)),...customPayMethods]; }
+// Registered credit cards (from Deudas) become their own selectable payment methods,
+// each showing its emoji — replaces the generic "💰 Crédito" bucket once at least one exists.
+function getCardPayMethods(){
+  return (DB.debts||[]).filter(d=>d.type==='credit_card')
+    .map(d=>({id:'debt_'+d.id, lbl:`${d.emoji||'💳'} ${d.name}${d.last4?' ····'+d.last4:''}`, debtId:d.id}));
+}
+function getAllPayMethods(){
+  const cards=getCardPayMethods();
+  const statics=PAY_METHODS.filter(p=>!hiddenDefaultPay.has(p.id) && !(p.id==='credito' && cards.length));
+  return [...statics,...cards,...customPayMethods];
+}
 
 async function deletePay(p){
   const ok=await phiConfirm({icon:'🗑️',title:'Eliminar método',msg:`¿Eliminar "${p.lbl}"?`,confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
@@ -2473,11 +2856,14 @@ function buildPayGrid(){
   getAllPayMethods().forEach(p=>{
     const wrap=document.createElement('div'); wrap.style.cssText='position:relative';
     const b=document.createElement('button');
-    b.textContent=p.lbl; b.onclick=()=>selectPay(p.id);
+    b.textContent=p.lbl;
+    // "Crédito" only ever renders when zero cards are registered — clicking it
+    // opens the quick-add prompt instead of selecting an unlinked bucket.
+    b.onclick=()=> p.id==='credito' ? openCardPrompt() : selectPay(p.id);
     const sel=p.id===selPayment;
     b.style.cssText=`width:100%;padding:7px 3px;border:1px solid ${sel?'rgba(184,155,106,0.6)':'var(--b2)'};border-radius:8px;background:${sel?'rgba(184,155,106,0.15)':'var(--bg3)'};color:${sel?'var(--ac2)':'var(--m)'};font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none`;
     let _pt;
-    const _start=()=>{ b.style.border='1px solid var(--rd)'; _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deletePay(p); },500); };
+    const _start=()=>{ b.style.border='1px solid var(--rd)'; _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deletePay(p); },1000); };
     const _cancel=()=>{ clearTimeout(_pt); const s=p.id===selPayment; b.style.border=s?'1px solid rgba(184,155,106,0.6)':'1px solid var(--b2)'; b.style.background=s?'rgba(184,155,106,0.15)':'var(--bg3)'; };
     b.addEventListener('touchstart',_start,{passive:true});
     b.addEventListener('touchend',_cancel); b.addEventListener('touchcancel',_cancel);
@@ -2558,7 +2944,7 @@ function buildCatGrid(){
     let _pt;
     const _start=()=>{
       b.style.border='1px solid var(--rd)';
-      _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deleteCat(c); },500);
+      _pt=setTimeout(()=>{ if(navigator.vibrate) navigator.vibrate(50); deleteCat(c); },1000);
     };
     const _cancel=()=>{
       clearTimeout(_pt);
@@ -2973,13 +3359,16 @@ async function addTx(){
     const d=new Date(date+'T12:00:00');
     // Extraer nombre limpio (sin emoji) para la columna category
     const catLabel = activeCat?.lbl.replace(/^\S+\s*/,'').trim() || selCat;
-    const payLbl = getAllPayMethods().find(p=>p.id===selPayment)?.lbl.replace(/^\S+\s*/,'').trim() || 'Efectivo';
+    const payMethod = getAllPayMethods().find(p=>p.id===selPayment);
+    const payLbl = payMethod?.lbl.replace(/^\S+\s*/,'').trim() || 'Efectivo';
+    const cardDebtId = payMethod?.debtId || null;
     const [res]=await sbPost('transactions',{
       date,type:txType,amount,
       category:txType==='expense'? catLabel :'Income',
       subcategory:selCat,
       description:desc,
       account:payLbl,
+      debt_id:cardDebtId,
       month:d.toLocaleString('en',{month:'long'}),
       year:d.getFullYear(),
     });
@@ -2987,6 +3376,16 @@ async function addTx(){
     if(txType==='income') DB.income.unshift(res);
     else{ DB.expenses.unshift(res); if(!['Taxes','Transfers'].includes(res.category)) DB.real_exp.unshift(res); }
     DB.monthly=buildMonthly(DB.all);
+    // Expense paid on a credit card raises that card's outstanding balance —
+    // no need to go re-enter it manually in Deudas.
+    if(txType==='expense' && cardDebtId){
+      const card=DB.debts.find(dd=>dd.id===cardDebtId);
+      if(card){
+        const newAmount=card.amount+amount;
+        await sbPatch('debts',cardDebtId,{amount:newAmount});
+        card.amount=newAmount;
+      }
+    }
     document.getElementById('txAmt').value='';
     document.getElementById('txFmt').textContent='';
     document.getElementById('txDesc').value='';
@@ -3069,6 +3468,10 @@ function recalcBalance(){
     DB.balances = sortChrono(DB.balances);
     DB.curBal   = DB.balances[DB.balances.length - 1].balance;
   }
+
+  // ── Subtract outstanding debt (credit cards, loans, etc.) from net worth.
+  DB.totalDebt = (DB.debts||[]).reduce((s,d)=>s+(d.amount||0), 0);
+  DB.curBal   -= DB.totalDebt;
 }
 
 function renderDiario(){
@@ -3241,8 +3644,21 @@ function renderHistorial(){
 async function deleteTx(id){
   const ok=await phiConfirm({icon:'🗑️',title:'Eliminar transacción',msg:'¿Estás seguro de que deseas eliminar esta transacción? Esta acción no se puede deshacer.',confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
   if(!ok)return;
+  const tx=DB.all.find(t=>t.id===id);
   const deleted=await sbDelete('transactions',id);
-  if(deleted){ DB.all=DB.all.filter(t=>t.id!==id); DB.income=DB.income.filter(t=>t.id!==id); DB.expenses=DB.expenses.filter(t=>t.id!==id); DB.real_exp=DB.real_exp.filter(t=>t.id!==id); DB.monthly=buildMonthly(DB.all); renderAll(); }
+  if(deleted){
+    DB.all=DB.all.filter(t=>t.id!==id); DB.income=DB.income.filter(t=>t.id!==id); DB.expenses=DB.expenses.filter(t=>t.id!==id); DB.real_exp=DB.real_exp.filter(t=>t.id!==id); DB.monthly=buildMonthly(DB.all);
+    // Reverse the balance bump this transaction made to its credit card, if any.
+    if(tx?.type==='expense' && tx.debt_id){
+      const card=DB.debts.find(dd=>dd.id===tx.debt_id);
+      if(card){
+        const newAmount=Math.max(0,card.amount-tx.amount);
+        await sbPatch('debts',tx.debt_id,{amount:newAmount});
+        card.amount=newAmount;
+      }
+    }
+    renderAll();
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -4530,12 +4946,12 @@ function setTab(key){document.querySelectorAll('.tab-item').forEach(b=>b.classLi
 window.addEventListener('scroll',()=>{
   // Map section element ID → data-nav-module key (handles perfecto ≠ mes_perfecto)
   const SNAV={
-    home:'home',diario:'diario',overview:'overview',flujo:'flujo',
+    home:'home',diario:'diario',overview:'overview',tarjetas:'tarjetas',deudas:'deudas',flujo:'flujo',
     gastos:'gastos',historial:'historial',proyeccion:'proyeccion',perfecto:'mes_perfecto',
     montecarlo:'montecarlo',calculator:'calculator',
     predictor:'predictor',insights:'insights'
   };
-  const DOM_ORDER=['home','diario','overview','flujo','gastos','historial','proyeccion',
+  const DOM_ORDER=['home','diario','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion',
                    'perfecto','montecarlo','calculator','predictor','insights'];
   let activeId='home';
   DOM_ORDER.forEach(id=>{
@@ -4591,7 +5007,103 @@ function pctile(arr,p){
   return s[Math.floor(p/100*(s.length-1))];
 }
 
+// ── Account Distribution ──────────────────────────────────────────────────
+const ACCT_COLORS=['#b89b6a','#4d9fff','#2dd4bf','#a78bfa','#22d47a','#f5a623','#f05353'];
+let userAccounts=JSON.parse(localStorage.getItem('dfg_accounts')||'[]');
+function saveAccts(){ localStorage.setItem('dfg_accounts',JSON.stringify(userAccounts)); }
+
+function buildAccountsGrid(){
+  const el=document.getElementById('acctList'); if(!el) return;
+  const total=DB.curBal||0;
+  if(!userAccounts.length){
+    el.innerHTML=`<div style="text-align:center;padding:18px 0;color:var(--m);font-size:12px">Sin cuentas — agrega una para distribuir tu patrimonio.</div>`;
+    _updateAcctSummary(); return;
+  }
+  el.innerHTML=userAccounts.map(a=>{
+    const pct=total>0?(a.amount/total*100).toFixed(1):'0.0';
+    const w=total>0?Math.max(0,Math.min(100,a.amount/total*100)):0;
+    return`<div id="acctRow_${a.id}" style="display:flex;align-items:center;gap:10px;margin-bottom:7px;padding:10px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:10px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none">
+      <div class="acct-hold-zone" data-id="${a.id}" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+        <span style="font-size:18px;flex-shrink:0">${a.emoji}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:var(--t);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name)}</div>
+          <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden">
+            <div class="acct-bar" style="height:100%;width:${w.toFixed(1)}%;background:${a.color};border-radius:2px;transition:width .4s ease"></div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <input type="number" inputmode="numeric" value="${a.amount}" data-id="${a.id}" oninput="updateAcctAmt(this.dataset.id,this.value)"
+          style="width:100px;text-align:right;background:transparent;border:none;border-bottom:1px solid var(--b2);color:var(--t);font-family:var(--font-display);font-size:13px;font-weight:700;outline:none;padding:2px 0;-webkit-appearance:none">
+        <div class="acct-pct" style="font-size:10px;color:${a.color};font-weight:600;margin-top:3px">${pct}%</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.acct-hold-zone').forEach(zone=>{
+    const id=zone.dataset.id; let _t;
+    const _s=()=>{ _t=setTimeout(async()=>{ if(navigator.vibrate)navigator.vibrate(50); const a=userAccounts.find(x=>x.id===id); if(!a)return; const ok=await phiConfirm({icon:'🗑️',title:'Eliminar cuenta',msg:`¿Eliminar "${a.name}"?`,confirmText:'Eliminar',cancelText:'Cancelar',danger:true}); if(ok){userAccounts=userAccounts.filter(x=>x.id!==id);saveAccts();buildAccountsGrid();} },1000); };
+    const _c=()=>clearTimeout(_t);
+    zone.addEventListener('mousedown',_s); zone.addEventListener('mouseup',_c); zone.addEventListener('mouseleave',_c);
+    zone.addEventListener('touchstart',_s,{passive:true}); zone.addEventListener('touchend',_c); zone.addEventListener('touchcancel',_c);
+    zone.addEventListener('contextmenu',e=>e.preventDefault());
+  });
+  _updateAcctSummary();
+}
+
+function updateAcctAmt(id,val){
+  const a=userAccounts.find(x=>x.id===id); if(!a) return;
+  a.amount=parseInt(val)||0; saveAccts();
+  const total=DB.curBal||0;
+  userAccounts.forEach(acc=>{
+    const row=document.getElementById('acctRow_'+acc.id); if(!row) return;
+    const pct=total>0?(acc.amount/total*100).toFixed(1):'0.0';
+    const w=total>0?Math.max(0,Math.min(100,acc.amount/total*100)):0;
+    const bar=row.querySelector('.acct-bar'); if(bar) bar.style.width=w.toFixed(1)+'%';
+    const pctEl=row.querySelector('.acct-pct'); if(pctEl) pctEl.textContent=pct+'%';
+  });
+  _updateAcctSummary();
+}
+
+function _updateAcctSummary(){
+  const sumEl=document.getElementById('acctSummary'); if(!sumEl) return;
+  const total=DB.curBal||0;
+  const allocated=userAccounts.reduce((s,a)=>s+a.amount,0);
+  const unalloc=total-allocated;
+  const uCol=Math.abs(unalloc)<500?'var(--gr)':unalloc>0?'var(--am)':'var(--rd)';
+  sumEl.innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+      <span style="color:var(--m)">Total asignado</span>
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--t)">${fmtF(allocated)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+      <span style="color:var(--m)">Patrimonio total</span>
+      <span style="font-family:var(--font-display);font-weight:700;color:var(--t)">${fmtF(total)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;padding-top:6px;border-top:1px solid var(--b2)">
+      <span style="color:var(--m)">Sin asignar</span>
+      <span style="font-family:var(--font-display);font-weight:700;color:${uCol}">${unalloc>=0?'+':''}${fmtF(unalloc)}</span>
+    </div>`;
+}
+
+function showAddAcct(){
+  const f=document.getElementById('acctAddForm'); if(f) f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function saveNewAcct(){
+  const emoji=document.getElementById('newAcctEmoji').value.trim()||'🏦';
+  const name=document.getElementById('newAcctName').value.trim();
+  const amount=parseInt(document.getElementById('newAcctAmt').value)||0;
+  if(!name){ const el=document.getElementById('newAcctName'); el.style.borderColor='var(--rd)'; setTimeout(()=>{el.style.borderColor='var(--b2)';},2000); return; }
+  userAccounts.push({id:'acct_'+Date.now(),emoji,name,amount,color:ACCT_COLORS[userAccounts.length%ACCT_COLORS.length]});
+  saveAccts();
+  document.getElementById('acctAddForm').style.display='none';
+  ['newAcctEmoji','newAcctName','newAcctAmt'].forEach(id=>{ document.getElementById(id).value=''; });
+  buildAccountsGrid();
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 function updateMC(){
+  buildAccountsGrid();
   const cap    = +document.getElementById('mcCap').value;
   const aporte = +document.getElementById('mcAporte').value;
   const years  = +document.getElementById('mcYears').value;
@@ -4892,11 +5404,21 @@ window.setType           = setType;
 window.addCustomCat      = addCustomCat;
 window.addCustomPay      = addCustomPay;
 window.setGastosPayFilter= setGastosPayFilter;
+window.showAddAcct       = showAddAcct;
+window.saveNewAcct       = saveNewAcct;
+window.updateAcctAmt     = updateAcctAmt;
 window.toggleVoice       = toggleVoice;
 window.addTx             = addTx;
 window.exportStatement   = exportStatement;
 window.selectPort        = selectPort;
 window.deleteTx          = deleteTx;
+window.addDebt            = addDebt;
+window.deleteDebt         = deleteDebt;
+window.addCard            = addCard;
+window.toggleCardForm     = toggleCardForm;
+window.toggleCardTx       = toggleCardTx;
+window.closeCardPrompt    = closeCardPrompt;
+window.confirmCardPrompt  = confirmCardPrompt;
 window.startVoiceTxFull  = startVoiceTxFull;
 window.stopVoiceTxFull   = stopVoiceTxFull;
 window.closeVoiceTxModal = closeVoiceTxModal;
@@ -4911,6 +5433,7 @@ window.renderGastos      = renderGastos;
 window.renderHistorial   = renderHistorial;
 window.calcUpdate        = calcUpdate;
 window.liveAmt           = liveAmt;
+
 // ─────────────────────────────────────────────────────────────────────────
 
 })(); // end IIFE
@@ -5002,6 +5525,8 @@ window.liveAmt           = liveAmt;
       if(e.data?.type === 'NEW_VERSION') showUpdateBanner();
     });
   }
+
+
 })();
 </script>
 
@@ -5074,6 +5599,49 @@ window.liveAmt           = liveAmt;
     <div class="cfm-btns">
       <button class="cfm-btn cfm-btn-cancel" onclick="closeVoiceTxModal()">Cancelar</button>
       <button class="cfm-btn cfm-btn-confirm" onclick="confirmVoiceTx()">Confirmar y guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quick "register a credit card" prompt — launched from Diario's payment grid
+     when the user picks "Crédito" and has no card linked yet. -->
+<div id="cardPromptOverlay" class="cfm-overlay" onclick="if(event.target===this)closeCardPrompt()" style="display:none">
+  <div class="cfm-box" style="max-width:360px;text-align:left;padding:24px 22px 20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span style="font-size:24px">💳</span>
+      <div>
+        <div class="cfm-title" style="text-align:left;margin:0;font-size:15px">Nueva tarjeta de crédito</div>
+        <div style="font-size:10px;color:var(--m);margin-top:2px">No tienes ninguna registrada — regístrala para vincular esta transacción</div>
+      </div>
+    </div>
+    <div class="vtx-field">
+      <div class="vtx-label">Nombre</div>
+      <input id="ccName" type="text" class="vtx-inp" placeholder="ej: Visa Bancolombia">
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="vtx-field" style="flex:1">
+        <div class="vtx-label">Últimos 4 dígitos</div>
+        <input id="ccLast4" type="text" inputmode="numeric" maxlength="4" class="vtx-inp" placeholder="1234">
+      </div>
+      <div class="vtx-field" style="flex:1">
+        <div class="vtx-label">Monto (COP)</div>
+        <input id="ccAmt" type="number" inputmode="numeric" class="vtx-inp" placeholder="0">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="vtx-field" style="flex:1">
+        <div class="vtx-label">Fecha de corte</div>
+        <input id="ccCut" type="date" class="vtx-inp">
+      </div>
+      <div class="vtx-field" style="flex:1">
+        <div class="vtx-label">Fecha de pago</div>
+        <input id="ccPay" type="date" class="vtx-inp">
+      </div>
+    </div>
+    <div id="ccErr" style="font-size:11px;color:var(--rd);min-height:16px;margin-bottom:6px;text-align:center"></div>
+    <div class="cfm-btns">
+      <button class="cfm-btn cfm-btn-cancel" onclick="closeCardPrompt()">Cancelar</button>
+      <button class="cfm-btn cfm-btn-confirm" onclick="confirmCardPrompt()">Guardar y usar</button>
     </div>
   </div>
 </div>
