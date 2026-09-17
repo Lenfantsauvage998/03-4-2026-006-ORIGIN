@@ -2202,53 +2202,40 @@ function renderTarjetas(){
     toggleCardForm(true);   // nothing to select yet, so open the form straight away
     return;
   }
-  tiles.innerHTML=cards.map(c=>{
-    const dates=[];
-    if(c.cut_date) dates.push('Corte '+c.cut_date);
-    if(c.pay_day)  dates.push('Pago '+c.pay_day);
-    const cardTx=(DB.all||[]).filter(t=>t.debt_id===c.id).sort((a,b)=>b.date.localeCompare(a.date));
-    const expanded=expandedCardIds.has(c.id);
-    const txRows=cardTx.map(t=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--b)">
-        <div style="min-width:0">
-          <div style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${esc(t.description||t.category)}</div>
-          <div style="font-size:9px;color:var(--m)">${esc(t.date)}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-          <div style="font-size:11px;font-weight:700;color:var(--rd)">${fmtF(t.amount)}</div>
-          <button onclick="deleteTx(${t.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:12px;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
-        </div>
-      </div>`).join('');
-    const txBlock=cardTx.length?`
-      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b)">
-        <button onclick="toggleCardTx(${c.id})" style="background:none;border:none;color:var(--ac2);cursor:pointer;font-size:10px;padding:0;-webkit-tap-highlight-color:transparent">
-          ${expanded?'▾':'▸'} ${cardTx.length} transacci${cardTx.length===1?'ón':'ones'}
-        </button>
-        ${expanded?`<div style="margin-top:2px">${txRows}</div>`:''}
-      </div>`:'';
-    return `
+  // Short "10 sep" style label for a stored YYYY-MM-DD date; '—' when missing.
+  const fmtDate=iso=>{
+    if(!iso) return '—';
+    const d=new Date(iso+'T12:00:00'); if(isNaN(d)) return iso;
+    return d.toLocaleString('es',{day:'numeric',month:'short'});
+  };
+  tiles.innerHTML=cards.map(c=>`
     <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:13px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:11px">
         <div style="min-width:0">
           <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.emoji||'💳')} ${esc(c.name)}</div>
           <div style="font-size:10px;color:var(--m);margin-top:2px;letter-spacing:.06em">···· ${esc(c.last4||'••••')}</div>
         </div>
         <button onclick="deleteDebt(${c.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:13px;flex-shrink:0;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
-        <div>
-          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Deuda</div>
-          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--rd)">${fmtF(c.amount)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Uso del mes</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--rd)">${fmtF(c.amount)}</div>
         </div>
-        ${c.available_amount!=null?`<div style="text-align:right">
-          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em">Cupo</div>
-          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--gr)">${fmtF(c.available_amount)}</div>
-        </div>`:''}
+        <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Cupo disponible</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--gr)">${c.available_amount!=null?fmtF(c.available_amount):'—'}</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de corte</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t)">${fmtDate(c.cut_date)}</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de pago</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--am)">${fmtDate(c.pay_day)}</div>
+        </div>
       </div>
-      ${dates.length?`<div style="font-size:10px;color:var(--m);margin-top:8px;padding-top:8px;border-top:1px solid var(--b)">${esc(dates.join(' · '))}</div>`:''}
-      ${txBlock}
-    </div>`;
-  }).join('');
+    </div>`).join('');
   toggleCardForm(false);    // cards exist → collapse the form, selecting is the default
 }
 
