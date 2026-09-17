@@ -1229,10 +1229,17 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
         <div id="debtMsg" style="margin-top:10px;font-size:11px;text-align:center;min-height:16px"></div>
       </div>
       <div class="card" data-module="deudas" data-feature="debt_list">
-        <div class="ct">Deuda total</div>
-        <div id="debtTotal" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--rd)">$0</div>
-        <div id="debtBreakdown" style="font-size:10px;color:var(--m);margin:4px 0 14px"></div>
-        <div id="debtList" style="max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <div class="ct" style="margin:0">Deuda total</div>
+          <select id="deudaCardSelect" onchange="renderDeudas()"
+            style="padding:5px 9px;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;color:var(--t);font-family:var(--font-body);font-size:10px;outline:none;cursor:pointer;-webkit-appearance:none"></select>
+        </div>
+        <div id="deudaAllView">
+          <div id="debtTotal" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--rd)">$0</div>
+          <div id="debtBreakdown" style="font-size:10px;color:var(--m);margin:4px 0 14px"></div>
+          <div id="debtList" style="max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+        </div>
+        <div id="deudaCardView" style="display:none;margin-top:6px"></div>
       </div>
     </div>
   </div>
@@ -1739,6 +1746,8 @@ function phiConfirm({icon='',title='',msg='',confirmText='Confirmar',cancelText=
 //  UTILS
 // ══════════════════════════════════════════════════════════
 const fmt  = v => { const a=Math.abs(v); if(a>=1e6) return '$'+(v/1e6).toFixed(1)+'M'; if(a>=1e3) return '$'+(v/1e3).toFixed(0)+'K'; return '$'+Math.round(v); };
+// Short "10 sep" style label for a stored YYYY-MM-DD date; '—' when missing. Shared by Tarjetas + Deudas card views.
+const fmtCardDate = iso => { if(!iso) return '—'; const d=new Date(iso+'T12:00:00'); if(isNaN(d)) return iso; return d.toLocaleString('es',{day:'numeric',month:'short'}); };
 const fmtF = v => '$'+Math.round(v).toLocaleString('es-CO');
 // Local-timezone YYYY-MM-DD (toISOString() is UTC and flips the date after 7pm in Colombia)
 const localISO = (d=new Date()) => { const o=d.getTimezoneOffset()*60000; return new Date(d.getTime()-o).toISOString().slice(0,10); };
@@ -2202,12 +2211,6 @@ function renderTarjetas(){
     toggleCardForm(true);   // nothing to select yet, so open the form straight away
     return;
   }
-  // Short "10 sep" style label for a stored YYYY-MM-DD date; '—' when missing.
-  const fmtDate=iso=>{
-    if(!iso) return '—';
-    const d=new Date(iso+'T12:00:00'); if(isNaN(d)) return iso;
-    return d.toLocaleString('es',{day:'numeric',month:'short'});
-  };
   tiles.innerHTML=cards.map(c=>`
     <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:12px;padding:13px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:11px">
@@ -2228,11 +2231,11 @@ function renderTarjetas(){
         </div>
         <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
           <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de corte</div>
-          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t)">${fmtDate(c.cut_date)}</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t)">${fmtCardDate(c.cut_date)}</div>
         </div>
         <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
           <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de pago</div>
-          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--am)">${fmtDate(c.pay_day)}</div>
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--am)">${fmtCardDate(c.pay_day)}</div>
         </div>
       </div>
     </div>`).join('');
@@ -2269,7 +2272,11 @@ async function addCard(){
   } catch(e){ msgEl.textContent='Error: '+e.message; msgEl.style.color='var(--rd)'; }
 }
 
-// ── SECTION: Deudas — loans and everything that is not a card ─────────────
+// ── SECTION: Deudas — loans + a per-card debt selector ─────────────────────
+// "Todas las deudas" (default) keeps the original total/breakdown/loan-list view.
+// Picking a specific registered card swaps to a detail panel for that card only —
+// same 4 fields as its Tarjetas tile (uso, cupo, corte, pago), read-only here
+// (cards are added/removed from the Tarjetas section, not from Deudas).
 function renderDeudas() {
   const cards=(DB.debts||[]).filter(isCardDebt);
   const others=(DB.debts||[]).filter(d=>!isCardDebt(d));
@@ -2280,6 +2287,50 @@ function renderDeudas() {
   if(totalEl) totalEl.textContent=fmtF(DB.totalDebt||0);
   const brEl=document.getElementById('debtBreakdown');
   if(brEl) brEl.textContent=`Tarjetas ${fmtF(cardTotal)} · Préstamos y otros ${fmtF(otherTotal)}`;
+
+  // ── Card selector: keep the chosen card selected across re-renders; drop
+  //    back to "Todas" if that card was deleted or there are no cards yet.
+  const sel=document.getElementById('deudaCardSelect');
+  if(sel){
+    const prev=sel.value;
+    sel.style.display=cards.length?'':'none';
+    sel.innerHTML='<option value="all">Todas las deudas</option>'+
+      cards.map(c=>`<option value="${c.id}">${esc(c.emoji||'💳')} ${esc(c.name)}</option>`).join('');
+    if(prev && [...sel.options].some(o=>o.value===prev)) sel.value=prev;
+  }
+  const selectedCard = (sel && sel.value!=='all') ? cards.find(c=>c.id===+sel.value) : null;
+  const allView=document.getElementById('deudaAllView');
+  const cardView=document.getElementById('deudaCardView');
+  if(allView)  allView.style.display  = selectedCard ? 'none' : '';
+  if(cardView) cardView.style.display = selectedCard ? '' : 'none';
+
+  if(selectedCard){
+    const c=selectedCard;
+    cardView.innerHTML=`
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px">
+        ${esc(c.emoji||'💳')} ${esc(c.name)}
+        <span style="font-size:10px;color:var(--m);margin-left:6px;letter-spacing:.06em;font-weight:400">···· ${esc(c.last4||'••••')}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg3);border-radius:9px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Uso del mes</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--rd)">${fmtF(c.amount)}</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:9px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Cupo disponible</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--gr)">${c.available_amount!=null?fmtF(c.available_amount):'—'}</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:9px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de corte</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--t)">${fmtCardDate(c.cut_date)}</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:9px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fecha de pago</div>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--am)">${fmtCardDate(c.pay_day)}</div>
+        </div>
+      </div>`;
+    return;
+  }
 
   const listEl=document.getElementById('debtList');
   if(!listEl) return;
@@ -6323,6 +6374,7 @@ window.updateMC          = updateMC;
 window.updateTarget      = updateTarget;
 window.updateAPY         = updateAPY;
 window.renderDiario      = renderDiario;
+window.renderDeudas      = renderDeudas;
 window.renderGastos      = renderGastos;
 window.renderHistorial   = renderHistorial;
 window.calcUpdate        = calcUpdate;
