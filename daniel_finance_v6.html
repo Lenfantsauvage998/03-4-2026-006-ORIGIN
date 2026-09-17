@@ -1094,6 +1094,16 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
             </div>
           </div>
         </div>
+        <div class="fi" id="txInstallWrap" style="display:none">
+          <a href="#" id="txInstallToggle" onclick="event.preventDefault();toggleInstallForm('tx')" style="font-size:10px;color:var(--ac2);text-decoration:none">＋ Cuotas / intereses</a>
+          <div id="txInstallForm" style="display:none;margin-top:8px;padding:11px;background:var(--bg2);border:1px solid var(--ac-bd);border-radius:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+              <div><label style="font-size:9px">Nº de cuotas</label><input id="txInstallments" type="number" inputmode="numeric" min="1" step="1" value="1" oninput="updateInstallPreview('tx')" style="padding:7px 8px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;width:100%"></div>
+              <div><label style="font-size:9px">Tasa mensual (%)</label><input id="txRate" type="number" inputmode="decimal" min="0" step="0.1" value="0" oninput="updateInstallPreview('tx')" style="padding:7px 8px;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;width:100%"></div>
+            </div>
+            <div id="txInstallPreview" style="font-size:10px;color:var(--m)"></div>
+          </div>
+        </div>
         <div class="fi">
           <label>Descripción</label>
           <div style="display:flex;gap:8px;align-items:center">
@@ -1771,6 +1781,75 @@ function cardCycle(card, asOf=new Date()){
   return {lastCut,nextCut,payDate};
 }
 const fmtF = v => '$'+Math.round(v).toLocaleString('es-CO');
+// ── Cuotas / intereses on a card purchase ──────────────────────────────────
+// Fixed-installment amortization: equal monthly payments at a flat monthly
+// rate (the usual "N cuotas" a Colombian card offers). installments<=1 or
+// rate<=0 → no interest, cuota is just the principal split evenly.
+function installmentInfo(principal, installments, ratePct){
+  const n=Math.max(1, Math.round(Number(installments))||1);
+  const r=(Number(ratePct)||0)/100;
+  if(n<=1 || r<=0) return { n, r:0, cuota:principal/n, totalInterest:0, totalPaid:principal };
+  const cuota=principal*r/(1-Math.pow(1+r,-n));
+  const totalPaid=cuota*n;
+  return { n, r, cuota, totalInterest:totalPaid-principal, totalPaid };
+}
+// Fields to add to an insert body for form `prefix` — omitted entirely when there's no
+// plan (n<=1 and rate<=0), so a normal single-payment purchase never touches these two
+// columns and keeps working even on a database that hasn't run the cuotas migration yet.
+function _installPayload(prefix){
+  const n=parseInt(document.getElementById(prefix+'Installments')?.value)||1;
+  const r=parseFloat(document.getElementById(prefix+'Rate')?.value)||0;
+  return (n>1||r>0) ? {installments:n, interest_rate:r} : {};
+}
+// Is the payment method currently selected in form `prefix` (tx|et|vtx) a registered card?
+// Installments only make sense for card purchases — cash/Nequi/débito don't carry a plan.
+function _installPaySelected(prefix){
+  if(prefix==='tx') return !!(typeof getAllPayMethods==='function' && getAllPayMethods().find(p=>p.id===selPayment)?.debtId);
+  const sel=document.getElementById(prefix+'Pay');
+  return !!(sel?.selectedOptions[0]?.dataset.debt);
+}
+function updateInstallVisibility(prefix){
+  const isCard=_installPaySelected(prefix) && (prefix!=='tx' || txType==='expense');
+  if(prefix==='tx'){
+    const wrap=document.getElementById('txInstallWrap');
+    if(wrap) wrap.style.display=isCard?'':'none';
+    if(!isCard){
+      const form=document.getElementById('txInstallForm'); if(form) form.style.display='none';
+      const n=document.getElementById('txInstallments'); if(n) n.value='1';
+      const r=document.getElementById('txRate'); if(r) r.value='0';
+      const p=document.getElementById('txInstallPreview'); if(p) p.textContent='';
+    }
+    return;
+  }
+  const wrap=document.getElementById(prefix+'InstallWrap');
+  if(wrap) wrap.style.display=isCard?'':'none';
+  if(!isCard){
+    const n=document.getElementById(prefix+'Installments'); if(n) n.value='1';
+    const r=document.getElementById(prefix+'Rate'); if(r) r.value='0';
+    const p=document.getElementById(prefix+'InstallPreview'); if(p) p.textContent='';
+  } else updateInstallPreview(prefix);
+}
+function toggleInstallForm(prefix){
+  const form=document.getElementById(prefix+'InstallForm'); if(!form) return;
+  const open=form.style.display!=='none';
+  form.style.display=open?'none':'block';
+  if(!open) updateInstallPreview(prefix);
+}
+function updateInstallPreview(prefix){
+  const amtEl=document.getElementById(prefix+'Amt');
+  const nEl=document.getElementById(prefix+'Installments');
+  const rEl=document.getElementById(prefix+'Rate');
+  const out=document.getElementById(prefix+'InstallPreview');
+  if(!amtEl||!nEl||!rEl||!out) return;
+  const amount=parseFloat(amtEl.value)||0;
+  const n=parseInt(nEl.value)||1;
+  const r=parseFloat(rEl.value)||0;
+  if(amount<=0||n<=1){ out.textContent = n<=1 ? '1 cuota = pago único, sin intereses.' : ''; return; }
+  const info=installmentInfo(amount,n,r);
+  out.textContent = r>0
+    ? `${info.n} cuotas de ${fmtF(info.cuota)}/mes · costo del crédito (interés): ${fmtF(info.totalInterest)} · total a pagar ${fmtF(info.totalPaid)}`
+    : `${info.n} cuotas de ${fmtF(info.cuota)}/mes · sin interés`;
+}
 // Local-timezone YYYY-MM-DD (toISOString() is UTC and flips the date after 7pm in Colombia)
 const localISO = (d=new Date()) => { const o=d.getTimezoneOffset()*60000; return new Date(d.getTime()-o).toISOString().slice(0,10); };
 // Accent/case-insensitive text for search matching
@@ -2380,6 +2459,15 @@ function renderDeudas() {
           :`<div style="font-size:11px;color:var(--m);text-align:center">Sin cargos en este ciclo.</div>`}
         </div>`;
     }
+    // "Cost of usage of the credit" — total interest still owed across this card's
+    // active installment purchases, wherever ("if he has any") — independent of cycle browsing.
+    const installTx=(DB.all||[]).filter(t=>t.debt_id===c.id && t.type==='expense' && t.installments>1);
+    const totalCreditCost=installTx.reduce((s,t)=>s+installmentInfo(t.amount,t.installments,t.interest_rate||0).totalInterest,0);
+    const creditCostBlock=installTx.length?`
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:9px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="font-size:10px;color:var(--m)">Costo del crédito · ${installTx.length} compra${installTx.length===1?'':'s'} a cuotas</div>
+        <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--am)">${fmtF(totalCreditCost)}</div>
+      </div>`:'';
     cardView.innerHTML=`
       <div style="font-size:13px;font-weight:600;margin-bottom:12px">
         ${esc(c.emoji||'💳')} ${esc(c.name)}
@@ -2403,6 +2491,7 @@ function renderDeudas() {
           <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--am)">${cyc&&cyc.payDate?fmtCardDate(localISO(cyc.payDate)):fmtCardDate(c.pay_day)}</div>
         </div>
       </div>
+      ${creditCostBlock}
       ${cycleBlock}`;
     return;
   }
@@ -3245,6 +3334,7 @@ function buildPayGrid(){
   addBtn.onclick=()=>{ const f=document.getElementById('payAddForm'); const open=f.style.display!=='none'; f.style.display=open?'none':'block'; if(!open) document.getElementById('newPayName').focus(); };
   addBtn.style.cssText='padding:7px 3px;border:1px dashed rgba(184,155,106,0.4);border-radius:8px;background:rgba(184,155,106,0.06);color:rgba(184,155,106,0.8);font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent';
   el.appendChild(addBtn);
+  updateInstallVisibility('tx');   // show/hide the cuotas toggle based on the (re)selected method
 }
 
 async function deleteCat(c){
@@ -3288,6 +3378,7 @@ function setType(t){
   document.getElementById('btnExp').style.cssText=`flex:1;padding:9px;border:none;border-radius:8px;font-family:var(--font-body);font-size:12px;cursor:pointer;font-weight:600;transition:all .15s;background:${t==='expense'?'var(--rd)':'transparent'};color:${t==='expense'?'#fff':'var(--m)'}`;
   document.getElementById('btnInc').style.cssText=`flex:1;padding:9px;border:none;border-radius:8px;font-family:var(--font-body);font-size:12px;cursor:pointer;font-weight:600;transition:all .15s;background:${t==='income'?'var(--gr)':'transparent'};color:${t==='income'?'#000':'var(--m)'}`;
   buildCatGrid();
+  updateInstallVisibility('tx');   // cuotas only apply to expenses
 }
 
 function buildCatGrid(){
@@ -3360,6 +3451,7 @@ function liveAmt(inp){
   const v=parseFloat(inp.value), el=document.getElementById('txFmt');
   el.textContent=!isNaN(v)&&v>0?fmtF(v)+' COP':'';
   el.style.color=txType==='expense'?'var(--rd)':'var(--gr)';
+  updateInstallPreview('tx');
 }
 
 // ── Voice recognition for description field ──────────────────────────────
@@ -3647,6 +3739,9 @@ function showVoiceTxModal(parsed, rawTranscript, {source='reglas'}={}) {
   document.getElementById('vtxDesc').value = parsed.description || '';
   document.getElementById('vtxDate').value = parsed.date;
   document.getElementById('vtxErr').textContent = '';
+  document.getElementById('vtxInstallments').value = 1;
+  document.getElementById('vtxRate').value = 0;
+  updateInstallVisibility('vtx');
   const btnExp = document.getElementById('vtxBtnExp');
   const btnInc = document.getElementById('vtxBtnInc');
   btnExp.classList.toggle('vtx-active', parsed.type === 'expense');
@@ -3689,6 +3784,7 @@ async function confirmVoiceTx() {
       debt_id:     (()=>{ const d=document.getElementById('vtxPay')?.selectedOptions[0]?.dataset.debt; return (d && _vtxType==='expense') ? +d : null; })(),
       month:  d.toLocaleString('en', { month:'long' }),
       year:   d.getFullYear(),
+      ..._installPayload('vtx'),
     });
     DB.all.unshift(res);
     rebuildSubsets();
@@ -3751,6 +3847,7 @@ async function addTx(){
       debt_id:cardDebtId,
       month:d.toLocaleString('en',{month:'long'}),
       year:d.getFullYear(),
+      ..._installPayload('tx'),
     });
     DB.all.unshift(res);
     if(txType==='income') DB.income.unshift(res);
@@ -3928,12 +4025,19 @@ function txRowHTML(t){
   const col=t.type==='income'?'var(--gr)':'var(--rd)';
   const sign=t.type==='income'?'+':'−';
   const catC=CMAP[t.subcategory]?.col||'#888';
+  // "N cuotas" badge — only when this purchase was set up with an installment plan.
+  let installLine='';
+  if(t.installments>1){
+    const info=installmentInfo(t.amount,t.installments,t.interest_rate||0);
+    installLine=`<div style="font-size:9px;color:var(--am);margin-top:1px">🔁 ${info.n} cuotas de ${fmtF(info.cuota)}${info.r>0?` · costo del crédito ${fmtF(info.totalInterest)}`:' · sin interés'}</div>`;
+  }
   return`<div data-txid="${t.id}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--row-divider);gap:8px">
     <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
       <div style="width:7px;height:7px;border-radius:50%;background:${catC};flex-shrink:0"></div>
       <div style="min-width:0">
         <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.description||t.category)}</div>
         <div style="font-size:10px;color:var(--m);margin-top:1px">${esc(t.date)} · <span style="color:${catC}">${esc(t.category)}</span>${t.account?` · ${esc(t.account)}`:''}</div>
+        ${installLine}
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
@@ -5630,6 +5734,9 @@ function openEditTx(id){
   document.getElementById('etDesc').value=t.description||'';
   document.getElementById('etDate').value=t.date||localISO();
   document.getElementById('etErr').textContent='';
+  document.getElementById('etInstallments').value=t.installments||1;
+  document.getElementById('etRate').value=t.interest_rate||0;
+  updateInstallVisibility('et');
   document.getElementById('etMeta').textContent=`#${t.id} · creada ${t.created_at?String(t.created_at).slice(0,10):t.date}`;
   const btn=document.getElementById('etSaveBtn'); btn.textContent='Guardar cambios'; btn.disabled=false;
   const ov=document.getElementById('editTxOverlay');
@@ -5661,6 +5768,13 @@ async function saveEditTx(){
   const d=new Date(date+'T12:00:00');
   const patch={date,type:_etType,amount,category:catLabel,subcategory:catId,description:desc,account,
                debt_id:_etType==='expense'?debtId:null,month:d.toLocaleString('en',{month:'long'}),year:d.getFullYear()};
+  // Only touch installments/interest_rate if this edit actually involves a plan —
+  // either the form has one set now, or the transaction already had one (so it's
+  // being cleared). This keeps a plain amount/date edit working even on a database
+  // that hasn't run the cuotas migration yet.
+  const instN=parseInt(document.getElementById('etInstallments')?.value)||1;
+  const instR=parseFloat(document.getElementById('etRate')?.value)||0;
+  if(instN>1||instR>0||t.installments||t.interest_rate){ patch.installments=instN; patch.interest_rate=instR; }
   const btn=document.getElementById('etSaveBtn'); btn.textContent='Guardando…'; btn.disabled=true;
   try{
     const rows=await sbPatch('transactions',_etId,patch);
@@ -6475,6 +6589,9 @@ window.renderDiario      = renderDiario;
 window.renderDeudas      = renderDeudas;
 window.deudaCycleNav     = deudaCycleNav;
 window.deudaSelectCard   = deudaSelectCard;
+window.toggleInstallForm    = toggleInstallForm;
+window.updateInstallPreview = updateInstallPreview;
+window.updateInstallVisibility = updateInstallVisibility;
 window.renderGastos      = renderGastos;
 window.renderHistorial   = renderHistorial;
 window.calcUpdate        = calcUpdate;
@@ -6511,7 +6628,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20260917-044';
+  const CURRENT_V = '20260917-045';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
@@ -6639,7 +6756,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
       <div class="vtx-label">Monto (COP)</div>
       <div style="position:relative">
         <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--m);font-size:13px">$</span>
-        <input id="vtxAmt" type="number" inputmode="numeric" class="vtx-inp"
+        <input id="vtxAmt" type="number" inputmode="numeric" class="vtx-inp" oninput="updateInstallPreview('vtx')"
                style="padding-left:26px;font-family:var(--font-display);font-size:20px;font-weight:700">
       </div>
     </div>
@@ -6647,7 +6764,16 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
     <!-- Category + payment method -->
     <div style="display:flex;gap:10px">
       <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Categoría</div><select id="vtxCat" class="vtx-inp"></select></div>
-      <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Método de pago</div><select id="vtxPay" class="vtx-inp"></select></div>
+      <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Método de pago</div><select id="vtxPay" class="vtx-inp" onchange="updateInstallVisibility('vtx')"></select></div>
+    </div>
+
+    <!-- Cuotas / interés — only shown once a registered card is selected -->
+    <div class="vtx-field" id="vtxInstallWrap" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+        <div><div class="vtx-label">Nº de cuotas</div><input id="vtxInstallments" type="number" inputmode="numeric" min="1" step="1" value="1" class="vtx-inp" oninput="updateInstallPreview('vtx')"></div>
+        <div><div class="vtx-label">Tasa mensual (%)</div><input id="vtxRate" type="number" inputmode="decimal" min="0" step="0.1" value="0" class="vtx-inp" oninput="updateInstallPreview('vtx')"></div>
+      </div>
+      <div id="vtxInstallPreview" style="font-size:10px;color:var(--m)"></div>
     </div>
 
     <!-- Description -->
@@ -6792,12 +6918,19 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
       <div class="vtx-label">Monto (COP)</div>
       <div style="position:relative">
         <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--m);font-size:13px">$</span>
-        <input id="etAmt" type="number" inputmode="numeric" class="vtx-inp" style="padding-left:26px;font-family:var(--font-display);font-size:20px;font-weight:700">
+        <input id="etAmt" type="number" inputmode="numeric" class="vtx-inp" oninput="updateInstallPreview('et')" style="padding-left:26px;font-family:var(--font-display);font-size:20px;font-weight:700">
       </div>
     </div>
     <div style="display:flex;gap:10px">
       <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Categoría</div><select id="etCat" class="vtx-inp"></select></div>
-      <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Método de pago</div><select id="etPay" class="vtx-inp"></select></div>
+      <div class="vtx-field" style="flex:1;min-width:0"><div class="vtx-label">Método de pago</div><select id="etPay" class="vtx-inp" onchange="updateInstallVisibility('et')"></select></div>
+    </div>
+    <div class="vtx-field" id="etInstallWrap" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+        <div><div class="vtx-label">Nº de cuotas</div><input id="etInstallments" type="number" inputmode="numeric" min="1" step="1" value="1" class="vtx-inp" oninput="updateInstallPreview('et')"></div>
+        <div><div class="vtx-label">Tasa mensual (%)</div><input id="etRate" type="number" inputmode="decimal" min="0" step="0.1" value="0" class="vtx-inp" oninput="updateInstallPreview('et')"></div>
+      </div>
+      <div id="etInstallPreview" style="font-size:10px;color:var(--m)"></div>
     </div>
     <div class="vtx-field"><div class="vtx-label">Descripción</div><input id="etDesc" type="text" class="vtx-inp" placeholder="Descripción"></div>
     <div class="vtx-field" style="margin-bottom:18px"><div class="vtx-label">Fecha</div><input id="etDate" type="date" class="vtx-inp"></div>

@@ -122,6 +122,16 @@ Turns free text or voice — *"ayer pagué 32 mil de taxi con nequi"*, *"muéstr
 
 The model only proposes JSON; the app validates amounts, categories, dates and payment methods, and falls back to the built-in rules parser if the model is unavailable or answers badly.
 
+### Cuotas & Cost of Credit
+Any card purchase in Diario can optionally be set up as an installment plan — number of cuotas and a monthly interest rate (0% for "sin interés" promos). The app computes the fixed monthly payment and total interest via standard annuity amortization, shown as a badge on the transaction everywhere it appears, and rolled up per card in Deudas ("Costo del crédito · N compras a cuotas"). The card's balance still increases by the full purchase price immediately — cuotas is a repayment-plan detail, not a delay in what you owe.
+
+**Requires a one-time database migration** — run this in the Supabase SQL editor before using cuotas (a normal single-payment expense works fine either way; only the cuotas fields depend on it):
+```sql
+ALTER TABLE transactions
+  ADD COLUMN IF NOT EXISTS installments integer,
+  ADD COLUMN IF NOT EXISTS interest_rate numeric;
+```
+
 ---
 
 ## Security
