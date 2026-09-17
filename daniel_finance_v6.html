@@ -1231,7 +1231,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <div class="card" data-module="deudas" data-feature="debt_list">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
           <div class="ct" style="margin:0">Deuda total</div>
-          <select id="deudaCardSelect" onchange="renderDeudas()"
+          <select id="deudaCardSelect" onchange="deudaSelectCard()"
             style="padding:5px 9px;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;color:var(--t);font-family:var(--font-body);font-size:10px;outline:none;cursor:pointer;-webkit-appearance:none"></select>
         </div>
         <div id="deudaAllView">
@@ -2201,6 +2201,20 @@ const DEBT_TYPE_LABEL = { credit_card:'Tarjeta de crédito', loan:'Préstamo', o
 const DEBT_TYPE_EMOJI = { credit_card:'💳', loan:'🏦', other:'📄' };
 
 const isCardDebt = d => d.type==='credit_card';
+// How many cycles back from "now" the Deudas card view is showing (0 = current, open cycle).
+// Reset to 0 whenever the selected card changes.
+let _deudaCycleOffset = 0;
+function deudaCycleNav(delta){
+  const next=_deudaCycleOffset+delta;
+  if(next>0) return;   // no browsing into a cycle that hasn't opened yet
+  _deudaCycleOffset=next;
+  renderDeudas();
+}
+// Inline HTML event-handler attributes run in the GLOBAL scope, not inside this
+// app's IIFE — an inline "_deudaCycleOffset=0" would silently create a throwaway
+// window global instead of resetting the real closure variable. Route the reset
+// through a real function instead, same as every other onXXX handler here.
+function deudaSelectCard(){ _deudaCycleOffset=0; renderDeudas(); }
 
 // ── SECTION: Mis Tarjetas — the card registry ─────────────────────────────
 // Cards are registered once here; the add-form stays collapsed while at least
@@ -2334,25 +2348,36 @@ function renderDeudas() {
 
   if(selectedCard){
     const c=selectedCard;
-    const cyc=cardCycle(c);
-    // Charges dated after the last cut date belong to the UPCOMING cut, not the one
-    // that just closed — that's the cycle currently accumulating toward next payment.
+    const cyc=cardCycle(c);   // the real upcoming cut — always shown in the stat boxes, independent of history browsing
+    // Charges dated after a cycle's cut date belong to the NEXT cut, not the one that
+    // just closed. ‹ › lets you step back through already-closed cycles instead of only
+    // ever seeing the one currently accumulating.
     let cycleBlock='';
     if(cyc){
-      const lastCutISO=localISO(cyc.lastCut), nextCutISO=localISO(cyc.nextCut);
-      const daysToCut=Math.max(0,Math.ceil((cyc.nextCut-new Date())/86400000));
+      // Walk back |_deudaCycleOffset| cycles from the current one to find the displayed cycle.
+      let dispCyc=cyc;
+      for(let i=0;i<-_deudaCycleOffset && dispCyc;i++) dispCyc=cardCycle(c,new Date(dispCyc.lastCut.getTime()-1));
+      const lastCutISO=localISO(dispCyc.lastCut), nextCutISO=localISO(dispCyc.nextCut);
+      const isCurrent=_deudaCycleOffset===0;
+      const daysToCut=Math.max(0,Math.ceil((dispCyc.nextCut-new Date())/86400000));
       const dayWord=daysToCut===0?'hoy':daysToCut===1?'mañana':`en ${daysToCut} días`;
       const cycleTx=(DB.all||[]).filter(t=>t.debt_id===c.id && t.type==='expense' && t.date>lastCutISO && t.date<=nextCutISO)
         .sort((a,b)=>b.date.localeCompare(a.date));
       const cycleTotal=cycleTx.reduce((s,t)=>s+t.amount,0);
+      const navBtn=(delta,disabled,glyph)=>`<button onclick="deudaCycleNav(${delta})" ${disabled?'disabled':''} title="${delta<0?'Ciclo anterior':'Ciclo siguiente'}"
+        style="width:22px;height:22px;flex-shrink:0;border:1px solid var(--b2);border-radius:6px;background:var(--bg2);color:${disabled?'var(--b2)':'var(--m)'};cursor:${disabled?'default':'pointer'};font-size:12px;line-height:1;padding:0">${glyph}</button>`;
       cycleBlock=`
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b)">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px">
-            <div style="font-size:11px;color:var(--m)">Ciclo actual · cierra ${fmtCardDate(nextCutISO)} <span style="color:var(--ac2)">(${dayWord})</span></div>
-            <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--am)">${fmtF(cycleTotal)}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            ${navBtn(-1,false,'‹')}
+            <div style="flex:1;text-align:center;font-size:11px;color:var(--m)">
+              ${isCurrent?'Ciclo actual':'Ciclo cerrado'} · ${fmtCardDate(lastCutISO)}–${fmtCardDate(nextCutISO)}${isCurrent?` <span style="color:var(--ac2)">(cierra ${dayWord})</span>`:''}
+            </div>
+            ${navBtn(1,isCurrent,'›')}
           </div>
+          <div style="text-align:right;font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--am);margin:6px 0 8px">${fmtF(cycleTotal)}</div>
           ${cycleTx.length?`<div style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch">${cycleTx.map(txRowHTML).join('')}</div>`
-          :`<div style="font-size:11px;color:var(--m)">Sin cargos nuevos desde el ${fmtCardDate(lastCutISO)}.</div>`}
+          :`<div style="font-size:11px;color:var(--m);text-align:center">Sin cargos en este ciclo.</div>`}
         </div>`;
     }
     cardView.innerHTML=`
@@ -2398,7 +2423,7 @@ function renderDeudas() {
       cycleNote=` · este ciclo ${fmtF(cycleTotal)} · cierra ${fmtCardDate(localISO(cyc.nextCut))}`;
     }
     return `
-    <div onclick="document.getElementById('deudaCardSelect').value='${c.id}';renderDeudas()" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer">
+    <div onclick="document.getElementById('deudaCardSelect').value='${c.id}';deudaSelectCard()" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer">
       <div style="min-width:0">
         <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.emoji||'💳')} ${esc(c.name)}</div>
         <div style="font-size:10px;color:var(--m);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tarjeta de crédito${cycleNote}</div>
@@ -6448,6 +6473,8 @@ window.updateTarget      = updateTarget;
 window.updateAPY         = updateAPY;
 window.renderDiario      = renderDiario;
 window.renderDeudas      = renderDeudas;
+window.deudaCycleNav     = deudaCycleNav;
+window.deudaSelectCard   = deudaSelectCard;
 window.renderGastos      = renderGastos;
 window.renderHistorial   = renderHistorial;
 window.calcUpdate        = calcUpdate;
@@ -6484,7 +6511,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20260917-043';
+  const CURRENT_V = '20260917-044';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
