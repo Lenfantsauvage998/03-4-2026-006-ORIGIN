@@ -2351,14 +2351,7 @@ function renderDeudas() {
             <div style="font-size:11px;color:var(--m)">Ciclo actual · cierra ${fmtCardDate(nextCutISO)} <span style="color:var(--ac2)">(${dayWord})</span></div>
             <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--am)">${fmtF(cycleTotal)}</div>
           </div>
-          ${cycleTx.length?`<div style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch">${cycleTx.map(t=>`
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--row-divider)">
-              <div style="min-width:0">
-                <div style="font-size:11px;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">${esc(t.description||t.category)}</div>
-                <div style="font-size:9px;color:var(--m)">${esc(t.date)}</div>
-              </div>
-              <div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--rd);flex-shrink:0">${fmtF(t.amount)}</div>
-            </div>`).join('')}</div>`
+          ${cycleTx.length?`<div style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch">${cycleTx.map(txRowHTML).join('')}</div>`
           :`<div style="font-size:11px;color:var(--m)">Sin cargos nuevos desde el ${fmtCardDate(lastCutISO)}.</div>`}
         </div>`;
     }
@@ -2389,13 +2382,34 @@ function renderDeudas() {
     return;
   }
 
+  // "Todas las deudas": cards get their own clickable summary row (tap → jumps the
+  // dropdown to that card's full cycle view) followed by the loan/other-debt rows.
   const listEl=document.getElementById('debtList');
   if(!listEl) return;
-  if(!others.length){
-    listEl.innerHTML='<div style="text-align:center;color:var(--m);font-size:12px;padding:20px 0">Sin préstamos ni otras deudas registradas</div>';
+  if(!cards.length && !others.length){
+    listEl.innerHTML='<div style="text-align:center;color:var(--m);font-size:12px;padding:20px 0">Sin deudas registradas</div>';
     return;
   }
-  listEl.innerHTML=others.map(d=>{
+  const cardRows=cards.map(c=>{
+    const cyc=cardCycle(c);
+    let cycleNote='';
+    if(cyc){
+      const cycleTotal=(DB.all||[]).filter(t=>t.debt_id===c.id && t.type==='expense' && t.date>localISO(cyc.lastCut) && t.date<=localISO(cyc.nextCut)).reduce((s,t)=>s+t.amount,0);
+      cycleNote=` · este ciclo ${fmtF(cycleTotal)} · cierra ${fmtCardDate(localISO(cyc.nextCut))}`;
+    }
+    return `
+    <div onclick="document.getElementById('deudaCardSelect').value='${c.id}';renderDeudas()" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b);cursor:pointer">
+      <div style="min-width:0">
+        <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.emoji||'💳')} ${esc(c.name)}</div>
+        <div style="font-size:10px;color:var(--m);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tarjeta de crédito${cycleNote}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--rd)">${fmtF(c.amount)}</div>
+        <span style="color:var(--m);font-size:13px">›</span>
+      </div>
+    </div>`;
+  }).join('');
+  const loanRows=others.map(d=>{
     const metaParts=[DEBT_TYPE_LABEL[d.type]||d.type];
     if(d.date)     metaParts.push('Desde '+d.date);
     if(d.pay_day)  metaParts.push('Pago '+d.pay_day);
@@ -2411,6 +2425,8 @@ function renderDeudas() {
       </div>
     </div>`;
   }).join('');
+  const divider=(cards.length && others.length)?'<div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;padding:10px 0 4px">Préstamos y otros</div>':'';
+  listEl.innerHTML=cardRows+divider+loanRows;
 }
 
 async function addDebt(){
@@ -6468,7 +6484,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20260917-042';
+  const CURRENT_V = '20260917-043';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
