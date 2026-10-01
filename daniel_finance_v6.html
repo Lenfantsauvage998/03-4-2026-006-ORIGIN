@@ -21,6 +21,7 @@
   style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src    https://fonts.gstatic.com;
   connect-src 'self' https://*.supabase.co https://api.emailjs.com
+              https://www.datos.gov.co https://open.er-api.com https://api.coingecko.com
               https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com
               http://localhost:11434 http://127.0.0.1:11434;
   img-src     'self' data:;
@@ -603,6 +604,14 @@ nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:b
 @media(min-width:768px){.nav-inner{padding:0 24px;}}
 .nav-logo{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.04em;color:var(--t);white-space:nowrap;flex-shrink:0;}
 .nav-logo span{color:var(--ac2);font-weight:400;}
+/* Section groups (page partitions) */
+.grp-hidden{display:none!important;}
+#grpBar{display:flex;gap:6px;justify-content:center;max-width:1540px;margin:0 auto;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none;}
+#grpBar::-webkit-scrollbar{display:none;}
+.gp{padding:6px 14px;border-radius:999px;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;border:1px solid var(--b2);background:none;font-family:var(--font-body);white-space:nowrap;flex-shrink:0;transition:all .2s;}
+.gp:hover{color:var(--t);}
+.gp.active{color:var(--ac2);background:var(--ac-muted);border-color:var(--ac-bd);}
+@media(max-width:767px){#grpBar{justify-content:flex-start;}}
 
 /* Bottom tab bar for mobile */
 .tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--tab-bg);backdrop-filter:blur(28px) saturate(1.5);border-top:1px solid rgba(255,255,255,0.05);padding:8px 0 calc(8px + env(safe-area-inset-bottom));justify-content:space-around;scrollbar-width:none;}
@@ -860,6 +869,8 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 
 /* TODAY STRIP */
 .today-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.today-strip.ts4{grid-template-columns:repeat(2,1fr);}
+@media(min-width:600px){.today-strip.ts4{grid-template-columns:repeat(4,1fr);}}
 .ts-cell{background:var(--ac-bg);border:1px solid var(--ac-bd);border-radius:10px;padding:10px 8px;text-align:center;min-width:0;}
 .ts-l{font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
 .ts-v{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t);line-height:1.1;white-space:nowrap;}
@@ -914,6 +925,88 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 .tx-act.del:hover{color:var(--rd);}
 @keyframes txFlash{0%{background:var(--ac-bg)}100%{background:transparent}}
 .tx-flash{animation:txFlash 1.8s ease both;border-radius:8px;}
+
+/* ════════════════════════════════════════════════════════════
+   REFINEMENT LAYER — "private bank" polish
+   Token-driven (works in every theme). Calmer labels, hairline
+   highlights, quieter shadows, segmented group switcher, one
+   soft page-in when a group opens.
+   ════════════════════════════════════════════════════════════ */
+::selection{background:var(--ac-bd);color:var(--t);}
+html{scrollbar-width:thin;scrollbar-color:var(--b2) transparent;}
+:focus-visible{outline:2px solid var(--focus-bd);outline-offset:2px;border-radius:8px;}
+.kpi-v,.tl-amount,.cp-right,tbody td,.amount-inp,.hb-val{font-variant-numeric:tabular-nums lining-nums;}
+
+/* Nav — sentence case links, underline-dot for the active one */
+nav{border-bottom-color:var(--b);}
+.nl{text-transform:none;font-size:11.5px;letter-spacing:.01em;font-weight:600;border-radius:10px;position:relative;}
+.nl.active{background:transparent;}
+.nl.active::after{content:'';position:absolute;left:50%;bottom:1px;width:14px;height:2px;margin-left:-7px;border-radius:2px;background:var(--ac2);}
+.nav-tool{border-radius:11px;background:transparent;}
+.nav-tool:hover{background:var(--ac-bg);}
+
+/* Group switcher — segmented control */
+#grpBar{padding:2px 16px 10px;}
+#grpBar .gp{border:none;background:transparent;font-size:12px;padding:7px 16px;color:var(--m);}
+#grpBar{--seg:var(--bg3);}
+#grpBar .gp.active{background:var(--bg3);color:var(--t);box-shadow:inset 0 0 0 1px var(--b2),0 6px 16px -8px rgba(0,0,0,.45);}
+@media(min-width:768px){#grpBar{display:flex;}}
+
+/* Section heads — numeral becomes a quiet index, hairline runs after the title */
+.section{border-bottom-color:transparent;}
+.section-header{gap:12px;margin-bottom:6px;}
+.snum{background:none;border:none;padding:0;border-radius:0;font-size:11px;letter-spacing:.06em;color:var(--m);font-variant-numeric:tabular-nums;}
+.stitle{font-weight:700;letter-spacing:-.035em;}
+.section-header::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--b2),transparent);margin-left:6px;}
+.ssub{font-size:12.5px;max-width:62ch;margin-bottom:24px;}
+
+/* Cards — hairline top light, softer depth */
+.card,.kpi{position:relative;border-radius:22px;}
+.card{box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 14px 34px -18px rgba(0,0,0,.55);}
+.card::before,.kpi::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.035),transparent 42%);}
+.card:hover{border-color:var(--ac-bd);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 40px -18px rgba(0,0,0,.6);}
+.ct{text-transform:none;font-size:12px;letter-spacing:.01em;font-weight:600;color:var(--m);margin-bottom:16px;}
+
+/* KPI — short accent tab instead of a full-width bar */
+.kpi{border-radius:20px;padding:20px 18px;}
+.kpi::after{right:auto;width:30px;height:3px;left:18px;border-radius:0 0 4px 4px;background:var(--kc,var(--ac));}
+.kpi-l{text-transform:none;letter-spacing:.01em;font-size:11px;margin-bottom:10px;}
+.kpi-v{letter-spacing:-.025em;}
+
+/* Forms + buttons */
+.fi label,.vtx-label,.sl-group label{text-transform:none;letter-spacing:.01em;font-size:11px;font-weight:600;}
+.fi input,.fi select,.vtx-inp,#gastosMonthFilter{border-radius:12px;transition:border-color .15s,box-shadow .15s;}
+.fi input:focus,.fi select:focus,.vtx-inp:focus{box-shadow:0 0 0 4px var(--ac-glow);}
+.btn-p{border-radius:12px;padding:14px;letter-spacing:.01em;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px -12px var(--color-primary);transition:transform .15s,box-shadow .2s,filter .2s;}
+.btn-p:hover{filter:brightness(1.07);transform:translateY(-1px);}
+.btn-sm{border-radius:9px;transition:color .15s,border-color .15s,background .15s;}
+.btn-sm:hover{color:var(--t);border-color:var(--ac-bd);background:var(--ac-bg);}
+.calc-panel,.score-card,.scenario,.insight{border-radius:16px;}
+.insight{border-radius:0 14px 14px 0;}
+.chip{border-radius:999px;}
+
+/* Tables */
+thead tr th{text-transform:none;letter-spacing:.01em;font-size:11px;font-weight:600;}
+tbody tr{transition:background .15s;}
+
+/* Overlays + toast */
+.cfm-box,.cp-box{border-radius:22px;}
+.cfm-box,.cp-box,.theme-pop,.phi-toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 30px 70px -20px rgba(0,0,0,.6);}
+.cfm-btn,.cfm-btn-confirm{border-radius:12px;}
+
+/* Mobile bottom bar — floating rounded dock with a dot on the active tab */
+@media(max-width:767px){
+  .tab-bar{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));border-radius:22px;border:1px solid var(--b2);padding:7px 0;box-shadow:0 18px 40px -14px rgba(0,0,0,.6);}
+  .tab-item{position:relative;text-transform:none;font-size:10px;letter-spacing:.01em;}
+  .tab-item.active::after{content:'';position:absolute;top:0;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--ac2);}
+  body{padding-bottom:92px;}
+  #fabAdd{bottom:calc(100px + env(safe-area-inset-bottom));}
+}
+
+/* One soft page-in whenever a group opens (opacity only: no stacking-context side effects) */
+@keyframes grpIn{from{opacity:0}to{opacity:1}}
+.section:not(.grp-hidden){animation:grpIn .4s ease both;}
+@media(prefers-reduced-motion:reduce){.section:not(.grp-hidden){animation:none;} .btn-p:hover{transform:none;}}
 </style>
 </head>
 <body>
@@ -978,6 +1071,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <button class="nl" data-nav-module="overview" onclick="goTo('overview')">Resumen</button>
       <button class="nl" data-nav-module="tarjetas" onclick="goTo('tarjetas')">Tarjetas</button>
       <button class="nl" data-nav-module="deudas" onclick="goTo('deudas')">Deudas</button>
+      <button class="nl" data-nav-module="renta" onclick="goTo('renta')">Rendimientos</button>
       <button class="nl" data-nav-module="flujo" onclick="goTo('flujo')">Flujo</button>
       <button class="nl" data-nav-module="gastos" onclick="goTo('gastos')">Gastos</button>
       <button class="nl" data-nav-module="historial" onclick="goTo('historial')">Historial</button>
@@ -986,6 +1080,8 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <button class="nl" data-nav-module="montecarlo" onclick="goTo('montecarlo')">Portafolios</button>
       <button class="nl" data-nav-module="calculator" onclick="goTo('calculator')">Calc</button>
       <button class="nl" data-nav-module="predictor" onclick="goTo('predictor')">Predictor</button>
+      <button class="nl" data-nav-module="lab" onclick="goTo('lab')">Laboratorio</button>
+      <button class="nl" data-nav-module="mercado" onclick="goTo('mercado')">Mercado</button>
       <button class="nl" data-nav-module="insights" onclick="goTo('insights')">Alertas</button>
     </div>
     <div id="navMoreWrap">
@@ -1002,6 +1098,7 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
       <button class="nav-tool" onclick="signOut()" title="Cerrar sesión" style="opacity:.75">⏻</button>
     </div>
   </div>
+  <div id="grpBar"></div>
 </nav>
 
 <!-- HERO -->
@@ -1256,6 +1353,50 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 </div>
 
 <!-- 02 FLUJO -->
+<!-- VIVIR DE RENDIMIENTOS -->
+<div class="section" id="renta" data-module="renta">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">13</span><h2 class="stitle">Vivir de tus rendimientos</h2></div>
+    <p class="ssub">Tu gasto mensual se limita a lo que rinde tu capital; todo ingreso nuevo va directo al portafolio. Aquí ves cuánto te toca, cómo vas y cuándo tus rendimientos cubrirán tu vida.</p>
+
+    <div class="kpi-grid" id="rtKpis"></div>
+
+    <div class="g64" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Tu mes frente al rendimiento</div>
+        <div id="rtMonth"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Tus supuestos</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="fi"><label>Rendimiento anual (E.A., %)</label><input id="rtRate" type="number" step="0.1" inputmode="decimal" placeholder="11" oninput="rentaSave()"></div>
+          <div class="fi"><label>% del patrimonio que rinde</label><input id="rtPct" type="number" step="1" min="0" max="100" inputmode="numeric" placeholder="90" oninput="rentaSave()"></div>
+        </div>
+        <div style="font-size:10px;color:var(--m);line-height:1.7">Parte de tu patrimonio neto (ya descontadas las deudas). Si ingresaste la inflación en Mercado, la proyección la usa para subir tu gasto cada año. Se guarda solo en este dispositivo.</div>
+        <div id="rtReading" style="font-size:12px;color:var(--m);line-height:1.75;margin-top:14px"></div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Gasto de los últimos meses vs tu rendimiento mensual</div>
+        <div class="chart-wrap" style="height:210px"><canvas id="cRtHist"></canvas></div>
+        <div id="rtHistNote" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Cuándo tu rendimiento alcanza a tu gasto</div>
+        <div class="chart-wrap" style="height:210px"><canvas id="cRtProj"></canvas></div>
+        <div id="rtProjNote" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">Tope por categoría este mes (tu rendimiento repartido según tus hábitos)</div>
+      <div id="rtCaps"></div>
+    </div>
+  </div>
+</div>
+
 <div class="section" id="flujo">
   <div class="wrap">
     <div class="section-header"><span class="snum">02</span><h2 class="stitle">Flujo Mensual</h2></div>
@@ -1600,6 +1741,115 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
   </div>
 </div>
 
+<!-- LABORATORIO DE DATOS -->
+<div class="section" id="lab" data-module="lab">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">11</span><h2 class="stitle">Laboratorio de datos</h2></div>
+    <p class="ssub">Estadística sobre tus transacciones reales: tendencia con intervalo, anomalías, concentración y correlaciones. Se calcula en tu navegador; nada sale de tu dispositivo.</p>
+
+    <div class="kpi-grid" id="labKpis"></div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+        <div class="ct" style="margin:0">Gasto real: tendencia y pronóstico a 3 meses</div>
+        <button class="btn-sm" onclick="labExport()" title="Descargar las métricas calculadas">Descargar métricas</button>
+      </div>
+      <div class="chart-wrap" style="height:250px;margin-top:12px"><canvas id="cLabFc"></canvas></div>
+      <div id="labFcNote" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+    </div>
+
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Tasa de ahorro mensual y mediana móvil (3 meses)</div>
+        <div class="chart-wrap" style="height:210px"><canvas id="cLabSave"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ct">Lectura del analista</div>
+        <div id="labReading" style="font-size:12px;color:var(--m);line-height:1.75"></div>
+      </div>
+    </div>
+
+    <div class="g64" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Gastos atípicos (puntaje z robusto &gt; 3,5 dentro de su categoría)</div>
+        <div class="table-wrap" id="labAnom"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Concentración del gasto por categoría</div>
+        <div id="labPareto"></div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Correlación entre variables mensuales</div>
+        <div id="labCorr" style="overflow-x:auto"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Distribución del monto por transacción (escala logarítmica)</div>
+        <div class="chart-wrap" style="height:190px"><canvas id="cLabHist"></canvas></div>
+        <div id="labPct" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">Método y límites</div>
+      <div id="labMethod" style="font-size:11px;color:var(--m);line-height:1.8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MERCADO · INDICADORES · FUENTES DE INGRESO -->
+<div class="section" id="mercado" data-module="mercado">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">12</span><h2 class="stitle">Mercado e ingresos</h2></div>
+    <p class="ssub">Dólar (TRM oficial), euro y cripto en vivo, cómo afecta a tu patrimonio y qué fuentes de ingreso podrías sumar. Contenido educativo, no asesoría financiera.</p>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <div id="mktStamp" style="font-size:11px;color:var(--m)">Cargando mercado…</div>
+      <button class="btn-sm" id="mktRefresh" onclick="mktRefresh()">Actualizar</button>
+    </div>
+    <div class="kpi-grid" id="mktKpis"></div>
+
+    <div class="g64" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Dólar en Colombia: TRM de los últimos 90 días</div>
+        <div class="chart-wrap" style="height:220px"><canvas id="cMktTrm"></canvas></div>
+        <div id="mktTrmNote" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <div class="ct">Qué significa para tu patrimonio</div>
+        <div id="mktExposure" style="font-size:12px;color:var(--m);line-height:1.75"></div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ct">Tus tasas: inflación y rendimiento real</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="fi"><label>Inflación anual (IPC, %)</label><input id="mkIpc" type="number" step="0.1" inputmode="decimal" placeholder="ej: 5,2" oninput="mktMacroSave()"></div>
+          <div class="fi"><label>Tasa de tu cuenta o CDT (E.A., %)</label><input id="mkRate" type="number" step="0.1" inputmode="decimal" placeholder="ej: 10" oninput="mktMacroSave()"></div>
+        </div>
+        <div style="font-size:10px;color:var(--m);margin:-4px 0 10px">El IPC lo publica el DANE y las tasas las ves en tu banco o en el Banco de la República. Se guardan solo en este dispositivo.</div>
+        <div id="mktReal" style="font-size:12px;color:var(--m);line-height:1.75"></div>
+      </div>
+      <div class="card">
+        <div class="ct">De dónde viene tu dinero hoy (últimos 6 meses completos)</div>
+        <div id="mktSources"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="ct" style="margin:0">Posibles fuentes de ingreso</div>
+        <div id="mktFilters" style="display:flex;gap:6px"></div>
+      </div>
+      <div id="mktIdeas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px"></div>
+      <div id="mktDisclaimer" style="font-size:10px;color:var(--m);line-height:1.7;margin-top:14px">Información educativa; no es asesoría financiera ni una recomendación de inversión. Los montos mínimos son aproximados y cambian por entidad: verifica condiciones, comisiones y que esté vigilada por la Superfinanciera. Rentabilidades pasadas no garantizan resultados futuros. Fuentes de datos: TRM de la Superfinanciera (datos.gov.co), tipos de cambio de open.er-api.com y precios cripto de CoinGecko.</div>
+    </div>
+  </div>
+</div>
+
 <!-- INSIGHTS — always last section -->
 <div class="section" id="insights">
   <div class="wrap">
@@ -1904,7 +2154,7 @@ const MODULE_SECTION = {
   home:'home', overview:'overview', tarjetas:'tarjetas', deudas:'deudas', flujo:'flujo', gastos:'gastos',
   proyeccion:'proyeccion', diario:'diario', mes_perfecto:'perfecto',
   montecarlo:'montecarlo', calculator:'calculator', insights:'insights',
-  predictor:'predictor', historial:'historial',
+  predictor:'predictor', historial:'historial', lab:'lab', mercado:'mercado', renta:'renta',
 };
 
 // Icon + short label + scroll-target for every possible tab.
@@ -1923,6 +2173,9 @@ const TAB_META = {
   calculator:   { icon:'≡',  label:'Calc',       to:'calculator'  },
   insights:     { icon:'◆',  label:'Alertas',    to:'insights'    },
   predictor:    { icon:'⊙',  label:'Predictor',  to:'predictor'   },
+  lab:          { icon:'∑',  label:'Lab',        to:'lab'         },
+  mercado:      { icon:'◈',  label:'Mercado',    to:'mercado'     },
+  renta:        { icon:'↻',  label:'Renta',      to:'renta'       },
   historial:    { icon:'☰',  label:'History',    to:'historial'   },
 };
 
@@ -1942,6 +2195,9 @@ const DEFAULT_CFG = {
     calculator:{enabled:true,features:{capital_summary:true,sliders:true,projection_chart:true,yearly_bar_chart:true,milestones:true}},
     insights:{enabled:true},
     predictor:{enabled:true},
+    lab:{enabled:true},
+    mercado:{enabled:true},
+    renta:{enabled:true},
     historial:{enabled:true,features:{history:true,csv_export:true}},
   },
   future_modules:{
@@ -1951,7 +2207,7 @@ const DEFAULT_CFG = {
     ai_summary:{enabled:false},
     ai_assistant:{enabled:true},
   },
-  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','insights']},
+  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','lab','mercado','renta','insights']},
 };
 
 // Feature flag helper — returns true unless explicitly set to false
@@ -2073,6 +2329,7 @@ function applyConfig(cfg){
   fitNav();
   // Re-sequence section numbers based on which sections are visible
   renumberSections();
+  initGroups();
 }
 
 // Walks every .snum in DOM order, skips hidden sections,
@@ -2219,6 +2476,9 @@ function renderAll() {
   if(M.insights?.enabled!==false)     renderInsights();
   if(M.montecarlo?.enabled!==false)   updateMC();
   if(M.predictor?.enabled!==false)    renderPredictor();
+  if(M.lab?.enabled!==false){ try{ renderLab(); }catch(e){ console.error('renderLab',e); } }
+  if(M.mercado?.enabled!==false){ try{ renderMercado(); }catch(e){ console.error('renderMercado',e); } }
+  if(M.renta?.enabled!==false){ try{ renderRenta(); }catch(e){ console.error('renderRenta',e); } }
   document.getElementById('footerTs').textContent = new Date().toLocaleString('es-CO');
 }
 
@@ -2337,7 +2597,10 @@ function renderTarjetas(){
           <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.emoji||'💳')} ${esc(c.name)}</div>
           <div style="font-size:10px;color:var(--m);margin-top:2px;letter-spacing:.06em">···· ${esc(c.last4||'••••')}</div>
         </div>
-        <button onclick="deleteDebt(${c.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:13px;flex-shrink:0;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <button onclick="payOffCard(${c.id})" title="Marcar como pagada (deuda a $0)" style="background:none;border:1px solid var(--gr);border-radius:8px;color:var(--gr);cursor:pointer;padding:2px 7px;font-size:10px;font-weight:600;-webkit-tap-highlight-color:transparent">✓ Pagada</button>
+          <button onclick="deleteDebt(${c.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:2px 4px;font-size:13px;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div style="background:var(--bg2);border-radius:9px;padding:8px 10px">
@@ -2535,6 +2798,7 @@ function renderDeudas() {
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
         <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--rd)">${fmtF(d.amount)}</div>
+        <button onclick="deleteDebt(${d.id},true)" title="Marcar como pagada" style="background:none;border:1px solid var(--gr);border-radius:8px;color:var(--gr);cursor:pointer;padding:2px 7px;font-size:10px;font-weight:600;-webkit-tap-highlight-color:transparent">✓ Pagada</button>
         <button onclick="deleteDebt(${d.id})" style="background:none;border:none;color:var(--m);cursor:pointer;padding:3px 6px;font-size:14px;-webkit-tap-highlight-color:transparent" onmouseover="this.style.color='var(--rd)'" onmouseout="this.style.color='var(--m)'">✕</button>
       </div>
     </div>`;
@@ -2571,8 +2835,23 @@ async function addDebt(){
   } catch(e){ msgEl.textContent='Error: '+e.message; msgEl.style.color='var(--rd)'; }
 }
 
-async function deleteDebt(id){
-  const ok=await phiConfirm({icon:'🗑️',title:'Eliminar deuda',msg:'¿Estás seguro de que deseas eliminar esta deuda? Esta acción no se puede deshacer.',confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
+// Card paid off: keep the card, just reset its balance to 0.
+async function payOffCard(id){
+  const card=(DB.debts||[]).find(d=>d.id===id);
+  if(!card) return;
+  const ok=await phiConfirm({icon:'✅',title:'Marcar como pagada',msg:`La deuda de ${esc(card.name)} (${fmtF(card.amount||0)}) quedará en $0. La tarjeta se conserva.`,confirmText:'Pagada',cancelText:'Cancelar'});
+  if(!ok) return;
+  try{
+    await sbPatch('debts',id,{amount:0});
+    card.amount=0;
+    renderAll();
+  }catch(e){ phiToast('No se pudo actualizar la tarjeta: '+e.message,{icon:'⚠️',duration:7000}); }
+}
+
+async function deleteDebt(id,paid){
+  const ok=await phiConfirm(paid
+    ?{icon:'✅',title:'Marcar como pagada',msg:'La deuda se quitará de tu lista y dejará de restarse de tu patrimonio neto.',confirmText:'Pagada',cancelText:'Cancelar'}
+    :{icon:'🗑️',title:'Eliminar deuda',msg:'¿Estás seguro de que deseas eliminar esta deuda? Esta acción no se puede deshacer.',confirmText:'Eliminar',cancelText:'Cancelar',danger:true});
   if(!ok)return;
   const deleted=await sbDelete('debts',id);
   if(deleted){
@@ -4063,7 +4342,12 @@ function renderTodayStrip(remBudget){
   let noSpend=0; for(let i=0;i<366;i++){ if(expDays.has(dayStr(i))) break; noSpend++; }
   let logStreak=0; for(let i=anyDays.has(todayStr)?0:1;i<366;i++){ if(anyDays.has(dayStr(i))) logStreak++; else break; }
   const over=remBudget<0;
-  el.innerHTML=`
+  // 4th cell: what is left of this month's investment yield (the "spend only the yield" goal)
+  let yCell='';
+  try{ const yp=rentaPlan(); if(yp.allow>0){ const yo=yp.remain<0;
+    yCell=`<div class="ts-cell"><div class="ts-l">De tu rendimiento</div><div class="ts-v" style="color:${yo?'var(--rd)':'var(--gr)'}">${yo?'−'+fmt(-yp.remain):fmt(yp.remain)}</div><div class="ts-s">${yo?'excedido este mes':'de '+fmt(yp.allow)+' · '+fmt(yp.perDay)+'/día'}</div></div>`; } }catch{}
+  el.classList.toggle('ts4',!!yCell);
+  el.innerHTML=yCell+`
     <div class="ts-cell"><div class="ts-l">Hoy</div><div class="ts-v" style="color:${todayExp?'var(--rd)':'var(--gr)'}">${fmt(todayExp)}</div><div class="ts-s">gastado hoy</div></div>
     <div class="ts-cell"><div class="ts-l">Disponible / día</div><div class="ts-v" style="color:${over?'var(--rd)':'var(--gr)'}">${over?'−'+fmt(Math.abs(remBudget)):fmt(safe)}</div><div class="ts-s">${over?'sobre el presupuesto':daysLeft+' día'+(daysLeft===1?'':'s')+' restante'+(daysLeft===1?'':'s')}</div></div>
     <div class="ts-cell"><div class="ts-l">Rachas</div><div class="ts-v">🔥 ${logStreak}</div><div class="ts-s">${logStreak===1?'día':'días'} registrando · 🧘 ${noSpend} sin gastar</div></div>`;
@@ -5481,7 +5765,594 @@ function renderPredictor(){
 // ══════════════════════════════════════════════════════════
 //  NAV
 // ══════════════════════════════════════════════════════════
-function goTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+// ══════════════════════════════════════════════════════════
+//  LABORATORIO DE DATOS — estadística en el navegador
+//  Serie base: gasto real (sin Taxes/Transfers) por mes completo.
+// ══════════════════════════════════════════════════════════
+const ST={
+  sum:a=>a.reduce((s,v)=>s+v,0),
+  mean:a=>a.length?ST.sum(a)/a.length:NaN,
+  median:a=>{ if(!a.length) return NaN; const s=[...a].sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; },
+  sd:a=>{ if(a.length<2) return NaN; const m=ST.mean(a); return Math.sqrt(ST.sum(a.map(v=>(v-m)**2))/(a.length-1)); },
+  q:(a,p)=>{ const s=[...a].sort((x,y)=>x-y), i=(s.length-1)*p, lo=Math.floor(i), hi=Math.ceil(i); return s[lo]+(s[hi]-s[lo])*(i-lo); },
+  mad:a=>{ const m=ST.median(a); return ST.median(a.map(v=>Math.abs(v-m))); },
+  pearson:(x,y)=>{ const n=x.length; if(n<3) return NaN; const mx=ST.mean(x), my=ST.mean(y); let sxy=0,sxx=0,syy=0; for(let i=0;i<n;i++){ sxy+=(x[i]-mx)*(y[i]-my); sxx+=(x[i]-mx)**2; syy+=(y[i]-my)**2; } return sxx&&syy?sxy/Math.sqrt(sxx*syy):NaN; },
+  // Ordinary least squares y = ic + slope·x, with residual sd and slope standard error
+  ols:(x,y)=>{ const n=x.length; if(n<3) return null; const mx=ST.mean(x), my=ST.mean(y); let Sxx=0,Sxy=0; for(let i=0;i<n;i++){ Sxx+=(x[i]-mx)**2; Sxy+=(x[i]-mx)*(y[i]-my); }
+    if(!Sxx) return null; const slope=Sxy/Sxx, ic=my-slope*mx; let sse=0,sst=0; for(let i=0;i<n;i++){ sse+=(y[i]-(ic+slope*x[i]))**2; sst+=(y[i]-my)**2; }
+    const s2=sse/(n-2); return {n,slope,ic,mx,Sxx,r2:sst?1-sse/sst:0,sd:Math.sqrt(s2),se:Math.sqrt(s2/Sxx)}; },
+};
+// Student-t critical values by degrees of freedom: 80% two-sided (0.90 quantile) and 95% two-sided (0.975 quantile)
+const T80={1:3.078,2:1.886,3:1.638,4:1.533,5:1.476,6:1.440,7:1.415,8:1.397,9:1.383,10:1.372,12:1.356,15:1.341,20:1.325,30:1.310,1e9:1.282};
+const T95={1:12.706,2:4.303,3:3.182,4:2.776,5:2.571,6:2.447,7:2.365,8:2.306,9:2.262,10:2.228,12:2.179,15:2.131,20:2.086,30:2.042,1e9:1.96};
+const tq=(tbl,df)=>tbl[Object.keys(tbl).map(Number).find(k=>k>=Math.max(1,df))];
+const labMonthKey=(k,i)=>{ const [Y,M]=k.split('-').map(Number), d=new Date(Y,M-1+i,15); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); };
+const labMonthLbl=k=>new Date(k+'-15T12:00:00').toLocaleString('es',{month:'short',year:'2-digit'}).replace('.','');
+let _labLast=null;
+
+function renderLab(){
+  const kpiEl=document.getElementById('labKpis');
+  if(!kpiEl) return;
+  const cur=new Date().toISOString().slice(0,7);
+  const REAL=t=>!['Taxes','Transfers'].includes(t.category);
+  const inc={},tot={},exp={},cat={};
+  (DB.all||[]).forEach(t=>{
+    if(!t.date||t.date.slice(0,7)>=cur) return;                    // complete months only
+    const k=t.date.slice(0,7);
+    if(t.type==='income') inc[k]=(inc[k]||0)+t.amount;
+    else if(t.type==='expense'){
+      tot[k]=(tot[k]||0)+t.amount;
+      if(REAL(t)){ exp[k]=(exp[k]||0)+t.amount; const c=t.category||'Otro'; cat[c]=cat[c]||{}; cat[c][k]=(cat[c][k]||0)+t.amount; }
+    }
+  });
+  const em=Object.keys(exp).sort(), y=em.map(k=>exp[k]), n=y.length;
+  const note=(id,html)=>{ const e=document.getElementById(id); if(e) e.innerHTML=html; };
+  const kp=(l,v,s,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${s}</div></div>`;
+  if(n<4){
+    kpiEl.innerHTML='<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">El laboratorio necesita al menos 4 meses completos de gastos para calcular tendencias con sentido. Registra más movimientos y vuelve.</div>';
+    ['labFcNote','labReading','labAnom','labPareto','labCorr','labPct','labMethod'].forEach(id=>note(id,''));
+    ['cLabFc','cLabSave','cLabHist'].forEach(id=>{ if(CH[id]){CH[id].destroy();delete CH[id];} });
+    return;
+  }
+
+  // ── 1 · Trend + 80% prediction interval + rolling-origin backtest ──────────
+  const x=y.map((_,i)=>i), fit=ST.ols(x,y);
+  const tc80=tq(T80,n-2), fc=[];
+  for(let h=1;h<=3;h++){
+    const x0=n-1+h, p=fit.ic+fit.slope*x0, se=fit.sd*Math.sqrt(1+1/n+((x0-fit.mx)**2)/fit.Sxx);
+    fc.push({p:Math.max(0,p),lo:Math.max(0,p-tc80*se),hi:p+tc80*se});
+  }
+  const sig=Math.abs(fit.slope/fit.se)>tq(T95,n-2);
+  let bt=null;
+  if(n>=6){
+    const eM=[],eN=[],eA=[];
+    for(let i=Math.max(4,Math.ceil(n/2));i<n;i++){
+      const f=ST.ols(x.slice(0,i),y.slice(0,i));
+      eM.push(Math.abs(y[i]-(f.ic+f.slope*i)));
+      eN.push(Math.abs(y[i]-y[i-1]));
+      eA.push(Math.abs(y[i]-ST.mean(y.slice(Math.max(0,i-3),i))));
+    }
+    bt={n:eM.length,mae:ST.mean(eM),naive:ST.mean(eN),avg3:ST.mean(eA)};
+  }
+  const lblAll=[...em.map(labMonthLbl),...[1,2,3].map(i=>labMonthLbl(labMonthKey(em[n-1],i)))];
+  const pad=a=>[...Array(n-1).fill(null),y[n-1],...a];
+  const c2=cssVar('--ac2'), cGr=cssVar('--gr'), cRd=cssVar('--rd'), cAm=cssVar('--am');
+  const tip={callbacks:{label:c=>c.parsed.y==null?null:`${c.dataset.label}: ${fmtF(c.parsed.y)}`},filter:i=>i.dataset.label!=='_lo'};
+  mkCh('cLabFc',{type:'line',data:{labels:lblAll,datasets:[
+    {label:'Gasto real',data:[...y,null,null,null],borderColor:c2,backgroundColor:c2,tension:.25,borderWidth:2,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:c2},
+    {label:'Tendencia (OLS)',data:lblAll.map((_,i)=>fit.ic+fit.slope*i),borderColor:cssVar('--m'),borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'_lo',data:pad(fc.map(f=>f.lo)),borderWidth:0,pointRadius:0,fill:false},
+    {label:'Intervalo 80%',data:pad(fc.map(f=>f.hi)),borderWidth:0,pointRadius:0,backgroundColor:cssVar('--ac-glow'),fill:'-1'},
+    {label:'Pronóstico',data:pad(fc.map(f=>f.p)),borderColor:cAm,borderWidth:2,pointRadius:4,pointBackgroundColor:cAm,pointBorderColor:cssVar('--bg2'),pointBorderWidth:2,tension:0},
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{boxWidth:12,font:{size:10},filter:i=>i.text!=='_lo'}},tooltip:tip},scales:{x:xO,y:{...yO,beginAtZero:false}}}});
+  const bestName=bt?(bt.mae<=Math.min(bt.naive,bt.avg3)?'el modelo lineal':bt.avg3<bt.naive?'el promedio de los últimos 3 meses':'repetir el último mes'):null;
+  note('labFcNote',
+    `Próximo mes: <b style="color:var(--t)">${fmtF(fc[0].p)}</b> (intervalo 80%: ${fmtF(fc[0].lo)} a ${fmtF(fc[0].hi)}). `+
+    (bt?`Backtest sobre ${bt.n} meses, error medio absoluto: modelo ${fmtF(bt.mae)} · último mes ${fmtF(bt.naive)} · promedio 3m ${fmtF(bt.avg3)}. Mejor método: <b style="color:var(--t)">${bestName}</b>.`
+       :'Con menos de 6 meses no hay backtest; trata el pronóstico como orientativo.'));
+
+  // ── 2 · Savings rate (all expenses vs income) ─────────────────────────────
+  const sk=Object.keys(inc).filter(k=>inc[k]>0).sort();
+  const rates=sk.map(k=>(inc[k]-(tot[k]||0))/inc[k]*100);
+  const roll=rates.map((_,i)=>ST.median(rates.slice(Math.max(0,i-2),i+1)));
+  const medRate=rates.length?ST.median(rates):NaN;
+  if(rates.length>=2){
+    mkCh('cLabSave',{type:'bar',data:{labels:sk.map(labMonthLbl),datasets:[
+      {type:'bar',label:'Tasa mensual',data:rates,backgroundColor:rates.map(r=>r>=0?cssVar('--ac-fill'):cRd),borderRadius:4,maxBarThickness:22,order:2},
+      {type:'line',label:'Mediana móvil 3m',data:roll,borderColor:cAm,borderWidth:2,pointRadius:0,tension:.3,order:1},
+    ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},
+      plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`}}},
+      scales:{x:xO,y:{...yO,ticks:{...yO.ticks,callback:v=>v+'%'}}}}});
+  } else if(CH.cLabSave){ CH.cLabSave.destroy(); delete CH.cLabSave; }
+
+  // ── 3 · Concentration (Pareto + HHI) ─────────────────────────────────────
+  const catTot=Object.entries(cat).map(([c,m])=>[c,ST.sum(Object.values(m))]).sort((a,b)=>b[1]-a[1]);
+  const grand=ST.sum(catTot.map(c=>c[1]))||1;
+  let acc=0, k80=0;
+  const rowsP=catTot.map(([c,v])=>{ const before=acc/grand; acc+=v; if(before<0.8) k80++; return {c,v,share:v/grand,cum:acc/grand,core:before<0.8}; });
+  const hhi=ST.sum(rowsP.map(r=>r.share**2))*10000;
+  const hhiTxt=hhi<1500?'diversificado':hhi<2500?'moderadamente concentrado':'muy concentrado';
+  const maxV=rowsP[0]?rowsP[0].v:1;
+  note('labPareto',
+    rowsP.slice(0,9).map(r=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px">
+      <div style="width:82px;flex-shrink:0;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.c)}">${esc(r.c)}</div>
+      <div style="flex:1;height:6px;background:var(--track-bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:${(r.v/maxV*100).toFixed(1)}%;border-radius:3px;background:var(--ac2);opacity:${r.core?1:.4}"></div></div>
+      <div style="width:34px;text-align:right;color:var(--m);font-variant-numeric:tabular-nums">${(r.share*100).toFixed(0)}%</div>
+      <div style="width:38px;text-align:right;color:var(--m);font-variant-numeric:tabular-nums" title="Acumulado">${(r.cum*100).toFixed(0)}%</div>
+    </div>`).join('')+
+    `<div style="font-size:10px;color:var(--m);margin-top:10px;line-height:1.7">Columnas: participación y acumulado. Barras plenas = el núcleo que suma el 80%. <b style="color:var(--t)">${k80}</b> de ${rowsP.length} categorías explican el 80% del gasto. Índice HHI ${Math.round(hhi)}: ${hhiTxt}.</div>`);
+
+  // ── 4 · Anomalies: modified z-score (Iglewicz–Hoaglin) within category ───
+  const byCat={};
+  (DB.real_exp||[]).forEach(t=>{ const c=t.category||'Otro'; (byCat[c]=byCat[c]||[]).push(t); });
+  const anoms=[];
+  Object.entries(byCat).forEach(([c,list])=>{
+    if(list.length<6) return;
+    const vals=list.map(t=>t.amount), med=ST.median(vals);
+    let mad=ST.mad(vals); const scale=mad?0.6745/mad:(()=>{ const md=ST.mean(vals.map(v=>Math.abs(v-med))); return md?1/(1.253314*md):0; })();
+    if(!scale) return;
+    list.forEach(t=>{ const z=(t.amount-med)*scale; if(z>3.5&&t.amount>1.5*med) anoms.push({t,z,med,c}); });
+  });
+  anoms.sort((a,b)=>b.z-a.z);
+  note('labAnom', anoms.length?
+    `<table style="min-width:420px"><thead><tr><th>Fecha</th><th>Detalle</th><th>Categoría</th><th style="text-align:right">Monto</th><th style="text-align:right">× mediana</th></tr></thead><tbody>`+
+    anoms.slice(0,8).map(a=>`<tr><td>${esc(a.t.date||'')}</td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(a.t.description||'—')}</td><td>${esc(a.c)}</td><td style="text-align:right;font-variant-numeric:tabular-nums">${fmtF(a.t.amount)}</td><td style="text-align:right;color:var(--am);font-variant-numeric:tabular-nums">${(a.t.amount/a.med).toFixed(1)}×</td></tr>`).join('')+
+    `</tbody></table>`
+    :'<div style="color:var(--m);font-size:12px;padding:14px 0">Sin gastos atípicos: ninguno se aleja más de 3,5 desviaciones robustas de lo normal en su categoría (se evalúan categorías con 6 o más movimientos).</div>');
+
+  // ── 5 · Correlation matrix (Pearson, significance at 95%) ────────────────
+  const topCats=catTot.slice(0,5).map(c=>c[0]);
+  const vars=[{n:'Ingresos',s:em.map(k=>inc[k]||0)},{n:'Gasto',s:y},...topCats.map(c=>({n:c,s:em.map(k=>cat[c][k]||0)}))];
+  const df=n-2, tcr=df>=1?tq(T95,df):null, rcrit=tcr?tcr/Math.sqrt(tcr*tcr+df):1;
+  if(n>=5){
+    const cell=(r,sg,tt)=>{ if(!isFinite(r)) return `<div style="background:var(--bg3);border-radius:6px;padding:7px 0;text-align:center;font-size:10px;color:var(--m)" title="${esc(tt)}">–</div>`;
+      const a=Math.min(1,Math.abs(r)), col=r>=0?'var(--ac2)':'var(--am)';
+      return `<div title="${esc(tt)}" style="background:color-mix(in srgb,${col} ${Math.round(a*60)}%,var(--bg3));border-radius:6px;padding:7px 0;text-align:center;font-size:10.5px;font-variant-numeric:tabular-nums;color:var(--t);font-weight:${sg?700:400};opacity:${sg?1:.6}">${r.toFixed(2).replace('-','−')}</div>`; };
+    const head=vars.map(v=>`<div style="font-size:9.5px;color:var(--m);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(v.n)}">${esc(v.n.slice(0,8))}</div>`).join('');
+    const body=vars.map((a,i)=>`<div style="font-size:10px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:center" title="${esc(a.n)}">${esc(a.n.slice(0,11))}</div>`+
+      vars.map((b,j)=>{ if(i===j) return `<div style="background:var(--bg3);border-radius:6px;padding:7px 0;text-align:center;font-size:10px;color:var(--m)">1</div>`;
+        const r=ST.pearson(a.s,b.s), sg=Math.abs(r)>=rcrit; return cell(r,sg,`${a.n} × ${b.n}: r=${isFinite(r)?r.toFixed(2):'n/d'}, n=${n}${sg?' (significativa al 95%)':' (no significativa)'}`); }).join('')).join('');
+    note('labCorr',`<div style="display:grid;grid-template-columns:78px repeat(${vars.length},minmax(40px,1fr));gap:4px;min-width:${78+vars.length*44}px"><div></div>${head}${body}</div>
+      <div style="font-size:10px;color:var(--m);margin-top:10px;line-height:1.7">Azul = se mueven juntas, ámbar = en sentido contrario. Las celdas en negrita superan |r| ≥ ${rcrit.toFixed(2)}, el umbral de significancia al 95% con ${n} meses; las tenues pueden ser azar.</div>`);
+  } else note('labCorr','<div style="color:var(--m);font-size:12px;padding:14px 0">Se necesitan 5 meses completos para estimar correlaciones.</div>');
+
+  // ── 6 · Transaction-size distribution (log bins) ─────────────────────────
+  const amts=(DB.real_exp||[]).map(t=>t.amount).filter(a=>a>0);
+  if(amts.length>=10){
+    const lo=Math.log10(Math.min(...amts)), hi=Math.log10(Math.max(...amts)), B=10, w=(hi-lo)/B||1;
+    const counts=Array(B).fill(0); amts.forEach(a=>{ counts[Math.min(B-1,Math.floor((Math.log10(a)-lo)/w))]++; });
+    mkCh('cLabHist',{type:'bar',data:{labels:counts.map((_,i)=>fmt(Math.pow(10,lo+i*w))),datasets:[{label:'Transacciones',data:counts,backgroundColor:cssVar('--ac-fill'),borderRadius:4,categoryPercentage:.9,barPercentage:.95}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false},tooltip:{callbacks:{title:i=>`Desde ${fmtF(Math.pow(10,lo+i[0].dataIndex*w))}`,label:c=>`${c.parsed.y} transacciones`}}},scales:{x:xO,y:{...yO,ticks:{...yO.ticks,callback:v=>v,precision:0}}}}});
+    const sorted=[...amts].sort((a,b)=>b-a), topN=Math.max(1,Math.ceil(amts.length*0.1)), topShare=ST.sum(sorted.slice(0,topN))/ST.sum(amts);
+    note('labPct',`Mediana ${fmtF(ST.median(amts))} · P75 ${fmtF(ST.q(amts,.75))} · P90 ${fmtF(ST.q(amts,.9))} · P99 ${fmtF(ST.q(amts,.99))}. El 10% de las transacciones más grandes (${topN}) suma <b style="color:var(--t)">${(topShare*100).toFixed(0)}%</b> del gasto.`);
+  } else { if(CH.cLabHist){CH.cLabHist.destroy();delete CH.cLabHist;} note('labPct','Aún hay pocas transacciones para describir la distribución.'); }
+
+  // ── 7 · Marginal propensity to spend (total expenses ~ income) ───────────
+  const both=Object.keys(inc).filter(k=>tot[k]!=null).sort();
+  const mps=both.length>=5?ST.ols(both.map(k=>inc[k]),both.map(k=>tot[k])):null;
+
+  // ── KPIs ─────────────────────────────────────────────────────────────────
+  const cv=ST.sd(y)/ST.mean(y)*100, medExp=ST.median(y);
+  const cvTxt=cv<15?'estable':cv<30?'moderada':'alta', cvCol=cv<15?'var(--gr)':cv<30?'var(--am)':'var(--rd)';
+  const cushion=DB.curBal>0&&medExp>0?DB.curBal/medExp:0;
+  const conf=n>=12?'alta':n>=6?'media':'baja';
+  kpiEl.innerHTML=
+    kp('Ahorro mediano',isFinite(medRate)?medRate.toFixed(1)+'%':'—',rates.length?`rango intercuartil ${ST.q(rates,.25).toFixed(0)}% a ${ST.q(rates,.75).toFixed(0)}%`:'sin ingresos suficientes',medRate>=20?'var(--gr)':medRate>=0?'var(--am)':'var(--rd)')+
+    kp('Variabilidad del gasto',cv.toFixed(0)+'%',`coef. de variación · ${cvTxt} (σ ${fmt(ST.sd(y))})`,cvCol)+
+    kp('Colchón',cushion.toFixed(1)+' meses','patrimonio neto ÷ gasto mediano',cushion>=6?'var(--gr)':cushion>=3?'var(--am)':'var(--rd)')+
+    kp('Tendencia del gasto',(fit.slope>=0?'+':'−')+fmt(Math.abs(fit.slope))+'/mes',`R² ${fit.r2.toFixed(2)} · ${sig?'significativa (95%)':'no concluyente'}`,sig?(fit.slope>0?'var(--rd)':'var(--gr)'):'var(--am)')+
+    kp('Propensión a gastar',mps?'$'+Math.round(mps.slope*1000).toLocaleString('es-CO'):'—',mps?`por cada $1.000 extra de ingreso · R² ${mps.r2.toFixed(2)}`:'requiere 5 meses con ingresos','var(--ac2)')+
+    kp('Concentración',(rowsP.slice(0,3).reduce((s,r)=>s+r.share,0)*100).toFixed(0)+'%',`top 3 categorías · ${hhiTxt}`,'var(--ac2)')+
+    kp('Gastos atípicos',String(anoms.length),'z robusto > 3,5',anoms.length?'var(--am)':'var(--gr)')+
+    kp('Muestra',`${n} meses`,`${(DB.all||[]).length} transacciones · confianza ${conf}`,conf==='alta'?'var(--gr)':conf==='media'?'var(--am)':'var(--rd)');
+
+  // ── Analyst reading ──────────────────────────────────────────────────────
+  const bullets=[
+    `El gasto real ${fit.slope>0?'sube':'baja'} unos <b style="color:var(--t)">${fmtF(Math.abs(fit.slope))}</b> por mes (R² ${fit.r2.toFixed(2)}). ${sig?'La señal supera el ruido con 95% de confianza.':'Con esta muestra la tendencia aún no se distingue del ruido mensual.'}`,
+    `La variabilidad es <b style="color:var(--t)">${cvTxt}</b> (${cv.toFixed(0)}%): ${cv<15?'tu gasto es predecible y se puede presupuestar con poco margen.':cv<30?'conviene dejar un margen del '+Math.round(cv)+'% en el presupuesto.':'hay meses muy distintos entre sí; revisa qué los dispara antes de fijar un presupuesto.'}`,
+    mps?`Propensión marginal a gastar: de cada $1.000 adicionales de ingreso, gastas unos <b style="color:var(--t)">$${Math.round(mps.slope*1000).toLocaleString('es-CO')}</b> (R² ${mps.r2.toFixed(2)}). ${mps.slope<0.5?'Buen reflejo: el ingreso extra tiende a quedarse como ahorro.':'El gasto crece casi al ritmo del ingreso (inflación de estilo de vida).'}`:null,
+    rowsP.length?`<b style="color:var(--t)">${esc(rowsP[0].c)}</b> pesa ${(rowsP[0].share*100).toFixed(0)}% del gasto real; ${k80} categorías explican el 80%.`:null,
+    anoms.length?`Mayor gasto atípico: <b style="color:var(--t)">${esc(anoms[0].t.description||anoms[0].c)}</b> por ${fmtF(anoms[0].t.amount)}, ${(anoms[0].t.amount/anoms[0].med).toFixed(1)}× lo normal en ${esc(anoms[0].c)}.`:null,
+    bt?`El pronóstico se validó con ${bt.n} cortes hacia adelante: ${bt.mae<=Math.min(bt.naive,bt.avg3)?'el modelo lineal fue el más preciso.':'un método simple le ganó al modelo lineal, así que confía más en el rango que en el punto.'}`:null,
+  ].filter(Boolean);
+  note('labReading','<ul style="list-style:none;display:flex;flex-direction:column;gap:9px">'+bullets.map(b=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd)">${b}</li>`).join('')+'</ul>');
+
+  note('labMethod',
+    `<b style="color:var(--t)">Datos.</b> ${n} meses completos y ${(DB.all||[]).length} transacciones cargadas (la app descarga las 600 más recientes). Se excluye el mes en curso y las categorías Taxes y Transfers del gasto real. `+
+    `<b style="color:var(--t)">Pronóstico.</b> Regresión lineal por mínimos cuadrados sobre el gasto mensual; intervalo de predicción 80% con t de Student; validado con backtest de origen móvil contra "repetir el último mes" y "promedio de 3 meses". `+
+    `<b style="color:var(--t)">Ahorro.</b> Ingresos menos todos los gastos del mes (incluye impuestos y transferencias), igual que el resto de la app. `+
+    `<b style="color:var(--t)">Atípicos.</b> Puntaje z modificado (mediana y MAD, Iglewicz–Hoaglin) por categoría, umbral 3,5. `+
+    `<b style="color:var(--t)">Correlación.</b> Pearson sobre totales mensuales; significancia al 95% según el tamaño de muestra. `+
+    `<b style="color:var(--t)">Límites.</b> Con pocos meses los intervalos son amplios y las correlaciones inestables; correlación no implica causalidad; esto es análisis descriptivo, no asesoría financiera.`);
+
+  _labLast={generado:new Date().toISOString(),meses:n,transacciones:(DB.all||[]).length,
+    gasto_mensual:Object.fromEntries(em.map((k,i)=>[k,y[i]])),
+    tendencia:{pendiente_mes:fit.slope,r2:fit.r2,significativa_95:sig},
+    pronostico:fc.map((f,i)=>({mes:labMonthKey(em[n-1],i+1),puntual:Math.round(f.p),inf80:Math.round(f.lo),sup80:Math.round(f.hi)})),
+    backtest:bt,variabilidad_cv_pct:cv,ahorro_mediano_pct:medRate,colchon_meses:cushion,hhi:hhi,
+    propension_gastar:mps?{pendiente:mps.slope,r2:mps.r2}:null,atipicos:anoms.slice(0,20).map(a=>({fecha:a.t.date,categoria:a.c,monto:a.t.amount,veces_mediana:+(a.t.amount/a.med).toFixed(2)}))};
+}
+function labExport(){
+  if(!_labLast){ phiToast('Aún no hay métricas para descargar.',{icon:'ℹ️'}); return; }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(_labLast,null,2)],{type:'application/json'}));
+  a.download='metricas-laboratorio-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+// ══════════════════════════════════════════════════════════
+//  MERCADO · INDICADORES · FUENTES DE INGRESO (Colombia)
+//  Live: TRM (datos.gov.co), FX (open.er-api.com), crypto (CoinGecko).
+//  Each source fails independently; last good copy lives in localStorage.
+// ══════════════════════════════════════════════════════════
+const MKT_KEY='dfg_mkt', MACRO_KEY='dfg_macro';
+let _mkt=null, _mktBusy=false, _mktFilterVal='all', _mktNote='';
+const lsGet=k=>{ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch{ return null; } };
+const lsSet=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} };
+const fmtUSD=v=>'US$'+v.toLocaleString('es-CO',{maximumFractionDigits:v<100?2:0});
+const fmtCOP2=v=>'$'+v.toLocaleString('es-CO',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pctTxt=(v,d=1)=>(v>=0?'+':'−')+Math.abs(v).toFixed(d).replace('.',',')+'%';
+
+async function mktJson(url){
+  const ac=new AbortController(), t=setTimeout(()=>ac.abort(),9000);
+  try{ const r=await fetch(url,{signal:ac.signal,cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
+  finally{ clearTimeout(t); }
+}
+async function mktLoad(){
+  const [fx,trm,cg]=await Promise.allSettled([
+    mktJson('https://open.er-api.com/v6/latest/USD'),
+    mktJson('https://www.datos.gov.co/resource/32sa-8pi3.json?$select=valor,vigenciadesde&$order=vigenciadesde%20DESC&$limit=90'),
+    mktJson('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true'),
+  ]);
+  const prev=lsGet(MKT_KEY)||{}, out={...prev,tryT:Date.now()};   // t = last time ANY source answered; tryT throttles retries
+  if(fx.status==='fulfilled'&&fx.value?.rates?.COP) out.fx={COP:fx.value.rates.COP,EUR:fx.value.rates.EUR};
+  if(trm.status==='fulfilled'&&Array.isArray(trm.value)&&trm.value.length>=5){
+    const rows=trm.value.map(r=>({d:String(r.vigenciadesde).slice(0,10),v:+r.valor})).filter(r=>r.v>0).reverse();
+    if(rows.length>=5) out.trm=rows;
+  }
+  if(cg.status==='fulfilled'&&cg.value?.bitcoin?.usd) out.cg={btc:cg.value.bitcoin,eth:cg.value.ethereum};
+  out.failed=[fx,trm,cg].filter(r=>r.status!=='fulfilled').length;
+  if(out.failed<3) out.t=Date.now();
+  lsSet(MKT_KEY,out);
+  return out;
+}
+async function mktRefresh(force=true){
+  if(_mktBusy) return;
+  const btn=document.getElementById('mktRefresh');
+  _mktBusy=true; if(btn){ btn.disabled=true; btn.textContent='Actualizando…'; }
+  try{ _mkt=await mktLoad(); }catch(e){ console.error('mktLoad',e); }
+  _mktBusy=false; if(btn){ btn.disabled=false; btn.textContent='Actualizar'; }
+  mktPaint();
+}
+function mktMacroSave(){
+  lsSet(MACRO_KEY,{ipc:document.getElementById('mkIpc')?.value||'',rate:document.getElementById('mkRate')?.value||''});
+  mktPaintReal();
+}
+function mktFilter(f){ _mktFilterVal=f; mktPaintIdeas(); }
+
+// Shared personal baseline (complete months): median real spend, median savings, income by source, cushion
+function mktBase(){
+  const cur=new Date().toISOString().slice(0,7), inc={},tot={},exp={},src={};
+  const SRC={salary:'Salario',interest:'Intereses',freelance:'Freelance','didi/uber':'Didi/Uber',didi:'Didi/Uber',refund:'Reembolsos',reembolso:'Reembolsos',familiar:'Familiar',family:'Familiar'};
+  (DB.all||[]).forEach(t=>{
+    if(!t.date||t.date.slice(0,7)>=cur) return; const k=t.date.slice(0,7);
+    if(t.type==='income'){ inc[k]=(inc[k]||0)+t.amount; const lb=SRC[(t.subcategory||'').toLowerCase()]||'Otros'; (src[k]=src[k]||{})[lb]=((src[k]||{})[lb]||0)+t.amount; }
+    else if(t.type==='expense'){ tot[k]=(tot[k]||0)+t.amount; if(!['Taxes','Transfers'].includes(t.category)) exp[k]=(exp[k]||0)+t.amount; }
+  });
+  const ks=Object.keys(inc).sort().slice(-6), sources={};
+  ks.forEach(k=>Object.entries(src[k]).forEach(([l,v])=>sources[l]=(sources[l]||0)+v));
+  const sav=Object.keys(inc).filter(k=>tot[k]!=null).map(k=>inc[k]-tot[k]);
+  const medExp=Object.keys(exp).length?ST.median(Object.values(exp)):0;
+  return {months:ks.length,sources,totalInc:ST.sum(Object.values(sources)),medExp,medSave:sav.length?ST.median(sav):0,
+    medInc:Object.keys(inc).length?ST.median(Object.values(inc)):0,expByMonth:exp,
+    cushion:DB.curBal>0&&medExp>0?DB.curBal/medExp:0};
+}
+
+function mktPaint(){
+  const m=_mkt||lsGet(MKT_KEY), kEl=document.getElementById('mktKpis');
+  if(!kEl) return;
+  if(!m||(!m.trm&&!m.fx&&!m.cg)){
+    kEl.innerHTML='<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">No se pudo cargar el mercado. Revisa tu conexión y toca Actualizar.</div>';
+    document.getElementById('mktStamp').textContent='Sin datos de mercado';
+    ['mktTrmNote','mktExposure'].forEach(id=>{ const e=document.getElementById(id); if(e) e.innerHTML=''; });
+    if(CH.cMktTrm){ CH.cMktTrm.destroy(); delete CH.cMktTrm; }
+    return;
+  }
+  const kp=(l,v,s,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${s}</div></div>`;
+  const trm=m.trm||null, last=trm?trm[trm.length-1]:null, usdcop=last?last.v:(m.fx?m.fx.COP:null);
+  let st=null;
+  if(trm&&trm.length>=10){
+    const v=trm.map(r=>r.v), mean=ST.mean(v), sd=ST.sd(v), n=v.length;
+    const rets=v.slice(1).map((x,i)=>Math.log(x/v[i]));
+    st={mean,sd,min:Math.min(...v),max:Math.max(...v),z:sd?(v[n-1]-mean)/sd:0,
+      pct:v.filter(x=>x<=v[n-1]).length/n*100,
+      c7:(v[n-1]/v[Math.max(0,n-6)]-1)*100,c30:(v[n-1]/v[Math.max(0,n-22)]-1)*100,vol:ST.sd(rets)*Math.sqrt(252)*100};
+  }
+  const dir=c=>c>=0?'var(--rd)':'var(--gr)';   // dollar up = pesos weaker
+  const cgk=(name,o)=>o?kp(name,fmtUSD(o.usd),`${pctTxt(o.usd_24h_change||0)} en 24 h`,(o.usd_24h_change||0)>=0?'var(--gr)':'var(--rd)'):kp(name,'—','no disponible ahora','var(--m)');
+  kEl.innerHTML=
+    kp('Dólar (TRM)',usdcop?fmtCOP2(usdcop):'—',st?`${pctTxt(st.c30)} en ~30 días · ${last.d}`:(last?last.d:'tipo de cambio de referencia'),st?dir(st.c30):'var(--ac2)')+
+    kp('Euro',m.fx?fmtCOP2(m.fx.COP/m.fx.EUR):'—','COP por 1 EUR (referencia)','var(--ac2)')+
+    cgk('Bitcoin',m.cg?.btc)+cgk('Ethereum',m.cg?.eth);
+  const age=Math.round((Date.now()-(m.t||0))/60000);
+  document.getElementById('mktStamp').textContent=(m.failed?`Algunas fuentes no respondieron; se muestra el último dato guardado. `:'')+`Actualizado ${age<1?'hace un momento':age<60?`hace ${age} min`:new Date(m.t).toLocaleString('es-CO')}`;
+
+  // TRM chart + stats
+  if(trm&&st){
+    const c2=cssVar('--ac2'), labels=trm.map(r=>new Date(r.d+'T12:00:00').toLocaleString('es',{day:'numeric',month:'short'}).replace('.',''));
+    mkCh('cMktTrm',{type:'line',data:{labels,datasets:[
+      {label:'_lo',data:trm.map(()=>st.mean-st.sd),borderWidth:0,pointRadius:0,fill:false},
+      {label:'Banda ±1σ',data:trm.map(()=>st.mean+st.sd),borderWidth:0,pointRadius:0,backgroundColor:cssVar('--ac-glow'),fill:'-1'},
+      {label:'Promedio 90 días',data:trm.map(()=>st.mean),borderColor:cssVar('--m'),borderDash:[5,4],borderWidth:1.5,pointRadius:0},
+      {label:'TRM',data:trm.map(r=>r.v),borderColor:c2,borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.2},
+    ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{boxWidth:12,font:{size:10},filter:i=>i.text!=='_lo'}},tooltip:{filter:i=>i.dataset.label!=='_lo',callbacks:{label:c=>`${c.dataset.label}: ${fmtCOP2(c.parsed.y)}`}}},
+      scales:{x:{...xO,ticks:{...xO.ticks,maxTicksLimit:8,maxRotation:0}},y:{...yO,ticks:{...yO.ticks,callback:v=>'$'+v.toLocaleString('es-CO')}}}}});
+    const pos=st.z>1?'por encima de su rango habitual':st.z<-1?'por debajo de su rango habitual':'dentro de su rango habitual';
+    document.getElementById('mktTrmNote').innerHTML=
+      `Hoy ${fmtCOP2(last.v)}: <b style="color:var(--t)">${pos}</b> (puntaje z ${st.z.toFixed(1).replace('.',',')}; está en el percentil ${Math.round(st.pct)} del periodo). Mínimo ${fmtCOP2(st.min)}, máximo ${fmtCOP2(st.max)}. Variación ${pctTxt(st.c7)} en una semana. Volatilidad anualizada ${st.vol.toFixed(1).replace('.',',')}%.`;
+  } else { if(CH.cMktTrm){ CH.cMktTrm.destroy(); delete CH.cMktTrm; } const e=document.getElementById('mktTrmNote'); if(e) e.textContent='La serie histórica de la TRM no está disponible ahora.'; }
+
+  // Exposure
+  const ex=document.getElementById('mktExposure');
+  if(ex){
+    if(usdcop&&DB.curBal>0){
+      const usd=DB.curBal/usdcop, up=usd-DB.curBal/(usdcop*1.05);
+      ex.innerHTML=`<p>Tu patrimonio neto de <b style="color:var(--t)">${fmtF(DB.curBal)}</b> equivale hoy a unos <b style="color:var(--t)">${fmtUSD(usd)}</b>.</p>
+        <p style="margin-top:8px">Si el dólar subiera 5%, esos mismos pesos valdrían ${fmtUSD(usd-up)}: ${fmtUSD(up)} menos medidos en dólares, sin que tu saldo en pesos cambie.</p>
+        <p style="margin-top:8px;font-size:11px">Un dólar caro favorece a quien recibe ingresos en dólares y encarece lo importado, los viajes y las suscripciones en USD. Uno barato hace lo contrario.</p>`;
+    } else ex.innerHTML='<p>Cuando tengas patrimonio neto positivo y el dólar cargado, aquí verás su equivalente en USD y la sensibilidad a la TRM.</p>';
+  }
+}
+
+function mktPaintReal(){
+  const el=document.getElementById('mktReal'); if(!el) return;
+  const mc=lsGet(MACRO_KEY)||{}, ipc=parseFloat(String(mc.ipc).replace(',','.')), rate=parseFloat(String(mc.rate).replace(',','.'));
+  const b=mktBase(), cur=Math.max(0,DB.curBal||0), out=[];
+  if(isFinite(ipc)&&isFinite(rate)){
+    const real=((1+rate/100)/(1+ipc/100)-1)*100;
+    out.push(`Rendimiento real: <b style="color:var(--t)">${pctTxt(real,2)}</b> E.A. (${rate.toFixed(1).replace('.',',')}% nominal menos ${ipc.toFixed(1).replace('.',',')}% de inflación). ${real>=0?'Tu dinero gana poder adquisitivo.':'Tu dinero pierde poder adquisitivo aunque el saldo suba.'}`);
+    if(cur) out.push(`Sobre tu patrimonio neto de ${fmtF(cur)}, eso es <b style="color:var(--t)">${real>=0?'+':'−'}${fmtF(Math.abs(cur*real/100))}</b> al año en poder adquisitivo, si todo estuviera a esa tasa.`);
+    if(b.medExp>0){
+      const r=real>0?real:rate, cap=b.medExp*12/(r/100);
+      if(r>0) out.push(`Para que los rendimientos ${real>0?'reales ':''}cubran tu gasto mediano (${fmtF(b.medExp)}/mes) harían falta unos <b style="color:var(--t)">${fmtF(cap)}</b>; hoy tienes ${Math.min(100,cur/cap*100).toFixed(1).replace('.',',')}% de esa cifra.`);
+    }
+  } else if(isFinite(ipc)&&cur){
+    out.push(`Con ${ipc.toFixed(1).replace('.',',')}% de inflación, ${fmtF(cur)} guardados sin rendimiento pierden unos <b style="color:var(--t)">${fmtF(cur*(1-1/(1+ipc/100)))}</b> de poder adquisitivo al año.`);
+  } else out.push('Ingresa la inflación y la tasa de tu cuenta para ver tu rendimiento real y cuánto capital cubriría tus gastos con intereses.');
+  el.innerHTML=out.map(t=>`<p style="margin-bottom:8px">${t}</p>`).join('');
+}
+
+const MKT_IDEAS=[
+  {id:'cdt',e:'🏦',n:'CDT o cuenta de alto rendimiento',t:'pasivo',cap:500000,eff:'Bajo',risk:1,when:'Meses',d:'Prestas tu dinero al banco a una tasa pactada. Compara tasas E.A. y plazos entre entidades.',has:'Intereses'},
+  {id:'fic',e:'📊',n:'Fondos de inversión colectiva',t:'pasivo',cap:200000,eff:'Bajo',risk:1,when:'Meses a años',d:'Un administrador reúne el dinero de muchos inversionistas. Los hay de bajo riesgo y de renta variable.',has:'Intereses'},
+  {id:'tes',e:'🏛️',n:'TES (deuda pública)',t:'pasivo',cap:1000000,eff:'Bajo',risk:2,when:'Años',d:'Bonos del Gobierno de Colombia. Su precio cambia con las tasas del mercado si vendes antes del vencimiento.',has:'Intereses'},
+  {id:'etf',e:'🌍',n:'ETFs y acciones globales',t:'pasivo',cap:300000,eff:'Bajo',risk:2,when:'Años',d:'Diversificación en cientos de empresas con un solo activo, vía comisionista o broker. Hay riesgo cambiario y de mercado.'},
+  {id:'div',e:'💼',n:'Acciones con dividendos (BVC)',t:'pasivo',cap:500000,eff:'Medio',risk:2,when:'Años',d:'Participación en empresas colombianas que reparten utilidades. Los dividendos no están garantizados.'},
+  {id:'inm',e:'🏠',n:'Inmueble en arriendo',t:'pasivo',cap:100000000,eff:'Medio',risk:2,when:'Años',d:'Renta mensual más valorización. Exige capital alto, mantenimiento y manejo de vacancia.'},
+  {id:'free',e:'💻',n:'Freelance',t:'activo',cap:0,eff:'Alto',risk:1,when:'Semanas',d:'Vendes tus habilidades por proyectos. El ingreso crece con tu tarifa y tu cartera de clientes.',has:'Freelance'},
+  {id:'cons',e:'🎓',n:'Consultoría o clases particulares',t:'activo',cap:0,eff:'Alto',risk:1,when:'Semanas',d:'Conviertes tu experiencia en horas pagadas. Tarifa alta, pero depende de tu tiempo.'},
+  {id:'mov',e:'🚗',n:'Plataformas de movilidad y domicilios',t:'activo',cap:0,eff:'Alto',risk:1,when:'Inmediato',d:'Ingreso flexible por horas. Descuenta combustible, mantenimiento y seguridad social.',has:'Didi/Uber'},
+  {id:'dig',e:'📦',n:'Productos digitales',t:'activo',cap:0,eff:'Alto',risk:2,when:'Meses',d:'Cursos, plantillas o software que vendes muchas veces. El trabajo es al inicio y el resultado es incierto.'},
+  {id:'cry',e:'🪙',n:'Criptoactivos',t:'pasivo',cap:100000,eff:'Medio',risk:3,when:'Variable',d:'Muy volátiles: pueden subir o caer más de 50% en meses. No es una fuente de ingreso estable; invierte solo lo que puedas perder.'},
+];
+
+function mktPaintIdeas(){
+  const el=document.getElementById('mktIdeas'), fl=document.getElementById('mktFilters'); if(!el) return;
+  fl.innerHTML=[['all','Todas'],['activo','Activos'],['pasivo','Pasivos']].map(([k,l])=>
+    `<button class="btn-sm" onclick="mktFilter('${k}')" style="${_mktFilterVal===k?'color:var(--ac2);border-color:var(--ac-bd);background:var(--ac-bg)':''}">${l}</button>`).join('');
+  const b=mktBase(), riskTxt=['','Bajo','Medio','Alto'];
+  el.innerHTML=MKT_IDEAS.filter(i=>_mktFilterVal==='all'||i.t===_mktFilterVal).map(i=>{
+    const chips=[];
+    if(i.has&&b.sources[i.has]) chips.push(`<span class="badge bg">Ya lo tienes</span>`);
+    if(i.cap===0) chips.push(`<span class="badge bt">Sin capital inicial</span>`);
+    else if(b.medSave>0) chips.push(`<span class="badge ba">≈ ${Math.ceil(i.cap/b.medSave)} ${Math.ceil(i.cap/b.medSave)===1?'mes':'meses'} de tu ahorro</span>`);
+    else chips.push(`<span class="badge ba">Hoy no hay ahorro mensual para fondearlo</span>`);
+    if(i.risk>=3&&b.cushion<3) chips.push(`<span class="badge br">Antes: colchón de 3 meses</span>`);
+    const cell=(l,v)=>`<div style="background:var(--bg2);border-radius:9px;padding:7px 9px"><div style="font-size:9px;color:var(--m);margin-bottom:2px">${l}</div><div style="font-size:11.5px;font-weight:600;color:var(--t)">${v}</div></div>`;
+    return `<div style="background:var(--bg3);border:1px solid var(--b2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="font-size:13px;font-weight:600;line-height:1.3">${i.e} ${i.n}</div>
+        <span class="badge ${i.t==='activo'?'bt':'bg'}" style="flex-shrink:0;margin:0">${i.t==='activo'?'Activo':'Pasivo'}</span>
+      </div>
+      <div style="font-size:11px;color:var(--m);line-height:1.6">${i.d}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${cell('Capital inicial',i.cap?'desde ~'+fmtF(i.cap):'$0')}
+        ${cell('Esfuerzo',i.eff)}
+        ${cell('Riesgo','<span style="letter-spacing:2px;color:var(--ac2)">'+'●'.repeat(i.risk)+'<span style="opacity:.25">'+'●'.repeat(3-i.risk)+'</span></span> '+riskTxt[i.risk])}
+        ${cell('Plazo típico',i.when)}
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:auto">${chips.join('')}</div>
+    </div>`;}).join('');
+}
+
+function mktPaintSources(){
+  const el=document.getElementById('mktSources'); if(!el) return;
+  const b=mktBase();
+  if(!b.totalInc){ el.innerHTML='<div style="color:var(--m);font-size:12px;padding:14px 0">Aún no hay ingresos en meses completos para analizar.</div>'; return; }
+  const rows=Object.entries(b.sources).sort((a,c)=>c[1]-a[1]), mx=rows[0][1], top=rows[0][1]/b.totalInc*100;
+  const hhi=ST.sum(rows.map(r=>(r[1]/b.totalInc)**2))*10000;
+  const passive=(b.sources['Intereses']||0)/Math.max(1,b.months);
+  el.innerHTML=rows.map(([l,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px">
+      <div style="width:84px;flex-shrink:0;color:var(--t)">${esc(l)}</div>
+      <div style="flex:1;height:6px;background:var(--track-bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:${(v/mx*100).toFixed(1)}%;background:var(--ac2);border-radius:3px"></div></div>
+      <div style="width:36px;text-align:right;color:var(--m);font-variant-numeric:tabular-nums">${(v/b.totalInc*100).toFixed(0)}%</div>
+    </div>`).join('')+
+    `<div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:12px"><b style="color:var(--t)">${top.toFixed(0)}%</b> de tu ingreso viene de ${esc(rows[0][0])}${top>=80?': dependes casi por completo de una sola fuente.':hhi<4000?': tienes un reparto razonable entre fuentes.':'.'} `+
+    (b.medExp>0?`Tus intereses promedio (${fmtF(passive)}/mes) cubren <b style="color:var(--t)">${Math.min(100,passive/b.medExp*100).toFixed(1).replace('.',',')}%</b> de tu gasto mediano.`:'')+`</div>`;
+}
+
+function renderMercado(){
+  if(!document.getElementById('mktKpis')) return;
+  const mc=lsGet(MACRO_KEY)||{};
+  const ipc=document.getElementById('mkIpc'), rt=document.getElementById('mkRate');
+  if(ipc&&document.activeElement!==ipc) ipc.value=mc.ipc||'';
+  if(rt&&document.activeElement!==rt) rt.value=mc.rate||'';
+  mktPaintReal(); mktPaintSources(); mktPaintIdeas();
+  const cached=lsGet(MKT_KEY);
+  if(!_mkt&&cached) _mkt=cached;
+  mktPaint();
+  // Refresh when there is nothing cached or the copy is older than 30 min (renderAll runs often; don't hammer the APIs)
+  if(!_mktBusy&&(!cached||Date.now()-(cached.tryT||cached.t||0)>30*60000)) mktRefresh(false);
+}
+
+// ══════════════════════════════════════════════════════════
+//  VIVIR DE RENDIMIENTOS — gasto limitado al rendimiento del capital
+//  allowance/mes = patrimonio neto × %que rinde × ((1+EA)^(1/12) − 1)
+//  Todo ingreso nuevo va al portafolio; el gasto sale solo del rendimiento.
+// ══════════════════════════════════════════════════════════
+const RENTA_KEY='dfg_renta';
+function rentaCfg(){
+  const s=lsGet(RENTA_KEY)||{}, rate=parseFloat(String(s.rate).replace(',','.')), pct=parseFloat(String(s.pct).replace(',','.'));
+  return {rate:isFinite(rate)&&rate>0?rate:11, pct:isFinite(pct)?Math.min(100,Math.max(0,pct)):90};
+}
+function rentaSave(){
+  lsSet(RENTA_KEY,{rate:document.getElementById('rtRate')?.value||'',pct:document.getElementById('rtPct')?.value||''});
+  renderRenta(true);
+}
+// Core plan, also used by the Diario "Hoy" strip
+function rentaPlan(){
+  const c=rentaCfg(), im=Math.pow(1+c.rate/100,1/12)-1, g=im*c.pct/100;
+  const total=Math.max(0,DB.curBal||0), capital=total*c.pct/100, allow=total*g;
+  const now=new Date(), ym=localISO(now).slice(0,7), dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(), day=now.getDate();
+  const spent=(DB.real_exp||[]).filter(t=>t.date&&t.date.slice(0,7)===ym).reduce((s,t)=>s+t.amount,0);
+  const incMonth=(DB.income||[]).filter(t=>t.date&&t.date.slice(0,7)===ym).reduce((s,t)=>s+t.amount,0);
+  const remain=allow-spent, daysLeft=dim-day+1;
+  return {c,im,g,total,capital,allow,spent,incMonth,remain,dim,day,daysLeft,perDay:Math.max(0,remain)/daysLeft,expected:allow*day/dim};
+}
+function rentaProject(total0,g,inc,exp,infl){
+  const pts=[]; let T=total0,E=exp,hit=null;
+  for(let m=0;m<=600;m++){
+    pts.push({m,y:T*g,E});
+    if(T*g>=E){ hit=m; break; }
+    T=T*(1+g)+inc-E; E*=1+infl;
+    if(T<=0) break;
+  }
+  return {hit,pts};
+}
+const monthsTxt=m=>{ const y=Math.floor(m/12), r=m%12; return (y?`${y} ${y===1?'año':'años'}`:'')+(y&&r?' y ':'')+(r||!y?`${r} ${r===1?'mes':'meses'}`:''); };
+
+function renderRenta(inputsOnly){
+  const kEl=document.getElementById('rtKpis'); if(!kEl) return;
+  const cfg=rentaCfg(), s=lsGet(RENTA_KEY)||{}, ri=document.getElementById('rtRate'), pi=document.getElementById('rtPct');
+  if(ri&&document.activeElement!==ri) ri.value=s.rate||''; if(pi&&document.activeElement!==pi) pi.value=s.pct||'';
+  if(ri&&!s.rate) ri.placeholder=String(cfg.rate); if(pi&&!s.pct) pi.placeholder=String(cfg.pct);
+  const p=rentaPlan(), b=mktBase(), kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
+  const note=(id,h)=>{ const e=document.getElementById(id); if(e) e.innerHTML=h; };
+  if(p.total<=0){
+    kEl.innerHTML='<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">Tu patrimonio neto es cero o negativo, así que todavía no hay rendimiento del cual vivir. Cada peso que ingreses al portafolio empieza a construirlo.</div>';
+    ['rtMonth','rtReading','rtHistNote','rtProjNote','rtCaps'].forEach(id=>note(id,''));
+    ['cRtHist','cRtProj'].forEach(id=>{ if(CH[id]){CH[id].destroy();delete CH[id];} });
+    return;
+  }
+  const over=p.spent>p.allow, usedPct=p.allow?p.spent/p.allow*100:0, cover=b.medExp?p.allow/b.medExp*100:0;
+  kEl.innerHTML=
+    kp('Tu rendimiento mensual',fmtF(p.allow),`${fmtF(p.capital)} al ${cfg.rate.toFixed(1).replace('.',',')}% E.A. (${(p.im*100).toFixed(2).replace('.',',')}%/mes)`,'var(--ac2)')+
+    kp('Gastado este mes',fmtF(p.spent),`${usedPct.toFixed(0)}% de tu rendimiento`,over?'var(--rd)':usedPct>(p.day/p.dim*100)?'var(--am)':'var(--gr)')+
+    kp(over?'Excedido':'Te queda hoy',over?fmtF(p.spent-p.allow):fmtF(p.perDay),over?'sobre el rendimiento del mes':`por día · ${p.daysLeft} ${p.daysLeft===1?'día':'días'} restantes`,over?'var(--rd)':'var(--gr)')+
+    kp('Cobertura de tu vida',b.medExp?cover.toFixed(0)+'%':'—',b.medExp?`rendimiento ÷ gasto mediano (${fmt(b.medExp)})`:'faltan meses completos',cover>=100?'var(--gr)':cover>=50?'var(--am)':'var(--ac2)');
+
+  // Month progress bar with a "where you should be today" marker
+  const fill=Math.min(100,usedPct), mark=p.day/p.dim*100, diff=p.spent-p.expected;
+  const status=over?`Superaste tu rendimiento en <b style="color:var(--rd)">${fmtF(p.spent-p.allow)}</b>: ese exceso no lo cubren los intereses, sale de tus ingresos o de tu capital.`
+    :diff>0?`Vas <b style="color:var(--am)">${fmtF(diff)}</b> por encima del ritmo ideal para hoy. Si bajas a ${fmtF(p.perDay)} por día, cierras dentro del rendimiento.`
+    :`Vas <b style="color:var(--gr)">${fmtF(-diff)}</b> por debajo del ritmo ideal. Te quedan ${fmtF(p.remain)} del rendimiento para ${p.daysLeft} ${p.daysLeft===1?'día':'días'}.`;
+  note('rtMonth',`<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:var(--t);font-weight:600">${fmtF(p.spent)}</span><span style="color:var(--m)">de ${fmtF(p.allow)}</span></div>
+    <div style="position:relative;height:12px;background:var(--track-bg);border-radius:6px;overflow:visible">
+      <div style="height:100%;width:${fill}%;border-radius:6px;background:${over?'var(--rd)':'var(--ac2)'};transition:width .8s"></div>
+      <div title="Dónde deberías ir hoy" style="position:absolute;top:-4px;bottom:-4px;left:${mark}%;width:2px;background:var(--t);opacity:.7;border-radius:1px"></div>
+    </div>
+    <div style="font-size:10px;color:var(--m);margin:6px 0 12px">La línea marca dónde deberías ir hoy (día ${p.day} de ${p.dim}).</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.7">${status}</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px solid var(--b)">Ingresos de este mes: <b style="color:var(--t)">${fmtF(p.incMonth)}</b>. Con esta regla, todo va al portafolio.</div>`);
+
+  // History vs allowance (last 6 complete months of real spend)
+  const hk=Object.keys(b.expByMonth).sort().slice(-6), hv=hk.map(k=>b.expByMonth[k]);
+  if(hk.length>=2){
+    mkCh('cRtHist',{type:'bar',data:{labels:hk.map(labMonthLbl),datasets:[
+      {type:'bar',label:'Gasto',data:hv,backgroundColor:hv.map(v=>v>p.allow?cssVar('--rd'):cssVar('--ac-fill')),borderRadius:4,maxBarThickness:26,order:2},
+      {type:'line',label:'Rendimiento mensual actual',data:hk.map(()=>p.allow),borderColor:cssVar('--am'),borderWidth:2,borderDash:[5,4],pointRadius:0,order:1},
+    ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtF(c.parsed.y)}`}}},scales:{x:xO,y:yO}}});
+    const within=hv.filter(v=>v<=p.allow).length;
+    note('rtHistNote',`En <b style="color:var(--t)">${within} de ${hv.length}</b> meses tu gasto habría cabido en el rendimiento de hoy. Gasto mediano: ${fmtF(b.medExp)}. Los meses anteriores se comparan con tu rendimiento actual, no con el que tenías entonces.`);
+  } else { if(CH.cRtHist){CH.cRtHist.destroy();delete CH.cRtHist;} note('rtHistNote','Necesitas al menos 2 meses completos para comparar.'); }
+
+  // Projection: when does yield ≥ spend?
+  const mc=lsGet(MACRO_KEY)||{}, ipc=parseFloat(String(mc.ipc).replace(',','.')), infl=isFinite(ipc)?Math.pow(1+ipc/100,1/12)-1:0;
+  const needed=b.medExp&&p.g?b.medExp/p.g:0;
+  if(b.medExp>0&&b.medInc>0){
+    const pr=rentaProject(p.total,p.g,b.medInc,b.medExp,infl), cap=pr.hit!==null?Math.min(pr.pts.length,pr.hit+13):Math.min(pr.pts.length,121);
+    const step=Math.max(1,Math.ceil(cap/36)), shown=pr.pts.filter((q,i)=>i%step===0||i===pr.pts.length-1).filter(q=>q.m<cap);
+    const now=new Date();
+    mkCh('cRtProj',{type:'line',data:{labels:shown.map(q=>{ const d=new Date(now.getFullYear(),now.getMonth()+q.m,1); return d.toLocaleString('es',{month:'short',year:'2-digit'}).replace('.',''); }),datasets:[
+      {label:'Rendimiento mensual',data:shown.map(q=>q.y),borderColor:cssVar('--ac2'),borderWidth:2,pointRadius:0,tension:.25},
+      {label:'Gasto mensual',data:shown.map(q=>q.E),borderColor:cssVar('--am'),borderWidth:2,borderDash:[5,4],pointRadius:0},
+    ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtF(c.parsed.y)}`}}},scales:{x:{...xO,ticks:{...xO.ticks,maxTicksLimit:7,maxRotation:0}},y:yO}}});
+    const when=pr.hit===0?'<b style="color:var(--gr)">Ya cubres tu gasto mediano con tus rendimientos.</b>'
+      :pr.hit!==null?`Con tu ingreso mediano (${fmt(b.medInc)}) y gasto mediano (${fmt(b.medExp)}), tus rendimientos cubren tu vida en <b style="color:var(--t)">${monthsTxt(pr.hit)}</b> (${new Date(now.getFullYear(),now.getMonth()+pr.hit,1).toLocaleString('es',{month:'long',year:'numeric'})}).`
+      :'Con tu ingreso y gasto medianos actuales el rendimiento no alcanza a tu gasto en 50 años: sube lo que aportas o baja el gasto.';
+    note('rtProjNote',`${when} Capital necesario hoy: <b style="color:var(--t)">${fmtF(needed)}</b>; tienes ${Math.min(100,p.total/needed*100).toFixed(1).replace('.',',')}%.${infl?' El gasto sube con tu inflación.':''} Supuestos constantes: tasa, ingreso y gasto.`);
+  } else { if(CH.cRtProj){CH.cRtProj.destroy();delete CH.cRtProj;} note('rtProjNote','Necesitas meses completos con ingresos y gastos para proyectar.'); }
+
+  // Category caps: allowance split by the last 3 complete months' spending mix
+  const cur=localISO(new Date()).slice(0,7), cm={}, mset=new Set();
+  (DB.real_exp||[]).forEach(t=>{ if(!t.date) return; const k=t.date.slice(0,7); if(k<cur){ mset.add(k); } });
+  const last3=new Set([...mset].sort().slice(-3)), thisM={};
+  (DB.real_exp||[]).forEach(t=>{ if(!t.date) return; const k=t.date.slice(0,7), c=t.category||'Otro'; if(last3.has(k)) cm[c]=(cm[c]||0)+t.amount; else if(k===cur) thisM[c]=(thisM[c]||0)+t.amount; });
+  const ctot=ST.sum(Object.values(cm));
+  if(ctot>0){
+    const rows=Object.entries(cm).sort((a,c)=>c[1]-a[1]).slice(0,8).map(([c,v])=>({c,cap:v/ctot*p.allow,sp:thisM[c]||0}));
+    note('rtCaps',rows.map(r=>{ const u=r.cap?r.sp/r.cap*100:0, bad=u>100; return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:11px">
+      <div style="width:90px;flex-shrink:0;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.c)}">${esc(r.c)}</div>
+      <div style="flex:1;height:6px;background:var(--track-bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.min(100,u).toFixed(1)}%;border-radius:3px;background:${bad?'var(--rd)':'var(--ac2)'}"></div></div>
+      <div style="width:150px;text-align:right;color:${bad?'var(--rd)':'var(--m)'};font-variant-numeric:tabular-nums">${fmt(r.sp)} de ${fmt(r.cap)}</div></div>`; }).join('')+
+      '<div style="font-size:10px;color:var(--m);line-height:1.7;margin-top:8px">El tope de cada categoría es la parte de tu rendimiento que le corresponde según tus últimos 3 meses. Es una guía: si subes una categoría, otra debe bajar.</div>');
+  } else note('rtCaps','<div style="color:var(--m);font-size:12px;padding:10px 0">Se necesitan meses completos de gastos para repartir tu rendimiento por categoría.</div>');
+
+  // Reading
+  const out=[];
+  out.push(`Tu capital produce unos <b style="color:var(--t)">${fmtF(p.allow)}</b> al mes. ${b.medExp?(cover>=100?'Ya alcanza para tu gasto mediano.':`Cubre ${cover.toFixed(0)}% de tu gasto mediano de ${fmtF(b.medExp)}.`):''}`);
+  if(b.medExp&&cover<100) out.push(`Mientras tanto, gastar solo el rendimiento exige vivir con <b style="color:var(--t)">${fmtF(p.allow)}</b>, es decir ${fmtF(b.medExp-p.allow)} menos de lo que gastas hoy.`);
+  out.push(`Cada $1 millón que sumes al portafolio agrega unos <b style="color:var(--t)">${fmtF(1e6*p.g)}</b> al mes de rendimiento.`);
+  note('rtReading','<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'+out.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd)">${t}</li>`).join('')+'</ul><div style="font-size:10px;margin-top:10px;line-height:1.6">Estimación educativa. Supone que el rendimiento E.A. se retira mes a mes y no incluye impuestos ni comisiones.</div>');
+}
+
+// ── Section groups: only one group of sections is shown at a time ──
+// Splits the long single-page scroll into a few "pages". goTo() switches group
+// automatically, so nav links, the mobile tab bar, ⌘K and the AI panel keep working.
+const NAV_GROUPS=[
+  {id:'inicio',  label:'🏠 Inicio',   secs:['home','diario','historial']},
+  {id:'cuentas', label:'💳 Cuentas',  secs:['overview','tarjetas','deudas','renta']},
+  {id:'analisis',label:'📊 Análisis', secs:['flujo','gastos','lab','mercado','insights']},
+  {id:'futuro',  label:'🚀 Futuro',   secs:['proyeccion','perfecto','montecarlo','calculator','predictor']},
+];
+let _navGroup=null;
+const groupOf=id=>NAV_GROUPS.find(g=>g.secs.includes(id))?.id;
+// A group is usable if at least one of its sections isn't switched off by client.json.
+const groupUsable=g=>g.secs.some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});
+function setGroup(gid,{top=false}={}){
+  const g=NAV_GROUPS.find(x=>x.id===gid&&groupUsable(x))||NAV_GROUPS.find(groupUsable)||NAV_GROUPS[0];
+  const changed=_navGroup!==g.id;
+  _navGroup=g.id;
+  try{localStorage.setItem('dfg_group',g.id);}catch{}
+  NAV_GROUPS.forEach(x=>x.secs.forEach(id=>{const el=document.getElementById(id); if(el) el.classList.toggle('grp-hidden',x.id!==g.id);}));
+  document.querySelectorAll('#grpBar .gp').forEach(b=>{b.classList.toggle('active',b.dataset.group===g.id); b.style.display=groupUsable(NAV_GROUPS.find(x=>x.id===b.dataset.group))?'':'none';});
+  if(changed) requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));   // charts drawn while hidden re-measure
+  if(top) window.scrollTo({top:0});
+  return changed;
+}
+function initGroups(){
+  const bar=document.getElementById('grpBar'); if(!bar) return;
+  bar.innerHTML=NAV_GROUPS.map(g=>`<button class="gp" data-group="${g.id}" onclick="setGroup('${g.id}',{top:true})">${g.label}</button>`).join('');
+  let saved=null; try{saved=localStorage.getItem('dfg_group');}catch{}
+  setGroup(saved||NAV_GROUPS[0].id);
+}
+function goTo(id){
+  const g=groupOf(id), changed=g?setGroup(g):false;
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:changed?'auto':'smooth',block:'start'});
+}
 
 // ── Desktop nav overflow → "Más ▾" menu ─────────────────────
 // Shows every enabled link, then hides trailing ones until the row fits,
@@ -5510,10 +6381,10 @@ window.addEventListener('scroll',()=>{
     home:'home',diario:'diario',overview:'overview',tarjetas:'tarjetas',deudas:'deudas',flujo:'flujo',
     gastos:'gastos',historial:'historial',proyeccion:'proyeccion',perfecto:'mes_perfecto',
     montecarlo:'montecarlo',calculator:'calculator',
-    predictor:'predictor',insights:'insights'
+    predictor:'predictor',lab:'lab',mercado:'mercado',renta:'renta',insights:'insights'
   };
-  const DOM_ORDER=['home','diario','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion',
-                   'perfecto','montecarlo','calculator','predictor','insights'];
+  const DOM_ORDER=['home','diario','overview','tarjetas','deudas','renta','flujo','gastos','historial','proyeccion',
+                   'perfecto','montecarlo','calculator','predictor','lab','mercado','insights'];
   let activeId='home';
   DOM_ORDER.forEach(id=>{
     const el=document.getElementById(id);
@@ -6571,6 +7442,13 @@ window.selectPort        = selectPort;
 window.deleteTx          = deleteTx;
 window.addDebt            = addDebt;
 window.deleteDebt         = deleteDebt;
+window.payOffCard         = payOffCard;
+window.setGroup           = setGroup;
+window.labExport          = labExport;
+window.mktRefresh         = mktRefresh;
+window.mktMacroSave       = mktMacroSave;
+window.mktFilter          = mktFilter;
+window.rentaSave          = rentaSave;
 window.addCard            = addCard;
 window.toggleCardForm     = toggleCardForm;
 window.toggleCardTx       = toggleCardTx;
@@ -6628,7 +7506,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20260917-045';
+  const CURRENT_V = '20261001-046';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update

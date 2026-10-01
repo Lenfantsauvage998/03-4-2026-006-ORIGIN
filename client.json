@@ -150,6 +150,18 @@
       "enabled": true,
       "label": "Insights"
     },
+    "lab": {
+      "enabled": true,
+      "label": "Laboratorio"
+    },
+    "mercado": {
+      "enabled": true,
+      "label": "Mercado"
+    },
+    "renta": {
+      "enabled": true,
+      "label": "Rendimientos"
+    },
     "predictor": {
       "enabled": false,
       "label": "Predictor"
@@ -180,6 +192,6 @@
   },
 
   "nav": {
-    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "insights"]
+    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "lab", "mercado", "renta", "insights"]
   }
 }

@@ -1,5 +1,5 @@
 // Bump version whenever static assets change
-const CACHE = 'dfg-v28';
+const CACHE = 'dfg-v29';
 
 // Derive base path from SW location so any GitHub Pages repo name works
 const BASE = self.location.pathname.replace(/\/sw\.js$/, '');
@@ -40,6 +40,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   // Let Supabase and Google Fonts go straight to network — never cache
   if (e.request.url.includes('supabase.co') || e.request.url.includes('fonts.googleapis')) return;
+  // Live market data (Mercado section): always fresh, the app keeps its own last-good copy in localStorage.
+  if (/datos\.gov\.co|open\.er-api\.com|api\.coingecko\.com/.test(e.request.url)) return;
   // AI assistant traffic: WebLLM keeps model weights in its own Cache (GBs) — never double-cache them here.
   // Ollama (localhost:11434) is a live local API.
   if (/huggingface\.co|hf\.co|raw\.githubusercontent\.com|localhost:11434|127\.0\.0\.1:11434|@mlc-ai/.test(e.request.url)) return;
