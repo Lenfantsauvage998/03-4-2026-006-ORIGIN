@@ -1359,6 +1359,22 @@ tbody tr{transition:background .15s;}
     <div class="section-header"><span class="snum">13</span><h2 class="stitle">Vivir de tus rendimientos</h2></div>
     <p class="ssub">Tu gasto mensual se limita a lo que rinde tu capital; todo ingreso nuevo va directo al portafolio. Aquí ves cuánto te toca, cómo vas y cuándo tus rendimientos cubrirán tu vida.</p>
 
+    <div class="card" style="margin-bottom:12px;padding:14px 18px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:12px;font-weight:600;color:var(--t)">Tasa E.A. del momento</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="btn-sm" onclick="rentaStep(-0.25)" title="Bajar 0,25 puntos" style="width:30px;height:32px;font-size:15px">−</button>
+          <div style="display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px;padding:0 10px;height:32px">
+            <input id="rtRate" type="number" step="0.05" inputmode="decimal" placeholder="11" oninput="rentaSave()" style="width:64px;border:none;background:transparent;color:var(--t);font-family:var(--font-display);font-size:16px;font-weight:700;outline:none;text-align:right;-webkit-appearance:none">
+            <span style="color:var(--m);font-size:13px;margin-left:3px">%</span>
+          </div>
+          <button class="btn-sm" onclick="rentaStep(0.25)" title="Subir 0,25 puntos" style="width:30px;height:32px;font-size:15px">+</button>
+        </div>
+        <div id="rtSince" style="font-size:10px;color:var(--m)"></div>
+      </div>
+      <div id="rtCapLine" style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px"></div>
+    </div>
+
     <div class="kpi-grid" id="rtKpis"></div>
 
     <div class="g64" style="margin-bottom:12px">
@@ -1368,11 +1384,9 @@ tbody tr{transition:background .15s;}
       </div>
       <div class="card">
         <div class="ct">Tus supuestos</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="fi"><label>Rendimiento anual (E.A., %)</label><input id="rtRate" type="number" step="0.1" inputmode="decimal" placeholder="11" oninput="rentaSave()"></div>
-          <div class="fi"><label>% del patrimonio que rinde</label><input id="rtPct" type="number" step="1" min="0" max="100" inputmode="numeric" placeholder="90" oninput="rentaSave()"></div>
-        </div>
-        <div style="font-size:10px;color:var(--m);line-height:1.7">Parte de tu patrimonio neto (ya descontadas las deudas). Si ingresaste la inflación en Mercado, la proyección la usa para subir tu gasto cada año. Se guarda solo en este dispositivo.</div>
+        <div class="fi"><label>% del patrimonio que rinde esa tasa</label><input id="rtPct" type="number" step="1" min="0" max="100" inputmode="numeric" placeholder="100" oninput="rentaSave()"></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t);cursor:pointer;margin-bottom:10px"><input type="checkbox" id="rtDebt" onchange="rentaSave()" style="width:auto;accent-color:var(--ac2)"> Descontar mis deudas del capital</label>
+        <div style="font-size:10px;color:var(--m);line-height:1.7">Con el interruptor activo, las deudas (tarjetas y préstamos) se restan del patrimonio antes de calcular el rendimiento. Apágalo si tus inversiones siguen rindiendo completas aunque debas. Si ingresaste la inflación en Mercado, la proyección la usa para subir tu gasto cada año. Todo se guarda solo en este dispositivo.</div>
         <div id="rtReading" style="font-size:12px;color:var(--m);line-height:1.75;margin-top:14px"></div>
       </div>
     </div>
@@ -6205,21 +6219,29 @@ function renderMercado(){
 const RENTA_KEY='dfg_renta';
 function rentaCfg(){
   const s=lsGet(RENTA_KEY)||{}, rate=parseFloat(String(s.rate).replace(',','.')), pct=parseFloat(String(s.pct).replace(',','.'));
-  return {rate:isFinite(rate)&&rate>0?rate:11, pct:isFinite(pct)?Math.min(100,Math.max(0,pct)):90};
+  return {rate:isFinite(rate)&&rate>0?rate:11, pct:isFinite(pct)?Math.min(100,Math.max(0,pct)):100, netDebt:s.debt!=='0', since:s.since||null};
 }
 function rentaSave(){
-  lsSet(RENTA_KEY,{rate:document.getElementById('rtRate')?.value||'',pct:document.getElementById('rtPct')?.value||''});
+  const old=lsGet(RENTA_KEY)||{}, rate=document.getElementById('rtRate')?.value||'';
+  lsSet(RENTA_KEY,{rate,pct:document.getElementById('rtPct')?.value||'',debt:document.getElementById('rtDebt')?.checked===false?'0':'1',
+    since:rate!==(old.rate||'')?localISO(new Date()):(old.since||null)});   // remember when the rate last changed
   renderRenta(true);
+}
+function rentaStep(d){
+  const r=document.getElementById('rtRate'); if(!r) return;
+  r.value=(Math.max(0.05,rentaCfg().rate+d)).toFixed(2).replace(/\.?0+$/,'');
+  rentaSave();
 }
 // Core plan, also used by the Diario "Hoy" strip
 function rentaPlan(){
   const c=rentaCfg(), im=Math.pow(1+c.rate/100,1/12)-1, g=im*c.pct/100;
-  const total=Math.max(0,DB.curBal||0), capital=total*c.pct/100, allow=total*g;
+  const debt=DB.totalDebt||0, netWorth=DB.curBal||0;
+  const total=Math.max(0,c.netDebt?netWorth:netWorth+debt), capital=total*c.pct/100, allow=total*g;
   const now=new Date(), ym=localISO(now).slice(0,7), dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(), day=now.getDate();
   const spent=(DB.real_exp||[]).filter(t=>t.date&&t.date.slice(0,7)===ym).reduce((s,t)=>s+t.amount,0);
   const incMonth=(DB.income||[]).filter(t=>t.date&&t.date.slice(0,7)===ym).reduce((s,t)=>s+t.amount,0);
   const remain=allow-spent, daysLeft=dim-day+1;
-  return {c,im,g,total,capital,allow,spent,incMonth,remain,dim,day,daysLeft,perDay:Math.max(0,remain)/daysLeft,expected:allow*day/dim};
+  return {c,im,g,total,capital,allow,spent,incMonth,remain,dim,day,daysLeft,debt,netWorth,perDay:Math.max(0,remain)/daysLeft,expected:allow*day/dim};
 }
 function rentaProject(total0,g,inc,exp,infl){
   const pts=[]; let T=total0,E=exp,hit=null;
@@ -6238,8 +6260,11 @@ function renderRenta(inputsOnly){
   const cfg=rentaCfg(), s=lsGet(RENTA_KEY)||{}, ri=document.getElementById('rtRate'), pi=document.getElementById('rtPct');
   if(ri&&document.activeElement!==ri) ri.value=s.rate||''; if(pi&&document.activeElement!==pi) pi.value=s.pct||'';
   if(ri&&!s.rate) ri.placeholder=String(cfg.rate); if(pi&&!s.pct) pi.placeholder=String(cfg.pct);
+  const dc=document.getElementById('rtDebt'); if(dc) dc.checked=cfg.netDebt;
   const p=rentaPlan(), b=mktBase(), kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
   const note=(id,h)=>{ const e=document.getElementById(id); if(e) e.innerHTML=h; };
+  note('rtSince',cfg.since?`vigente desde el ${new Date(cfg.since+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'})}`:'cámbiala cuando cambie tu tasa');
+  note('rtCapLine',`Patrimonio neto <b style="color:var(--t)">${fmtF(p.netWorth)}</b>${cfg.netDebt?(p.debt?` (ya con ${fmtF(p.debt)} de deudas descontadas)`:''):` + ${fmtF(p.debt)} de deudas que no se descuentan = <b style="color:var(--t)">${fmtF(p.total)}</b>`} · rinde el ${cfg.pct}% → capital productivo <b style="color:var(--t)">${fmtF(p.capital)}</b>.`);
   if(p.total<=0){
     kEl.innerHTML='<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">Tu patrimonio neto es cero o negativo, así que todavía no hay rendimiento del cual vivir. Cada peso que ingreses al portafolio empieza a construirlo.</div>';
     ['rtMonth','rtReading','rtHistNote','rtProjNote','rtCaps'].forEach(id=>note(id,''));
@@ -7449,6 +7474,7 @@ window.mktRefresh         = mktRefresh;
 window.mktMacroSave       = mktMacroSave;
 window.mktFilter          = mktFilter;
 window.rentaSave          = rentaSave;
+window.rentaStep          = rentaStep;
 window.addCard            = addCard;
 window.toggleCardForm     = toggleCardForm;
 window.toggleCardTx       = toggleCardTx;
@@ -7506,7 +7532,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20261001-046';
+  const CURRENT_V = '20261001-047';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
