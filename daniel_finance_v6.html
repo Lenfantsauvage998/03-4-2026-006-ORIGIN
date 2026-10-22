@@ -21,7 +21,7 @@
   style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src    https://fonts.gstatic.com;
   connect-src 'self' https://*.supabase.co https://api.emailjs.com
-              https://www.datos.gov.co https://open.er-api.com https://api.coingecko.com
+              https://www.datos.gov.co https://open.er-api.com https://api.coingecko.com https://world.openfoodfacts.org
               https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com
               http://localhost:11434 http://127.0.0.1:11434;
   img-src     'self' data:;
@@ -783,6 +783,36 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 #vtxListeningOv .vtx-mic{width:76px;height:76px;border-radius:50%;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:34px;animation:voice-pulse 1.2s ease-in-out infinite;}
 #vtxListeningOv .vtx-hint{color:rgba(255,255,255,0.55);font-size:12px;font-family:var(--font-body);max-width:260px;text-align:center;}
 #vtxInterim{color:rgba(255,255,255,0.85);font-size:13px;font-family:var(--font-body);font-style:italic;max-width:290px;text-align:center;min-height:20px;}
+/* SALUD — nutrición + sueño */
+.hl-sum{display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+.hl-meal{margin-bottom:12px;padding:14px 16px;}
+.hl-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--row-divider);}
+.hl-res{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;min-width:0;transition:background .15s;}
+.hl-res:hover,.hl-res:active{background:var(--row-hover);}
+.hl-list{display:flex;flex-direction:column;gap:2px;margin-top:8px;}
+.hl-grp{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--m);font-weight:600;margin:12px 0 4px;}
+.hl-empty{font-size:12px;color:var(--m);padding:14px 4px;line-height:1.6;}
+.hl-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;background:var(--bg3);border-radius:10px;padding:3px;flex-shrink:0;}
+.hl-tabs::-webkit-scrollbar{display:none;}
+.hl-tabs button,#nuRangeBtns button{flex-shrink:0;padding:7px 11px;border:none;border-radius:8px;background:transparent;color:var(--m);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.hl-tabs button.active,#nuRangeBtns button.active{background:var(--bg2);color:var(--t);box-shadow:0 1px 3px rgba(0,0,0,.12);}
+#nuRangeBtns{display:inline-flex;gap:2px;background:var(--bg3);border-radius:9px;padding:3px;}
+.hl-body{overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;}
+.hl-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.hl-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.hl-row2 .fi,.hl-row3 .fi{min-width:0;}
+.cfm-overlay.hl-ov{align-items:center;}
+.hl-box{max-width:560px!important;text-align:left!important;max-height:88vh;display:flex;flex-direction:column;padding:18px 18px 16px!important;overflow-y:auto;}
+.hl-box>.hl-body{overflow-y:auto;}
+@media(max-width:600px){
+  .cfm-overlay.hl-ov{padding:0;align-items:flex-end;}
+  .hl-box{max-width:none!important;height:94vh;max-height:94vh;border-radius:20px 20px 0 0!important;padding-bottom:calc(16px + env(safe-area-inset-bottom))!important;}
+}
+.hl-q{display:flex;gap:6px;}
+.hl-q button{flex:1;font-size:22px;padding:8px 0;border-radius:10px;border:1px solid var(--b2);background:var(--bg3);cursor:pointer;opacity:.55;transition:all .15s;}
+.hl-q button.active{opacity:1;border-color:var(--ac2);background:var(--ac-bg);transform:scale(1.05);}
+.chip.hl-on{background:var(--ac-bg);border-color:var(--ac2);color:var(--ac2);font-weight:600;}
+#slFactors{flex-wrap:wrap;overflow:visible;}
 /* Voice TX modal — extends cfm-box */
 .vtx-field{margin-bottom:13px;}
 .vtx-label{font-size:10px;color:var(--m);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
@@ -1082,6 +1112,8 @@ tbody tr{transition:background .15s;}
       <button class="nl" data-nav-module="predictor" onclick="goTo('predictor')">Predictor</button>
       <button class="nl" data-nav-module="lab" onclick="goTo('lab')">Laboratorio</button>
       <button class="nl" data-nav-module="mercado" onclick="goTo('mercado')">Mercado</button>
+      <button class="nl" data-nav-module="nutricion" onclick="goTo('nutricion')">Nutrición</button>
+      <button class="nl" data-nav-module="sueno" onclick="goTo('sueno')">Sueño</button>
       <button class="nl" data-nav-module="insights" onclick="goTo('insights')">Alertas</button>
     </div>
     <div id="navMoreWrap">
@@ -1876,6 +1908,86 @@ tbody tr{transition:background .15s;}
 </div>
 
 <!-- INSIGHTS — always last section -->
+<!-- SALUD · NUTRICIÓN -->
+<div class="section" id="nutricion" data-module="nutricion">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">14</span><h2 class="stitle">Nutrición</h2></div>
+    <p class="ssub">Tus calorías y macros según tu objetivo. Registra lo que comes buscando, escaneando o con tus recetas.</p>
+    <div id="nuSetup"></div>
+    <div id="nuMain" style="display:none">
+      <div class="card" style="margin-bottom:12px" data-module="nutricion" data-feature="day_summary">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px">
+          <button class="btn-sm" onclick="nuShift(-1)" title="Día anterior" style="padding:6px 12px">‹</button>
+          <div style="text-align:center"><div id="nuDayLbl" style="font-weight:700;font-size:14px;color:var(--t)">Hoy</div><button class="btn-sm" onclick="nuShift(0)" style="border:none;background:none;padding:0;font-size:10px;color:var(--ac2)">ir a hoy</button></div>
+          <button class="btn-sm" onclick="nuShift(1)" title="Día siguiente" style="padding:6px 12px">›</button>
+        </div>
+        <div id="nuSummary"></div>
+      </div>
+      <div class="g64" style="margin-bottom:12px">
+        <div id="nuMeals" data-module="nutricion" data-feature="meals"></div>
+        <div class="card" style="align-self:start" data-module="nutricion" data-feature="goals">
+          <div class="ct">Mis objetivos</div>
+          <div id="nuGoals"></div>
+        </div>
+      </div>
+      <div class="card" data-module="nutricion" data-feature="trends">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <div class="ct" style="margin:0">Tendencias</div>
+          <div id="nuRangeBtns"><button data-r="7" onclick="nuSetRange(7)">7 días</button><button data-r="30" onclick="nuSetRange(30)">30 días</button></div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="cNuKcal"></canvas></div>
+        <div id="nuTrend" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SALUD · SUEÑO -->
+<div class="section" id="sueno" data-module="sueno">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">15</span><h2 class="stitle">Sueño</h2></div>
+    <p class="ssub">Registra cada noche en segundos y mira tu duración, eficiencia, consistencia y qué te ayuda a dormir mejor.</p>
+    <div id="slSetup"></div>
+    <div id="slMain" style="display:none">
+      <div class="kpi-grid" id="slKpis" data-module="sueno" data-feature="sleep_kpis"></div>
+      <div class="g64" style="margin-bottom:12px">
+        <div class="card" id="slForm" style="border-color:var(--ac-bd)" data-module="sueno" data-feature="sleep_form">
+          <div class="ct">Registrar noche</div>
+          <div class="fi"><label>Noche del</label><input id="slNight" type="date" oninput="slPaintForm()"></div>
+          <div class="hl-row2">
+            <div class="fi"><label>Me acosté</label><input id="slBed" type="time" oninput="slPaintForm()"></div>
+            <div class="fi"><label>Me desperté</label><input id="slWake" type="time" oninput="slPaintForm()"></div>
+          </div>
+          <div class="hl-row3">
+            <div class="fi"><label>Min. en dormirme</label><input id="slLat" type="number" inputmode="numeric" min="0" placeholder="15" oninput="slPaintForm()"></div>
+            <div class="fi"><label>Despertares</label><input id="slAwk" type="number" inputmode="numeric" min="0" placeholder="0"></div>
+            <div class="fi"><label>Min. despierto</label><input id="slAwkMin" type="number" inputmode="numeric" min="0" placeholder="0" oninput="slPaintForm()"></div>
+          </div>
+          <div id="slDurPrev" style="font-size:11px;color:var(--m);margin:-4px 0 12px"></div>
+          <div class="fi"><label>¿Cómo dormiste?</label><div class="hl-q" id="slQBtns"></div></div>
+          <div class="fi"><label>Factores de ese día</label><div class="chips" id="slFactors"></div></div>
+          <div class="fi"><label>Notas</label><input id="slNotes" type="text" maxlength="300" placeholder="Opcional"></div>
+          <div style="display:flex;gap:8px"><button class="btn-p" id="slSaveBtn" onclick="slSave()" style="flex:1">Guardar noche</button><button class="btn-sm" id="slCancel" onclick="slFormReset()" style="display:none">Cancelar</button></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:11px;color:var(--m)">Mi meta de sueño
+            <input id="slGoal" type="number" step="0.5" min="4" max="12" inputmode="decimal" onchange="slSaveGoal(this.value)" style="width:64px;padding:6px 8px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body)"> horas</div>
+        </div>
+        <div class="card" style="align-self:start" data-module="sueno" data-feature="sleep_insights">
+          <div class="ct">Lo que dicen tus noches</div>
+          <div id="slInsights"></div>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:12px" data-module="sueno" data-feature="sleep_charts">
+        <div class="card"><div class="ct">Duración y calidad (últimas 30 noches)</div><div class="chart-wrap" style="height:220px"><canvas id="cSlDur"></canvas></div></div>
+        <div class="card"><div class="ct">Tus horarios</div><div class="chart-wrap" style="height:220px"><canvas id="cSlBed"></canvas></div></div>
+      </div>
+      <div class="card" data-module="sueno" data-feature="sleep_history">
+        <div class="ct">Historial</div>
+        <div id="slHist"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="section" id="insights">
   <div class="wrap">
     <div class="section-header"><span class="snum">09</span><h2 class="stitle">Alertas & Análisis</h2></div>
@@ -2180,6 +2292,7 @@ const MODULE_SECTION = {
   proyeccion:'proyeccion', diario:'diario', mes_perfecto:'perfecto',
   montecarlo:'montecarlo', calculator:'calculator', insights:'insights',
   predictor:'predictor', historial:'historial', lab:'lab', mercado:'mercado', renta:'renta',
+  nutricion:'nutricion', sueno:'sueno',
 };
 
 // Icon + short label + scroll-target for every possible tab.
@@ -2201,6 +2314,8 @@ const TAB_META = {
   lab:          { icon:'∑',  label:'Lab',        to:'lab'         },
   mercado:      { icon:'◈',  label:'Mercado',    to:'mercado'     },
   renta:        { icon:'↻',  label:'Renta',      to:'renta'       },
+  nutricion:    { icon:'🍽', label:'Nutrición',  to:'nutricion'   },
+  sueno:        { icon:'☾',  label:'Sueño',      to:'sueno'       },
   historial:    { icon:'☰',  label:'History',    to:'historial'   },
 };
 
@@ -2223,6 +2338,8 @@ const DEFAULT_CFG = {
     lab:{enabled:true},
     mercado:{enabled:true},
     renta:{enabled:true},
+    nutricion:{enabled:true,features:{day_summary:true,meals:true,goals:true,trends:true}},
+    sueno:{enabled:true,features:{sleep_form:true,sleep_kpis:true,sleep_insights:true,sleep_charts:true,sleep_history:true}},
     historial:{enabled:true,features:{history:true,csv_export:true}},
   },
   future_modules:{
@@ -2232,7 +2349,7 @@ const DEFAULT_CFG = {
     ai_summary:{enabled:false},
     ai_assistant:{enabled:true},
   },
-  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','lab','mercado','renta','insights']},
+  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','lab','mercado','renta','nutricion','sueno','insights']},
 };
 
 // Feature flag helper — returns true unless explicitly set to false
@@ -2443,6 +2560,7 @@ async function loadAll() {
     setProgress(95);
     renderAll();  // recalcBalance called inside renderAll
     aiAutoInit();
+    loadHealth();   // health tables load on their own: if they're missing, finances still work
     setProgress(100);
     setTimeout(()=>setProgress(0),800);
     document.getElementById('splashScreen').style.display='none';
@@ -2505,6 +2623,7 @@ function renderAll() {
   if(M.mercado?.enabled!==false){ try{ renderMercado(); }catch(e){ console.error('renderMercado',e); } }
   if(M.home?.enabled!==false){ try{ renderAlloc(); }catch(e){ console.error('renderAlloc',e); } }
   if(M.renta?.enabled!==false){ try{ renderRenta(); }catch(e){ console.error('renderRenta',e); } }
+  if(M.nutricion?.enabled!==false||M.sueno?.enabled!==false) renderHealth();
   document.getElementById('footerTs').textContent = new Date().toLocaleString('es-CO');
 }
 
@@ -6433,6 +6552,1011 @@ function allocApplyRate(){
   rentaSave();
 }
 
+// ══════════════════════════════════════════════════════════
+//  SALUD — Nutrición (objetivos, diario de comidas, escáner) + Sueño
+//  Tablas propias en Supabase (ver HL_SQL). Se cargan aparte de las finanzas:
+//  si faltan, solo esta parte muestra la tarjeta de configuración.
+// ══════════════════════════════════════════════════════════
+const HL={st:'idle',err:'',profile:null,log:[],foods:[],recipes:[],sleep:[]};
+const HL_SQL=`-- DFG Finance OS · módulo Salud. Pega esto una vez en Supabase → SQL Editor → Run.
+create table if not exists health_profile (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  sex text, birth date, height_cm numeric, weight_kg numeric, bodyfat numeric,
+  activity int, goal text, rate numeric, target_weight numeric,
+  preset text, p_pct numeric, c_pct numeric, f_pct numeric, kcal_override numeric,
+  sleep_goal numeric, updated_at timestamptz default now()
+);
+create table if not exists food_log (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  date date not null, meal text not null, name text not null, brand text,
+  qty numeric, unit text, grams numeric,
+  kcal numeric default 0, prot numeric default 0, carb numeric default 0, fat numeric default 0,
+  fiber numeric, sugar numeric, sodium numeric, satfat numeric,
+  source text, ref text, created_at timestamptz default now()
+);
+create table if not exists custom_foods (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  name text not null, brand text, barcode text,
+  kcal numeric, prot numeric, carb numeric, fat numeric,
+  fiber numeric, sugar numeric, sodium numeric, satfat numeric,
+  servings jsonb default '[]', source text default 'custom', created_at timestamptz default now()
+);
+create table if not exists recipes (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  name text not null, servings numeric default 1, items jsonb default '[]',
+  created_at timestamptz default now()
+);
+create table if not exists sleep_log (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  night date not null, bed text not null, wake text not null,
+  latency int default 0, awakenings int default 0, awake_min int default 0,
+  quality int, factors jsonb default '[]', notes text, created_at timestamptz default now(),
+  unique (user_id, night)
+);
+create index if not exists food_log_date on food_log (user_id, date);
+create index if not exists sleep_log_night on sleep_log (user_id, night);
+do $$ declare t text; begin
+  foreach t in array array['health_profile','food_log','custom_foods','recipes','sleep_log'] loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists own_rows on %I', t);
+    execute format('create policy own_rows on %I for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid())', t);
+  end loop;
+end $$;`;
+
+const hlNum=v=>{ const n=parseFloat(String(v??'').replace(',','.')); return isFinite(n)?n:0; };
+const hlOpt=v=>{ const n=parseFloat(String(v??'').replace(',','.')); return isFinite(n)?n:null; };
+const hlR=(v,d=0)=>{ const m=10**d; return Math.round((+v||0)*m)/m; };
+const hlK=v=>Math.round(+v||0).toLocaleString('es-CO');
+const hlG=v=>{ const n=+v||0; return (n>=100?Math.round(n):hlR(n,1)).toLocaleString('es-CO'); };
+const hlAddDays=(iso,n)=>{ const d=new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return localISO(d); };
+const hlNorm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const hlEl=id=>document.getElementById(id);
+const hlSet=(id,h)=>{ const e=hlEl(id); if(e) e.innerHTML=h; };
+
+async function loadHealth(){
+  if(HL.st==='loading') return;
+  HL.st='loading'; renderHealth();
+  try{
+    const since=hlAddDays(localISO(),-120);
+    const [pr,log,foods,rec,sl]=await Promise.all([
+      sbGet('health_profile','select=*&order=id.desc&limit=1'),
+      sbGet('food_log',`select=*&date=gte.${since}&order=created_at.asc`),
+      sbGet('custom_foods','select=*&order=created_at.desc'),
+      sbGet('recipes','select=*&order=created_at.desc'),
+      sbGet('sleep_log',`select=*&night=gte.${since}&order=night.asc`),
+    ]);
+    Object.assign(HL,{profile:pr[0]||null,log,foods,recipes:rec,sleep:sl,st:'ok',err:''});
+  }catch(e){
+    // PostgREST answers 404 (or 400 on older versions) when a table doesn't exist yet
+    HL.st=/^40[04]/.test(e.message)?'missing':'error'; HL.err=e.message;
+  }
+  renderHealth();
+}
+function renderHealth(){
+  try{ renderNutri(); }catch(e){ console.error('renderNutri',e); }
+  try{ renderSleep(); }catch(e){ console.error('renderSleep',e); }
+}
+function hlSetupHtml(){
+  if(HL.st==='loading'||HL.st==='idle') return '<div class="card" style="text-align:center;color:var(--m);font-size:12px;padding:28px">Cargando tus datos de salud…</div>';
+  const miss=HL.st==='missing';
+  return `<div class="card" style="border-color:var(--ac-bd)">
+    <div class="ct">${miss?'Falta un paso: crear las tablas de Salud':'No se pudieron cargar tus datos de salud'}</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.75;margin-bottom:14px">${miss
+      ?'Tus comidas, objetivos y sueño se guardan en tu Supabase para que se sincronicen entre dispositivos. Copia el SQL, ábrelo en <b style="color:var(--t)">Supabase → SQL Editor</b>, pégalo y dale <b style="color:var(--t)">Run</b>. Solo se hace una vez.'
+      :`Error: ${esc(HL.err)}. Revisa tu conexión e inténtalo de nuevo.`}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${miss?'<button class="btn-sm" onclick="hlCopySql()" style="padding:9px 14px;color:var(--t)">📋 Copiar SQL</button>':''}<button class="btn-sm" onclick="loadHealth()" style="padding:9px 14px">↻ Reintentar</button></div>
+    ${miss?`<textarea id="hlSqlBox" readonly style="display:none;width:100%;height:180px;margin-top:12px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px;color:var(--t);font-family:monospace;font-size:10px;padding:10px">${esc(HL_SQL)}</textarea>`:''}
+  </div>`;
+}
+async function hlCopySql(){
+  try{ await navigator.clipboard.writeText(HL_SQL); phiToast('SQL copiado. Pégalo en Supabase → SQL Editor',{icon:'📋'}); }
+  catch{ document.querySelectorAll('#hlSqlBox').forEach(t=>{ t.style.display='block'; t.select(); }); phiToast('Copia el SQL del cuadro',{icon:'📋'}); }
+}
+async function hlSaveProfile(fields){
+  const body={...fields,updated_at:new Date().toISOString()};
+  const r=HL.profile?.id?await sbPatch('health_profile',HL.profile.id,body):await sbPost('health_profile',body);
+  HL.profile=r[0]||{...HL.profile,...body};
+}
+
+// ── Objetivos: BMR → TDEE → meta según objetivo → macros ──
+const NU_ACT=[['Sedentario (oficina, poco ejercicio)',1.2],['Ligero (1–3 días de ejercicio)',1.375],['Moderado (3–5 días)',1.55],['Alto (6–7 días)',1.725],['Muy alto (trabajo físico + entreno)',1.9]];
+const NU_PRESETS={
+  balanced:{l:'Balanceado',pkg:1.8,fpct:27},
+  protein:{l:'Alto en proteína',pkg:2.2,fpct:25},
+  lowcarb:{l:'Bajo en carbohidratos',pkg:2.0,fpct:40},
+  keto:{l:'Keto',pkg:1.8,carbG:25},
+  custom:{l:'Personalizado (%)'},
+};
+function nuAge(birth){ if(!birth) return null; const b=new Date(birth+'T12:00:00'), n=new Date(); let a=n.getFullYear()-b.getFullYear(); if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate())) a--; return a; }
+function nuTargets(pr){
+  if(!pr) return null;
+  const w=hlNum(pr.weight_kg), h=hlNum(pr.height_cm), age=nuAge(pr.birth), male=pr.sex!=='f';
+  if(!w||!h||!age) return null;
+  const bf=hlOpt(pr.bodyfat);
+  const bmr=bf&&bf>0&&bf<70?370+21.6*w*(1-bf/100):10*w+6.25*h-5*age+(male?5:-161);
+  const act=NU_ACT[Math.min(4,Math.max(0,(+pr.activity||1)-1))][1], tdee=bmr*act;
+  const goal=pr.goal||'keep', rate=goal==='keep'?0:hlNum(pr.rate)||0.5, delta=rate*7700/7;
+  let kcal=goal==='lose'?tdee-delta:goal==='gain'?tdee+delta:tdee, floored=false;
+  const floor=Math.max(male?1500:1200,bmr);
+  if(goal==='lose'&&kcal<floor){ kcal=floor; floored=true; }
+  const manual=hlOpt(pr.kcal_override); if(manual&&manual>=800) kcal=manual;
+  kcal=Math.round(kcal/10)*10;
+  const ps=NU_PRESETS[pr.preset]||NU_PRESETS.balanced;
+  let p,f,c;
+  if(pr.preset==='custom'){
+    const pp=hlNum(pr.p_pct)||30, cp=hlNum(pr.c_pct)||40, fp=hlNum(pr.f_pct)||30, s=pp+cp+fp||100;
+    p=kcal*pp/s/4; c=kcal*cp/s/4; f=kcal*fp/s/9;
+  }else if(ps.carbG){
+    p=ps.pkg*w; c=ps.carbG; f=Math.max(0,(kcal-p*4-c*4)/9);
+  }else{
+    p=ps.pkg*w; f=kcal*ps.fpct/100/9; c=(kcal-p*4-f*9)/4;
+    if(c<0){ f=Math.max(0,f+c*4/9); c=0; }   // very low kcal + high protein: trim fat before carbs go negative
+  }
+  const tw=hlOpt(pr.target_weight), weeks=rate&&tw&&((goal==='lose'&&tw<w)||(goal==='gain'&&tw>w))?Math.abs(w-tw)/rate:null;
+  return {bmr,tdee,kcal,p:Math.round(p),c:Math.round(c),f:Math.round(f),fiber:Math.round(kcal/1000*14),sugar:Math.round(kcal*0.1/4),sodium:2300,
+    goal,rate,floored,manual:!!(manual&&manual>=800),weeks,w,tw,aggressive:goal==='lose'&&rate/w>0.01};
+}
+
+// ── Base local: valores por 100 g (aprox. Tabla ICBF / USDA). nombre|kcal|prot|carb|grasa|fibra|porciones ──
+const NU_LOCAL_RAW=`Arroz blanco cocido|130|2.7|28|0.3|0.4|taza:160;porción:150;cucharada:15
+Arroz integral cocido|123|2.7|26|1|1.6|taza:160
+Arroz con pollo|165|9|20|5|0.8|porción:250
+Arroz chino|175|7|23|6|1|porción:300
+Arroz con coco|210|3|33|7|1|porción:150
+Arepa de maíz blanca|220|4.5|42|3.5|3|unidad mediana:80;unidad pequeña:50
+Arepa de choclo|250|5|38|9|2|unidad:120
+Arepa de huevo|290|8|30|15|2|unidad:150
+Arepa boyacense|300|7|42|11|2|unidad:110
+Pan blanco tajado|265|9|49|3.2|2.7|tajada:25
+Pan integral tajado|250|12|43|3.5|6|tajada:28
+Pan francés|270|9|52|3|2.5|unidad:60
+Pan aliñado|320|8|50|10|2|unidad:60
+Pandebono|330|10|38|15|0.5|unidad:45
+Pan de yuca|330|7|40|16|0.5|unidad:45
+Almojábana|330|11|35|16|0.5|unidad:60
+Buñuelo|360|8|38|20|0.8|unidad:45
+Mogolla integral|280|9|50|5|5|unidad:70
+Croissant|406|8|46|21|2.6|unidad:60
+Tostada de pan|395|11|72|6|4|unidad:10
+Galletas de soda|430|9|71|12|3|paquete (3 u):27;unidad:9
+Avena en hojuelas|389|16.9|66|6.9|10.6|cucharada:10;taza:80
+Granola|471|10|64|20|7|taza:110;cucharada:12
+Cereal de maíz (corn flakes)|357|7.5|84|0.4|3.3|taza:30
+Pasta cocida|158|5.8|31|0.9|1.8|taza:140;porción:200
+Lasaña|135|7|13|6|1|porción:300
+Tortilla de trigo|310|8|50|8|3|unidad:45
+Tortilla de maíz|218|5.7|45|2.9|6.3|unidad:30
+Quinua cocida|120|4.4|21|1.9|2.8|taza:185
+Mazorca cocida|96|3.4|21|1.5|2.4|unidad:150
+Harina de trigo|364|10|76|1|2.7|taza:125;cucharada:8
+Calentado (arroz con fríjol)|200|7|28|7|4|porción:250
+Tamal tolimense|190|8|18|10|2|unidad:400
+Empanada de carne|300|8|30|17|2|unidad:90
+Empanada de pollo|290|9|29|15|2|unidad:90
+Papa rellena|230|7|25|11|2|unidad:180
+Pastel de pollo (hojaldre)|330|10|30|19|1|unidad:120
+Patacón|280|1.5|40|13|2.5|unidad:70
+Tajadas de maduro fritas|260|1.5|40|11|2.5|porción:100
+Plátano maduro cocido|116|0.8|31|0.2|2.3|unidad:180
+Plátano maduro asado|140|1.2|37|0.3|2.5|unidad:180
+Plátano verde cocido|122|1.3|32|0.4|2.3|unidad:180
+Papa cocida|87|1.9|20|0.1|1.8|unidad mediana:150
+Papa criolla cocida|90|2|20|0.2|1.5|unidad:30;porción:150
+Papas a la francesa|312|3.4|41|15|3.8|porción pequeña:80;porción mediana:120
+Puré de papa|113|2|16|4.2|1.5|taza:210
+Yuca cocida|160|1.4|38|0.3|1.8|porción:150
+Yuca frita|330|1.5|45|16|2|porción:120
+Arracacha cocida|100|1|24|0.2|2|porción:150
+Ñame cocido|116|1.5|27|0.1|3.9|porción:150
+Batata cocida|86|1.6|20|0.1|3|unidad:130
+Fríjol rojo cocido|127|8.7|23|0.5|7.4|taza:180;porción:150
+Fríjoles guisados|140|7|20|3.5|6|porción:200
+Lentejas cocidas|116|9|20|0.4|7.9|taza:200
+Garbanzo cocido|164|8.9|27|2.6|7.6|taza:165
+Arveja verde cocida|84|5.4|16|0.2|5.5|taza:160
+Hummus|166|7.9|14|9.6|6|cucharada:15
+Pechuga de pollo a la plancha|165|31|0|3.6|0|filete:150;porción:120
+Muslo de pollo sin piel|209|26|0|10.9|0|unidad:100
+Pollo asado con piel|239|27|0|14|0|presa:150
+Pollo apanado frito|280|20|12|17|0.5|presa:150
+Pollo broaster|280|20|12|17|0.5|presa:150
+Carne molida de res cocida|250|26|0|15|0|porción:120
+Carne de res magra asada|190|29|0|8|0|porción:150
+Lomo de res a la plancha|180|28|0|7|0|filete:150
+Sobrebarriga|260|25|0|17|0|porción:150
+Lomo de cerdo|170|26|0|7|0|porción:150
+Costilla de cerdo|290|24|0|21|0|porción:150
+Chicharrón|540|30|0|46|0|porción:60
+Chorizo|330|14|2|30|0|unidad:70
+Salchicha|290|11|3|26|0|unidad:50
+Jamón de cerdo|145|17|2|7|0|tajada:20
+Jamón de pavo|110|17|3|3|0|tajada:20
+Tocineta frita|540|37|1.4|42|0|tira:8
+Hígado de res|175|27|5|5|0|porción:120
+Morcilla|380|14|15|30|0.5|porción:80
+Carne de hamburguesa|250|20|1|18|0|unidad:110
+Atún en agua|116|26|0|0.8|0|lata escurrida:120
+Atún en aceite|198|29|0|8|0|lata escurrida:120
+Tilapia a la plancha|128|26|0|2.7|0|filete:150
+Salmón|208|20|0|13|0|filete:150
+Mojarra frita|230|22|4|14|0|unidad:300
+Camarones cocidos|99|24|0.2|0.3|0|porción:100
+Bagre guisado|150|17|3|8|0|porción:150
+Sardinas en salsa de tomate|180|17|2|11|0|lata:155
+Huevo cocido|155|12.6|1.1|10.6|0|unidad:50
+Huevo frito|196|13.6|0.8|15|0|unidad:46
+Huevos pericos|170|11|3|12|0.5|porción (2 huevos):130
+Huevos revueltos|150|10|1.6|11|0|porción (2 huevos):120
+Clara de huevo|52|11|0.7|0.2|0|unidad:33
+Leche entera|61|3.2|4.8|3.3|0|vaso:240
+Leche semidescremada deslactosada|46|3.3|4.8|1.5|0|vaso:240
+Leche descremada|35|3.4|5|0.1|0|vaso:240
+Leche de almendras sin azúcar|15|0.6|0.3|1.2|0.2|vaso:240
+Yogur natural|61|3.5|4.7|3.3|0|vaso:200
+Yogur griego natural|97|9|3.6|5|0|pote:150
+Yogur griego 0%|59|10|3.6|0.4|0|pote:150
+Yogur con dulce|85|3|14|1.8|0|vaso:200
+Kumis|70|3|10|2|0|vaso:200
+Queso campesino|260|18|3|20|0|tajada:30
+Queso doble crema|330|22|2|26|0|tajada:30
+Queso mozzarella|300|22|2.2|22|0|tajada:20
+Queso parmesano|431|38|4|29|0|cucharada:5
+Quesito|200|14|3|15|0|porción:50
+Cuajada|180|13|3|13|0|porción:60
+Queso crema|342|6|4|34|0|cucharada:15
+Mantequilla|717|0.9|0.1|81|0|cucharadita:5;cucharada:14
+Arequipe|320|7|55|8|0|cucharada:20
+Leche condensada|321|7.9|54|8.7|0|cucharada:20
+Crema de leche|340|2|3|36|0|cucharada:15
+Helado de crema|207|3.5|24|11|0.7|bola:65
+Banano|89|1.1|23|0.3|2.6|unidad mediana:120
+Manzana|52|0.3|14|0.2|2.4|unidad:180
+Pera|57|0.4|15|0.1|3.1|unidad:180
+Naranja|47|0.9|12|0.1|2.4|unidad:150
+Mandarina|53|0.8|13|0.3|1.8|unidad:90
+Fresas|32|0.7|7.7|0.3|2|taza:150
+Mango|60|0.8|15|0.4|1.6|unidad:250
+Papaya|43|0.5|11|0.3|1.7|porción:200;taza:145
+Piña|50|0.5|13|0.1|1.4|tajada:85;taza:165
+Sandía|30|0.6|7.6|0.2|0.4|tajada:280
+Melón|34|0.8|8|0.2|0.9|taza:160
+Guayaba|68|2.6|14|1|5.4|unidad:90
+Maracuyá|97|2.2|23|0.7|10|unidad:40
+Lulo|25|0.7|6|0.2|1.1|unidad:60
+Mora|43|1.4|10|0.5|5.3|taza:145
+Uchuva|53|1.9|11|0.7|4.9|taza:140
+Granadilla|97|2.4|23|0.7|10|unidad:80
+Pitahaya|50|0.5|13|0.1|3|unidad:150
+Uvas|69|0.7|18|0.2|0.9|taza:150
+Kiwi|61|1.1|15|0.5|3|unidad:75
+Durazno|39|0.9|9.5|0.3|1.5|unidad:150
+Feijoa|55|1|13|0.6|6.4|unidad:50
+Tomate de árbol|40|2|10|0.4|1.4|unidad:80
+Aguacate|160|2|8.5|14.7|6.7|unidad hass:150;porción (1/4):50
+Coco rallado|354|3.3|15|33|9|cucharada:7
+Uvas pasas|299|3.1|79|0.5|3.7|cucharada:10
+Bocadillo|300|0.5|75|0.1|3|unidad:30
+Tomate|18|0.9|3.9|0.2|1.2|unidad:120
+Cebolla cabezona|40|1.1|9.3|0.1|1.7|unidad:110
+Lechuga|15|1.4|2.9|0.2|1.3|taza:50
+Espinaca|23|2.9|3.6|0.4|2.2|taza:30
+Brócoli cocido|35|2.4|7.2|0.4|3.3|taza:155
+Coliflor cocida|23|1.8|4.1|0.5|2.3|taza:125
+Zanahoria|41|0.9|9.6|0.2|2.8|unidad:70
+Pepino|15|0.7|3.6|0.1|0.5|unidad:200
+Pimentón|31|1|6|0.3|2.1|unidad:120
+Ahuyama cocida|20|0.7|4.9|0.1|1.1|taza:245
+Habichuela cocida|35|1.9|7.9|0.3|3.2|taza:125
+Champiñones|22|3.1|3.3|0.3|1|taza:70
+Repollo|25|1.3|5.8|0.1|2.5|taza:90
+Remolacha cocida|44|1.7|10|0.2|2|unidad:80
+Calabacín|17|1.2|3.1|0.3|1|unidad:200
+Ensalada verde mixta|20|1.3|3.5|0.2|1.8|porción:100
+Guacamole|155|2|8.6|13.7|6|cucharada:15
+Hogao|90|1.5|8|6|1.5|cucharada:15
+Tinto (café negro)|2|0.1|0|0|0|pocillo:80;taza:150
+Café con leche|40|2|3.5|1.8|0|taza:240
+Capuchino|50|2.6|4.4|2.5|0|taza:240
+Chocolate en leche|90|3.5|12|3.2|0.8|taza:240
+Aguapanela|50|0|13|0|0|vaso:240
+Jugo de naranja natural|45|0.7|10.4|0.2|0.2|vaso:240
+Jugo de fruta en agua con azúcar|40|0.2|10|0|0.3|vaso:300
+Jugo de fruta en leche con azúcar|80|2.5|13|2|0.3|vaso:300
+Avena colombiana (bebida)|90|2.8|15|2.2|0.5|vaso:250
+Gaseosa|42|0|10.6|0|0|lata:350;botella:400
+Gaseosa sin azúcar|0|0|0|0|0|lata:350
+Té helado embotellado|30|0|7.5|0|0|botella:400
+Bebida energizante|45|0|11|0|0|lata:250
+Bebida hidratante|24|0|6|0|0|botella:500
+Cerveza|43|0.5|3.6|0|0|lata:330
+Cerveza light|29|0.2|1.3|0|0|lata:330
+Vino tinto|85|0.1|2.6|0|0|copa:150
+Aguardiente|200|0|9|0|0|trago:30
+Ron|231|0|0|0|0|trago:45
+Whisky|250|0|0|0|0|trago:45
+Proteína whey (polvo)|380|75|9|5|0|scoop:30
+Papas fritas de paquete|536|7|53|35|4.4|paquete pequeño:25;paquete mediano:45
+Platanitos de paquete|520|2.3|60|30|3.5|paquete:45
+Achiras|430|5|70|15|1|paquete:30
+Crispetas|387|13|78|4.5|15|taza:8;paquete:40
+Maní salado|585|24|21|50|8|puñado:28
+Almendras|579|21|22|50|12.5|puñado:28
+Nueces|654|15|14|65|6.7|puñado:28
+Marañón|553|18|30|44|3.3|puñado:28
+Mantequilla de maní|588|25|20|50|6|cucharada:16
+Chocolatina de leche|535|7.6|59|30|3.4|barra pequeña:20;barra:40
+Chocolate amargo 70%|598|7.8|46|43|11|cuadro:10
+Galletas de chocolate|480|5|68|21|2.5|unidad:12
+Galletas de avena|450|6.5|67|18|3|unidad:15
+Torta de chocolate|370|5|50|17|2|porción:90
+Ponqué|400|5|55|18|1|porción:60
+Brownie|466|6|56|25|2|unidad:60
+Obleas con arequipe|420|5|70|13|1|unidad:40
+Barra de cereal|400|6|70|11|4|unidad:25
+Barra de proteína|360|30|38|11|5|unidad:50
+Gomitas|340|6|78|0|0|paquete:40
+Pancakes|227|6.4|28|10|1|unidad:75
+Bandeja paisa|200|10|17|10|3|plato completo:900
+Ajiaco|85|6|10|2.5|1.5|plato:500
+Sancocho|75|6|8|2|1.2|plato:500
+Mondongo|90|7|7|4|1|plato:450
+Sopa de lentejas|70|4|10|1.5|3|plato:350
+Sopa de verduras|35|1.5|6|0.8|1.5|plato:350
+Crema de ahuyama|60|1.5|8|2.5|1|plato:300
+Caldo de costilla|60|5|4|3|0.5|plato:400
+Changua|65|4|4|3.5|0|plato:350
+Lechona|260|14|12|17|0.5|porción:300
+Pizza|266|11|33|10|2.3|porción:110
+Hamburguesa completa|250|13|24|11|1.5|unidad:220
+Perro caliente|260|9|24|14|1|unidad:150
+Salchipapa|300|8|30|17|2.5|porción:300
+Wrap de pollo|210|12|20|9|1.5|unidad:300
+Burrito|210|10|23|8|2.5|unidad:250
+Sushi|145|5|25|3|1|pieza:30
+Sándwich de jamón y queso|260|13|27|11|1.5|unidad:150
+Ensalada César con pollo|150|11|6|9|1.5|porción:300
+Huevos rancheros|150|8|6|10|1.5|porción:200
+Aceite vegetal|884|0|0|100|0|cucharadita:5;cucharada:14
+Aceite de oliva|884|0|0|100|0|cucharada:14
+Azúcar|387|0|100|0|0|cucharadita:4;cucharada:12
+Panela|380|0.4|95|0.1|0|porción:30
+Miel|304|0.3|82|0|0.2|cucharada:21
+Mermelada|250|0.4|62|0.1|1|cucharada:20
+Mayonesa|680|1|1|75|0|cucharada:15
+Salsa de tomate|112|1.7|26|0.1|0.3|cucharada:17
+Salsa rosada|400|1|10|40|0|cucharada:15
+Mostaza|66|4|5.8|3.3|3.3|cucharadita:5`;
+let _nuLocal=null;
+function nuLocal(){
+  if(_nuLocal) return _nuLocal;
+  _nuLocal=NU_LOCAL_RAW.split('\n').map(l=>{ const [n,k,p,c,f,fi,s]=l.split('|');
+    return {n,b:'',k:+k,p:+p,c:+c,f:+f,fi:+fi,su:null,na:null,sf:null,base:100,s:(s||'').split(';').filter(Boolean).map(x=>{ const i=x.lastIndexOf(':'); return [x.slice(0,i),+x.slice(i+1)]; }),src:'local',key:hlNorm(n)}; });
+  return _nuLocal;
+}
+// Normalise the different sources into one food shape (values per 100 g, or per serving when base==='u')
+const nuFromCustom=r=>({n:r.name,b:r.brand||'',k:+r.kcal||0,p:+r.prot||0,c:+r.carb||0,f:+r.fat||0,fi:hlOpt(r.fiber),su:hlOpt(r.sugar),na:hlOpt(r.sodium),sf:hlOpt(r.satfat),base:100,s:Array.isArray(r.servings)?r.servings:[],src:r.source==='off'?'off':'custom',ref:String(r.id),code:r.barcode||''});
+function nuFromOff(p){
+  const m=p.nutriments||{}, kc=m['energy-kcal_100g']??(m.energy_100g!=null?m.energy_100g/4.184:null);
+  if(kc==null||!p.product_name) return null;
+  const sq=hlOpt(p.serving_quantity);
+  return {n:p.product_name,b:(p.brands||'').split(',')[0].trim(),k:+kc,p:+m.proteins_100g||0,c:+m.carbohydrates_100g||0,f:+m.fat_100g||0,
+    fi:hlOpt(m.fiber_100g),su:hlOpt(m.sugars_100g),na:m.sodium_100g!=null?m.sodium_100g*1000:null,sf:hlOpt(m['saturated-fat_100g']),
+    base:100,s:sq?[[`porción${p.serving_size?' ('+String(p.serving_size).slice(0,20)+')':''}`,sq]]:[],src:'off',ref:p.code||'',code:p.code||''};
+}
+function nuRecipeTotals(r){
+  const it=Array.isArray(r.items)?r.items:[], t={g:0,k:0,p:0,c:0,f:0,fi:0,su:0,na:0,sf:0};
+  it.forEach(i=>Object.keys(t).forEach(k=>t[k]+=+i[k]||0)); return t;
+}
+function nuFromRecipe(r){
+  const t=nuRecipeTotals(r), sv=Math.max(1,hlNum(r.servings)||1);
+  if(t.g>0){ const m=100/t.g; return {n:r.name,b:'Receta',k:t.k*m,p:t.p*m,c:t.c*m,f:t.f*m,fi:t.fi*m,su:t.su*m,na:t.na*m,sf:t.sf*m,base:100,s:[['porción',t.g/sv]],src:'recipe',ref:String(r.id)}; }
+  return {n:r.name,b:'Receta',k:t.k/sv,p:t.p/sv,c:t.c/sv,f:t.f/sv,fi:t.fi/sv,su:t.su/sv,na:t.na/sv,sf:t.sf/sv,base:'u',s:[['porción',0]],src:'recipe',ref:String(r.id)};
+}
+// A logged entry turned back into a food (for "Recientes" and for editing quantities)
+function nuFromLog(e){
+  const g=+e.grams||0, n={n:e.name,b:e.brand||'',src:e.source||'quick',ref:e.ref||''};
+  const v=['kcal','prot','carb','fat','fiber','sugar','sodium','satfat'].map(k=>e[k]==null?null:+e[k]);
+  if(g>0){ const m=100/g; return {...n,k:v[0]*m,p:v[1]*m,c:v[2]*m,f:v[3]*m,fi:v[4]==null?null:v[4]*m,su:v[5]==null?null:v[5]*m,na:v[6]==null?null:v[6]*m,sf:v[7]==null?null:v[7]*m,base:100,
+    s:e.unit&&e.unit!=='g'&&+e.qty>0?[[e.unit,g/+e.qty]]:[]}; }
+  const q=+e.qty||1;
+  return {...n,k:v[0]/q,p:v[1]/q,c:v[2]/q,f:v[3]/q,fi:v[4]==null?null:v[4]/q,su:v[5]==null?null:v[5]/q,na:v[6]==null?null:v[6]/q,sf:v[7]==null?null:v[7]/q,base:'u',s:[[e.unit||'porción',0]]};
+}
+// Macros for a food at a quantity. unit 'g' → grams; otherwise a serving label.
+function nuCalc(food,qty,unit){
+  qty=Math.max(0,+qty||0);
+  let mult, grams;
+  if(food.base==='u'){ mult=qty; grams=0; }
+  else{ const sv=unit==='g'?1:(food.s.find(s=>s[0]===unit)||[0,100])[1]; grams=unit==='g'?qty:qty*sv; mult=grams/100; }
+  const o=v=>v==null?null:hlR(v*mult,1);
+  return {grams:hlR(grams,1),kcal:hlR(food.k*mult),prot:hlR(food.p*mult,1),carb:hlR(food.c*mult,1),fat:hlR(food.f*mult,1),fiber:o(food.fi),sugar:o(food.su),sodium:food.na==null?null:hlR(food.na*mult),satfat:o(food.sf)};
+}
+
+// ── Diario de comidas ──
+const NU_MEALS=[{id:'desayuno',l:'Desayuno',e:'🌅'},{id:'almuerzo',l:'Almuerzo',e:'☀️'},{id:'cena',l:'Cena',e:'🌙'},{id:'snack',l:'Snacks',e:'🍎'}];
+const NU={day:localISO(),range:7,sh:null,pick:{},offCache:{},offT:null,offSeq:0,scan:null,editProfile:false};
+const nuSum=items=>items.reduce((t,e)=>{ ['kcal','prot','carb','fat','fiber','sugar','sodium'].forEach(k=>t[k]+=+e[k]||0); return t; },{kcal:0,prot:0,carb:0,fat:0,fiber:0,sugar:0,sodium:0});
+const nuDayItems=d=>HL.log.filter(e=>e.date===d);
+function nuDayLabel(d){
+  const t=localISO(); if(d===t) return 'Hoy'; if(d===hlAddDays(t,-1)) return 'Ayer'; if(d===hlAddDays(t,1)) return 'Mañana';
+  return new Date(d+'T12:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
+}
+function nuShift(n){ NU.day=n?hlAddDays(NU.day,n):localISO(); renderNutri(); }
+
+function renderNutri(){
+  const main=hlEl('nuMain'); if(!main) return;
+  if(HL.st!=='ok'){ hlSet('nuSetup',hlSetupHtml()); main.style.display='none'; return; }
+  hlSet('nuSetup',''); main.style.display='';
+  const T=nuTargets(HL.profile), items=nuDayItems(NU.day), tot=nuSum(items);
+  hlSet('nuDayLbl',nuDayLabel(NU.day));
+  // Summary: kcal ring + macro bars + micros
+  const goal=T?T.kcal:0, rem=goal-tot.kcal, pct=goal?Math.min(1,tot.kcal/goal):0, over=goal&&tot.kcal>goal;
+  const R=52, C=2*Math.PI*R;
+  const bar=(l,v,t,col)=>{ const u=t?v/t*100:0; return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="color:var(--t);font-weight:600">${l}</span><span style="color:var(--m);font-variant-numeric:tabular-nums">${hlG(v)}${t?' / '+hlK(t):''} g</span></div>
+    <div style="height:7px;background:var(--track-bg);border-radius:4px;overflow:hidden"><div style="height:100%;width:${Math.min(100,u).toFixed(1)}%;background:${u>110?'var(--rd)':col};border-radius:4px;transition:width .6s"></div></div></div>`; };
+  hlSet('nuSummary',`<div class="hl-sum">
+    <div style="position:relative;width:132px;height:132px;flex-shrink:0;margin:0 auto">
+      <svg viewBox="0 0 120 120" width="132" height="132" style="transform:rotate(-90deg)"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--track-bg)" stroke-width="10"/>
+      <circle cx="60" cy="60" r="${R}" fill="none" stroke="${over?'var(--rd)':'var(--ac2)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" style="transition:stroke-dashoffset .8s"/></svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+        <div style="font-family:var(--font-display);font-size:24px;font-weight:800;color:${over?'var(--rd)':'var(--t)'};line-height:1">${goal?hlK(Math.abs(rem)):hlK(tot.kcal)}</div>
+        <div style="font-size:10px;color:var(--m);margin-top:3px">${goal?(over?'kcal de más':'kcal restantes'):'kcal'}</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--m);margin-bottom:12px;flex-wrap:wrap">
+        <span>Meta <b style="color:var(--t)">${goal?hlK(goal):'—'}</b></span><span>Comida <b style="color:var(--t)">${hlK(tot.kcal)}</b></span><span>Restantes <b style="color:${over?'var(--rd)':'var(--gr)'}">${goal?hlK(rem):'—'}</b></span>
+      </div>
+      ${bar('Proteína',tot.prot,T?.p,'var(--gr)')}${bar('Carbohidratos',tot.carb,T?.c,'var(--am)')}${bar('Grasa',tot.fat,T?.f,'var(--bl)')}
+      <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--m)">
+        <span>Fibra <b style="color:var(--t)">${hlG(tot.fiber)}</b>${T?' / '+T.fiber:''} g</span>
+        <span>Azúcar <b style="color:${T&&tot.sugar>T.sugar?'var(--am)':'var(--t)'}">${hlG(tot.sugar)}</b>${T?' / máx '+T.sugar:''} g</span>
+        <span>Sodio <b style="color:${tot.sodium>2300?'var(--am)':'var(--t)'}">${hlK(tot.sodium)}</b> / máx 2.300 mg</span>
+      </div>
+    </div>
+  </div>${T?'':'<div style="font-size:11px;color:var(--am);margin-top:12px">Completa <b>Mis objetivos</b> para ver tu meta de calorías y macros.</div>'}`);
+  // Meals
+  const yItems=nuDayItems(hlAddDays(NU.day,-1));
+  hlSet('nuMeals',NU_MEALS.map(m=>{
+    const it=items.filter(e=>e.meal===m.id), st=nuSum(it), hasY=yItems.some(e=>e.meal===m.id);
+    return `<div class="card hl-meal">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:${it.length?8:4}px">
+        <div style="font-weight:700;font-size:13px;color:var(--t)">${m.e} ${m.l}</div>
+        <div style="font-size:11px;color:var(--m);font-variant-numeric:tabular-nums"><b style="color:var(--t)">${hlK(st.kcal)}</b> kcal${it.length?` · P ${hlG(st.prot)} · C ${hlG(st.carb)} · G ${hlG(st.fat)}`:''}</div>
+      </div>
+      ${it.map(e=>`<div class="hl-item">
+        <div style="flex:1;min-width:0;cursor:pointer" onclick="nuEdit(${+e.id})">
+          <div style="font-size:12px;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.name)}${e.brand?` <span style="color:var(--m)">· ${esc(e.brand)}</span>`:''}</div>
+          <div style="font-size:10px;color:var(--m)">${hlG(e.qty)} ${esc(e.unit||'')}${e.grams&&e.unit!=='g'?` (${hlG(e.grams)} g)`:''} · P ${hlG(e.prot)} · C ${hlG(e.carb)} · G ${hlG(e.fat)}</div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--t);font-variant-numeric:tabular-nums">${hlK(e.kcal)}</div>
+        <button class="btn-sm" onclick="nuDel(${+e.id})" title="Quitar" style="padding:4px 8px">✕</button>
+      </div>`).join('')}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+        <button class="btn-sm" onclick="nuOpen('${m.id}')" style="color:var(--ac2);font-weight:600">+ Agregar alimento</button>
+        ${hasY?`<button class="btn-sm" onclick="nuCopyYesterday('${m.id}')">↺ Copiar de ayer</button>`:''}
+        ${it.length>=2?`<button class="btn-sm" onclick="nuMealToRecipe('${m.id}')">⭐ Guardar como receta</button>`:''}
+      </div>
+    </div>`; }).join(''));
+  renderNuGoals(T);
+  renderNuTrends(T);
+}
+
+// ── Mis objetivos ──
+function renderNuGoals(T){
+  const el=hlEl('nuGoals'); if(!el) return;
+  if(el.contains(document.activeElement)) return;   // don't rebuild the form under the cursor
+  const pr=HL.profile||{}, open=NU.editProfile||!T;
+  const sel=(id,opts,v)=>`<select id="${id}" oninput="nuPreview()">${opts.map(([val,l])=>`<option value="${val}"${String(v)===String(val)?' selected':''}>${l}</option>`).join('')}</select>`;
+  const inp=(id,v,ph,ty='number',ex='')=>`<input id="${id}" type="${ty}" ${ty==='number'?'inputmode="decimal" step="any"':''} value="${esc(v??'')}" placeholder="${ph}" oninput="nuPreview()" ${ex}>`;
+  el.innerHTML=(T&&!open?nuGoalsSummary(T):'')+(open?`<div class="hl-form">
+    <div class="hl-row2"><div class="fi"><label>Sexo</label>${sel('nuPfSex',[['m','Hombre'],['f','Mujer']],pr.sex||'m')}</div>
+      <div class="fi"><label>Fecha de nacimiento</label>${inp('nuPfBirth',pr.birth,'','date')}</div></div>
+    <div class="hl-row2"><div class="fi"><label>Estatura (cm)</label>${inp('nuPfH',pr.height_cm,'175')}</div>
+      <div class="fi"><label>Peso actual (kg)</label>${inp('nuPfW',pr.weight_kg,'75')}</div></div>
+    <div class="hl-row2"><div class="fi"><label>% de grasa (opcional)</label>${inp('nuPfBf',pr.bodyfat,'Ej: 18')}</div>
+      <div class="fi"><label>Peso meta (opcional)</label>${inp('nuPfTw',pr.target_weight,'Ej: 70')}</div></div>
+    <div class="fi"><label>Actividad</label>${sel('nuPfAct',NU_ACT.map(([l],i)=>[i+1,l]),pr.activity||2)}</div>
+    <div class="hl-row2"><div class="fi"><label>Objetivo</label>${sel('nuPfGoal',[['lose','Perder grasa'],['keep','Mantener peso'],['gain','Ganar músculo']],pr.goal||'keep')}</div>
+      <div class="fi"><label>Ritmo</label>${sel('nuPfRate',[[0.25,'0,25 kg/semana'],[0.5,'0,5 kg/semana'],[0.75,'0,75 kg/semana'],[1,'1 kg/semana']],pr.rate||0.5)}</div></div>
+    <div class="fi"><label>Distribución de macros</label>${sel('nuPfPreset',Object.entries(NU_PRESETS).map(([k,v])=>[k,v.l]),pr.preset||'balanced')}</div>
+    <div id="nuPfCustom" class="hl-row3" style="display:${pr.preset==='custom'?'grid':'none'}">
+      <div class="fi"><label>Proteína %</label>${inp('nuPfPp',pr.p_pct,'30')}</div><div class="fi"><label>Carbos %</label>${inp('nuPfCp',pr.c_pct,'40')}</div><div class="fi"><label>Grasa %</label>${inp('nuPfFp',pr.f_pct,'30')}</div></div>
+    <div class="fi"><label>Calorías manuales (opcional, reemplaza el cálculo)</label>${inp('nuPfKcal',pr.kcal_override,'Déjalo vacío para calcular')}</div>
+    <div id="nuPfPreview" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px"><button class="btn-p" onclick="nuSaveProfile()" style="flex:1">Guardar objetivos</button>${T?'<button class="btn-sm" onclick="NU.editProfile=false;renderNuGoals(nuTargets(HL.profile))">Cancelar</button>':''}</div>
+  </div>`:'');
+  if(open) nuPreview();
+}
+function nuGoalsSummary(T){
+  const pc=(g,k)=>T.kcal?Math.round(g*k/T.kcal*100):0;
+  const goalTxt=T.goal==='lose'?`Perder ${String(T.rate).replace('.',',')} kg/semana`:T.goal==='gain'?`Ganar ${String(T.rate).replace('.',',')} kg/semana`:'Mantener peso';
+  return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;text-align:center">
+      ${[['Metabolismo basal',T.bmr],['Gasto diario (TDEE)',T.tdee],['Tu meta',T.kcal]].map(([l,v],i)=>`<div style="background:var(--bg3);border-radius:10px;padding:10px 4px"><div style="font-size:9px;color:var(--m);text-transform:uppercase;letter-spacing:.05em">${l}</div><div style="font-family:var(--font-display);font-size:17px;font-weight:800;color:${i===2?'var(--ac2)':'var(--t)'}">${hlK(v)}</div><div style="font-size:9px;color:var(--m)">kcal</div></div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--t);font-weight:600;margin-bottom:8px">${goalTxt}${T.manual?' · calorías manuales':''}</div>
+    ${[['Proteína',T.p,4,'var(--gr)'],['Carbohidratos',T.c,4,'var(--am)'],['Grasa',T.f,9,'var(--bl)']].map(([l,g,k,col])=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px"><span style="width:10px;height:10px;border-radius:3px;background:${col}"></span><span style="flex:1;color:var(--t)">${l}</span><b style="color:var(--t)">${g} g</b><span style="color:var(--m);text-align:right;white-space:nowrap">${hlK(g*k)} kcal · ${pc(g,k)}%</span></div>`).join('')}
+    <div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:10px">Fibra ≥ ${T.fiber} g · azúcar añadido ≤ ${T.sugar} g · sodio ≤ 2.300 mg${T.weeks?` · llegarías a ${hlG(T.tw)} kg en unas <b style="color:var(--t)">${Math.ceil(T.weeks)} semanas</b>`:''}.</div>
+    ${T.floored?'<div style="font-size:11px;color:var(--am);margin-top:8px">Tu meta se subió al mínimo seguro (no menos que tu metabolismo basal). Para bajar más rápido, aumenta tu actividad.</div>':''}
+    ${T.aggressive&&!T.floored?'<div style="font-size:11px;color:var(--am);margin-top:8px">Ese ritmo supera el 1% de tu peso por semana; puede costarte músculo. Considera un ritmo más suave.</div>':''}
+    <button class="btn-sm" onclick="NU.editProfile=true;renderNuGoals(nuTargets(HL.profile))" style="margin-top:12px">✎ Editar perfil y objetivos</button>`;
+}
+function nuReadProfileForm(){
+  const v=id=>hlEl(id)?.value??'';
+  return {sex:v('nuPfSex'),birth:v('nuPfBirth')||null,height_cm:hlOpt(v('nuPfH')),weight_kg:hlOpt(v('nuPfW')),bodyfat:hlOpt(v('nuPfBf')),target_weight:hlOpt(v('nuPfTw')),
+    activity:+v('nuPfAct')||2,goal:v('nuPfGoal'),rate:hlOpt(v('nuPfRate')),preset:v('nuPfPreset'),p_pct:hlOpt(v('nuPfPp')),c_pct:hlOpt(v('nuPfCp')),f_pct:hlOpt(v('nuPfFp')),kcal_override:hlOpt(v('nuPfKcal'))};
+}
+function nuPreview(){
+  const f=nuReadProfileForm(), c=hlEl('nuPfCustom'); if(c) c.style.display=f.preset==='custom'?'grid':'none';
+  const T=nuTargets(f), pv=hlEl('nuPfPreview'); if(!pv) return;
+  pv.innerHTML=T?`<div style="background:var(--ac-bg);border:1px solid var(--ac-bd);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--t);line-height:1.7">Meta: <b>${hlK(T.kcal)} kcal</b> · P ${T.p} g · C ${T.c} g · G ${T.f} g<br><span style="color:var(--m);font-size:11px">Basal ${hlK(T.bmr)} · gasto diario ${hlK(T.tdee)}${T.floored?' · ajustada al mínimo seguro':''}</span></div>`
+    :'<div style="font-size:11px;color:var(--m)">Completa fecha de nacimiento, estatura y peso para calcular.</div>';
+}
+async function nuSaveProfile(){
+  const f=nuReadProfileForm();
+  if(!nuTargets(f)){ phiToast('Faltan fecha de nacimiento, estatura o peso',{icon:'⚠️'}); return; }
+  if(NU.saving) return; NU.saving=true;   // a double tap must not POST two profile rows
+  try{ await hlSaveProfile(f); NU.editProfile=false; document.activeElement?.blur?.(); renderNutri(); phiToast('Objetivos guardados',{icon:'🎯'}); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+  finally{ NU.saving=false; }
+}
+
+// ── Tendencias ──
+function nuSetRange(n){ NU.range=n; renderNuTrends(nuTargets(HL.profile)); }
+function renderNuTrends(T){
+  if(!hlEl('cNuKcal')) return;
+  document.querySelectorAll('#nuRangeBtns button').forEach(b=>b.classList.toggle('active',+b.dataset.r===NU.range));
+  const today=localISO(), days=[...Array(NU.range)].map((_,i)=>hlAddDays(today,i-NU.range+1));
+  const byDay=days.map(d=>nuSum(nuDayItems(d))), kc=byDay.map(t=>Math.round(t.kcal));
+  mkCh('cNuKcal',{type:'bar',data:{labels:days.map(d=>new Date(d+'T12:00:00').toLocaleDateString('es-CO',NU.range>7?{day:'numeric',month:'short'}:{weekday:'short',day:'numeric'}).replace('.','')),datasets:[
+    {type:'bar',label:'Calorías',data:kc,backgroundColor:kc.map(v=>T&&v>T.kcal*1.1?cssVar('--rd'):cssVar('--ac-fill')),borderRadius:4,maxBarThickness:26,order:2},
+    ...(T?[{type:'line',label:'Meta',data:days.map(()=>T.kcal),borderColor:cssVar('--am'),borderWidth:2,borderDash:[5,4],pointRadius:0,order:1}]:[]),
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${hlK(c.parsed.y)} kcal`}}},
+    scales:{x:{...xO,ticks:{...xO.ticks,maxRotation:0,autoSkip:true,maxTicksLimit:10}},y:{...yO,ticks:{...yO.ticks,callback:v=>hlK(v)}}}}});
+  const logged=byDay.filter(t=>t.kcal>0), n=logged.length, out=[];
+  if(!n){ hlSet('nuTrend','<div style="font-size:12px;color:var(--m)">Registra comidas para ver tus tendencias.</div>'); return; }
+  const avg=k=>ST.mean(logged.map(t=>t[k]));
+  out.push(`Registraste <b style="color:var(--t)">${n} de ${NU.range}</b> días. Promedio: <b style="color:var(--t)">${hlK(avg('kcal'))} kcal</b>${T?` (${avg('kcal')>T.kcal?'+':''}${hlK(avg('kcal')-T.kcal)} vs meta)`:''}.`);
+  if(T){
+    const lowP=logged.filter(t=>t.prot<T.p*0.9).length, within=logged.filter(t=>Math.abs(t.kcal-T.kcal)<=T.kcal*0.1).length;
+    out.push(`En <b style="color:var(--t)">${within} de ${n}</b> días quedaste a ±10% de tu meta de calorías.`);
+    out.push(lowP?`La proteína quedó por debajo de la meta (${T.p} g) en <b style="color:var(--am)">${lowP} de ${n}</b> días; promedio ${hlG(avg('prot'))} g.`:`Cumpliste tu proteína todos los días registrados (promedio ${hlG(avg('prot'))} g).`);
+    if(avg('fiber')<T.fiber*0.7) out.push(`Fibra promedio ${hlG(avg('fiber'))} g de ${T.fiber} g: suma frutas, verduras, avena o fríjoles.`);
+  }
+  const k=avg('kcal')||1; out.push(`Reparto promedio: proteína ${Math.round(avg('prot')*4/k*100)}% · carbohidratos ${Math.round(avg('carb')*4/k*100)}% · grasa ${Math.round(avg('fat')*9/k*100)}%.`);
+  // Consecutive logged days ending today (or yesterday, if today is still empty)
+  let streak=0, d=nuDayItems(today).length?today:hlAddDays(today,-1);
+  while(streak<400&&nuDayItems(d).length){ streak++; d=hlAddDays(d,-1); }
+  if(streak>1) out.push(`Racha: <b style="color:var(--gr)">${streak} días</b> seguidos registrando.`);
+  hlSet('nuTrend','<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'+out.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd);font-size:12px;color:var(--m);line-height:1.6">${t}</li>`).join('')+'</ul>');
+}
+
+// ── Escritura del diario ──
+async function nuAddEntries(rows){
+  const r=await sbPost('food_log',rows); HL.log.push(...r); renderNutri(); return r;
+}
+async function nuDel(id){
+  const e=HL.log.find(x=>+x.id===+id); if(!e) return;
+  if(!await sbDelete('food_log',id)){ phiToast('No se pudo quitar',{icon:'⚠️'}); return; }
+  HL.log=HL.log.filter(x=>+x.id!==+id); renderNutri();
+  const {id:_,created_at,user_id,...copy}=e;
+  phiToast(`Quitaste ${e.name}`,{icon:'🗑',actionText:'Deshacer',onAction:()=>nuAddEntries([copy]).catch(err=>phiToast(err.message,{icon:'⚠️'}))});
+}
+async function nuCopyYesterday(meal){
+  const src=nuDayItems(hlAddDays(NU.day,-1)).filter(e=>e.meal===meal); if(!src.length) return;
+  try{ await nuAddEntries(src.map(({id,created_at,user_id,...e})=>({...e,date:NU.day}))); phiToast(`Copiaste ${src.length} alimento${src.length===1?'':'s'} de ayer`,{icon:'↺'}); }
+  catch(e){ phiToast('No se pudo copiar: '+e.message,{icon:'⚠️'}); }
+}
+async function nuMealToRecipe(meal){
+  const it=nuDayItems(NU.day).filter(e=>e.meal===meal), m=NU_MEALS.find(x=>x.id===meal);
+  const name=`${m.l} ${new Date(NU.day+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'})}`;
+  const items=it.map(e=>({n:e.name,g:+e.grams||0,k:+e.kcal||0,p:+e.prot||0,c:+e.carb||0,f:+e.fat||0,fi:+e.fiber||0,su:+e.sugar||0,na:+e.sodium||0,sf:+e.satfat||0}));
+  try{ const r=await sbPost('recipes',{name,servings:1,items}); HL.recipes.unshift(r[0]); phiToast(`Guardada como receta "${name}"`,{icon:'⭐'}); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+
+// ── Hoja "Agregar alimento" ──
+const NU_TABS=[['search','Buscar'],['recent','Recientes'],['mine','Mis alimentos'],['recipes','Recetas'],['quick','Rápido'],['scan','📷 Escanear']];
+function nuOpen(meal,tab='search'){
+  NU.sh={meal,tab,q:'',sel:null,edit:null,form:null,recipe:null,offRes:null,offBusy:false};
+  const ov=hlEl('nuOv'); ov.style.display='flex'; requestAnimationFrame(()=>ov.classList.add('show'));
+  nuSheet(); setTimeout(()=>hlEl('nuQ')?.focus(),60);
+}
+function nuClose(){
+  nuScanStop(); clearTimeout(NU.offT); NU.sh=null;
+  const ov=hlEl('nuOv'); if(!ov) return; ov.classList.remove('show'); setTimeout(()=>{ if(!NU.sh) ov.style.display='none'; },250);
+}
+function nuTab(t){ nuScanStop(); NU.sh.tab=t; NU.sh.sel=null; NU.sh.form=null; nuSheet(); if(t==='search') setTimeout(()=>hlEl('nuQ')?.focus(),30); if(t==='scan') nuScanStart(); }
+function nuEdit(id){
+  const e=HL.log.find(x=>+x.id===+id); if(!e) return;
+  nuOpen(e.meal); NU.sh.edit=e; NU.sh.sel=nuFromLog(e); nuSheet();
+}
+function nuRow(food,key){
+  NU.pick[key]=food;
+  const per=food.base==='u'?`${hlK(food.k)} kcal / ${esc(food.s[0]?.[0]||'porción')}`:`${hlK(food.k)} kcal / 100 g`;
+  return `<div class="hl-res" onclick="nuPick('${key}')"><div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(food.n)}</div>
+    <div style="font-size:10px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${food.b?esc(food.b)+' · ':''}${per} · P ${hlG(food.p)} · C ${hlG(food.c)} · G ${hlG(food.f)}</div></div><span style="color:var(--ac2);font-size:18px;line-height:1">+</span></div>`;
+}
+function nuPick(key){ const f=NU.pick[key]; if(!f||!NU.sh) return; nuScanStop(); NU.sh.sel=f; nuSheet(); }
+function nuBack(){ if(!NU.sh) return; if(NU.sh.edit){ nuClose(); return; } NU.sh.sel=null; NU.sh.form=null; nuSheet(); }
+
+function nuSheet(){
+  const box=hlEl('nuBox'), s=NU.sh; if(!box||!s) return;
+  NU.pick={};
+  const mealSel=`<select id="nuMealSel" class="vtx-inp" style="width:auto;padding:6px 10px;font-size:12px" onchange="NU.sh.meal=this.value">${NU_MEALS.map(m=>`<option value="${m.id}"${m.id===s.meal?' selected':''}>${m.e} ${m.l}</option>`).join('')}</select>`;
+  const head=(title,back)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">${back?`<button class="btn-sm" onclick="${back}" style="padding:6px 10px">‹</button>`:''}<div class="cfm-title" style="margin:0;flex:1;font-size:15px;text-align:left">${title}</div><button class="btn-sm" onclick="nuClose()" style="padding:6px 10px">✕</button></div>`;
+  if(s.sel){ box.innerHTML=head(s.edit?'Editar alimento':(s.recipe?'Agregar a la receta':'Agregar alimento'),'nuBack()')+nuPortionHtml(s.sel,s.edit,s.recipe?'':mealSel); nuPortionPaint(); return; }
+  if(s.form){ box.innerHTML=head('Crear alimento','nuBack()')+nuFoodFormHtml(s.form); return; }
+  if(s.recipe&&s.tab==='builder'){ box.innerHTML=head('Receta','')+nuRecipeHtml(); nuRecipePaint(); return; }
+  const tabs=(s.recipe?NU_TABS.filter(t=>['search','recent','mine','quick'].includes(t[0])):NU_TABS);
+  let body='';
+  if(s.tab==='search') body=`<input id="nuQ" class="vtx-inp" placeholder="Busca: arepa, pollo, Alpina…" value="${esc(s.q)}" oninput="nuSearch(this.value)" autocomplete="off"><div id="nuRes" class="hl-list"></div>`;
+  else if(s.tab==='recent'){
+    const g={}; [...HL.log].reverse().forEach(e=>{ const k=hlNorm(e.name)+'|'+hlNorm(e.brand); (g[k]=g[k]||{e,n:0}).n++; });
+    const list=Object.values(g).sort((a,b)=>b.n-a.n||String(b.e.created_at).localeCompare(String(a.e.created_at))).slice(0,40);
+    body=`<div class="hl-list">${list.length?list.map((x,i)=>nuRow(nuFromLog(x.e),'rc'+i)).join(''):'<div class="hl-empty">Aún no has registrado comidas.</div>'}</div>`;
+  }
+  else if(s.tab==='mine') body=`<button class="btn-sm" onclick="nuFoodForm()" style="margin-bottom:10px;color:var(--ac2);font-weight:600">+ Crear alimento</button><div class="hl-list">${HL.foods.length?HL.foods.map((f,i)=>`<div style="display:flex;align-items:center;gap:6px">${nuRow(nuFromCustom(f),'cf'+i).replace('class="hl-res"','class="hl-res" style="flex:1"')}<button class="btn-sm" onclick="nuFoodDel(${+f.id})" title="Borrar" style="padding:4px 8px">✕</button></div>`).join(''):'<div class="hl-empty">Crea alimentos propios o escanea productos; quedan aquí.</div>'}</div>`;
+  else if(s.tab==='recipes') body=`<button class="btn-sm" onclick="nuRecipeNew()" style="margin-bottom:10px;color:var(--ac2);font-weight:600">+ Nueva receta</button><div class="hl-list">${HL.recipes.length?HL.recipes.map((r,i)=>`<div style="display:flex;align-items:center;gap:6px">${nuRow(nuFromRecipe(r),'rp'+i).replace('class="hl-res"','class="hl-res" style="flex:1"')}<button class="btn-sm" onclick="nuRecipeEdit(${+r.id})" title="Editar" style="padding:4px 8px">✎</button></div>`).join(''):'<div class="hl-empty">Arma recetas con tus ingredientes o guarda una comida completa con “Guardar como receta”.</div>'}</div>`;
+  else if(s.tab==='quick') body=`<div class="hl-form"><div class="fi"><label>Nombre (opcional)</label><input id="nuQkN" placeholder="Ej: almuerzo ejecutivo"></div>
+    <div class="hl-row2"><div class="fi"><label>Calorías</label><input id="nuQkK" type="number" inputmode="decimal" placeholder="0"></div><div class="fi"><label>Proteína (g)</label><input id="nuQkP" type="number" inputmode="decimal" placeholder="0"></div></div>
+    <div class="hl-row2"><div class="fi"><label>Carbohidratos (g)</label><input id="nuQkC" type="number" inputmode="decimal" placeholder="0"></div><div class="fi"><label>Grasa (g)</label><input id="nuQkF" type="number" inputmode="decimal" placeholder="0"></div></div>
+    ${s.recipe?'':`<div class="fi"><label>Comida</label>${mealSel}</div>`}<button class="btn-p" onclick="nuQuickAdd()">Agregar</button></div>`;
+  else if(s.tab==='scan') body=`<div style="position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:4/3;margin-bottom:10px"><video id="nuVid" playsinline muted style="width:100%;height:100%;object-fit:cover"></video><div style="position:absolute;left:12%;right:12%;top:38%;height:24%;border:2px solid rgba(255,255,255,.8);border-radius:10px;pointer-events:none"></div></div>
+    <div id="nuScanMsg" style="font-size:11px;color:var(--m);margin-bottom:10px;text-align:center">Apunta al código de barras del empaque.</div>
+    <div style="display:flex;gap:6px"><input id="nuCode" class="vtx-inp" inputmode="numeric" placeholder="O escribe el código (EAN)"><button class="btn-sm" onclick="nuBarcode(hlEl('nuCode').value)" style="padding:8px 12px">Buscar</button></div>`;
+  box.innerHTML=head(s.recipe?`Ingrediente para “${esc(s.recipe.name||'Receta')}”`:'Agregar alimento',s.recipe?"nuTab('builder')":'')+
+    `<div class="hl-tabs">${tabs.map(([k,l])=>`<button class="${k===s.tab?'active':''}" onclick="nuTab('${k}')">${l}</button>`).join('')}</div><div class="hl-body">${body}</div>`;
+  if(s.tab==='search') nuSearchPaint();
+}
+
+// Search: local list instantly, Open Food Facts after a pause (their search API allows ~10 req/min)
+function nuSearch(q){
+  const s=NU.sh; if(!s) return; s.q=q; s.offRes=null;
+  nuSearchPaint(); clearTimeout(NU.offT);
+  if(hlNorm(q).trim().length>=3) NU.offT=setTimeout(()=>nuOffSearch(q),600);
+}
+function nuSearchPaint(){
+  const el=hlEl('nuRes'), s=NU.sh; if(!el||!s) return;
+  const q=hlNorm(s.q).trim(), words=q.split(/\s+/).filter(Boolean);
+  if(!q){ el.innerHTML='<div class="hl-empty">Escribe para buscar en la base colombiana, tus alimentos y Open Food Facts.</div>'+(HL.log.length?'<div style="font-size:10px;color:var(--m);margin-top:6px">¿Algo que comes seguido? Mira la pestaña Recientes.</div>':''); return; }
+  const match=n=>{ const t=' '+n.replace(/[^a-z0-9ñ%]+/g,' '); return words.every(w=>t.includes(' '+w)); };   // word-prefix: "pollo" ≠ "repollo"
+  const mine=[...HL.foods.map(nuFromCustom),...HL.recipes.map(nuFromRecipe)].filter(f=>match(hlNorm(f.n+' '+f.b)));
+  const loc=nuLocal().filter(f=>match(f.key)).sort((a,b)=>(a.key.startsWith(q)?0:1)-(b.key.startsWith(q)?0:1)||a.key.length-b.key.length).slice(0,25);
+  const grp=(t,list,p)=>list.length?`<div class="hl-grp">${t}</div>`+list.map((f,i)=>nuRow(f,p+i)).join(''):'';
+  const off=s.offRes;
+  el.innerHTML=grp('Tus alimentos y recetas',mine.slice(0,10),'m')+grp('Base colombiana',loc,'l')+
+    (q.length>=3?(off==null?'<div class="hl-grp">Productos de marca (Open Food Facts)</div><div class="hl-empty">Buscando…</div>':off.err?`<div class="hl-grp">Productos de marca</div><div class="hl-empty">${esc(off.err)}</div>`:grp('Productos de marca (Open Food Facts)',off.list,'o')):'')+
+    (!mine.length&&!loc.length&&off&&!off.list?.length?`<div class="hl-empty">Sin resultados. <a href="#" onclick="nuFoodForm();return false" style="color:var(--ac2)">Crea el alimento</a> o usa <a href="#" onclick="nuTab('quick');return false" style="color:var(--ac2)">Rápido</a>.</div>`:'');
+}
+async function nuOffSearch(q){
+  const key=hlNorm(q).trim(), seq=++NU.offSeq;
+  if(!NU.offCache[key]){
+    const base='https://world.openfoodfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=20&fields=code,product_name,brands,nutriments,serving_size,serving_quantity&search_terms='+encodeURIComponent(q);
+    try{
+      let r=await fetch(base+'&tagtype_0=countries&tag_contains_0=contains&tag_0=colombia'), j=r.ok?await r.json():null;
+      let list=(j?.products||[]).map(nuFromOff).filter(Boolean);
+      if(list.length<5){ r=await fetch(base); j=r.ok?await r.json():null; const more=(j?.products||[]).map(nuFromOff).filter(Boolean); const seen=new Set(list.map(f=>f.code)); list=list.concat(more.filter(f=>!seen.has(f.code))); }
+      if(!r.ok&&!list.length) throw new Error(r.status===429?'Open Food Facts limita las búsquedas; espera un minuto.':'Open Food Facts no respondió.');
+      NU.offCache[key]={list:list.slice(0,20)};
+    }catch(e){ NU.offCache[key]={err:e.message.includes('Open Food')?e.message:'Sin conexión con Open Food Facts.',list:[]}; }
+  }
+  const res=NU.offCache[key];
+  if(res.err) setTimeout(()=>{ if(NU.offCache[key]===res) delete NU.offCache[key]; },60000);   // back off before retrying (rate limit)
+  if(seq!==NU.offSeq||!NU.sh||hlNorm(NU.sh.q).trim()!==key) return;   // a newer search replaced this one
+  NU.sh.offRes=NU.offCache[key]; nuSearchPaint();}
+
+// Portion picker
+function nuPortionHtml(f,edit,mealSel){
+  const units=f.base==='u'?f.s.map(s=>s[0]):[...f.s.map(s=>s[0]),'g'];
+  let qty=1, unit=units[0];
+  if(edit){ qty=+edit.qty||1; unit=units.includes(edit.unit)?edit.unit:(f.base==='u'?units[0]:'g'); if(unit==='g'&&edit.unit!=='g') qty=+edit.grams||100; }
+  else if(f.base!=='u'&&!f.s.length){ qty=100; unit='g'; }
+  const svTxt=f.s.filter(s=>s[1]).map(s=>`${esc(s[0])} = ${hlG(s[1])} g`).join(' · ');
+  return `<div style="font-size:14px;font-weight:700;color:var(--t);margin-bottom:2px">${esc(f.n)}</div>
+    <div style="font-size:11px;color:var(--m);margin-bottom:14px">${f.b?esc(f.b)+' · ':''}${f.base==='u'?'valores por porción':hlK(f.k)+' kcal por 100 g'}${svTxt?' · '+svTxt:''}</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <input id="nuQty" class="vtx-inp" type="number" inputmode="decimal" step="any" min="0" value="${hlR(qty,2)}" oninput="nuPortionPaint()" style="flex:1 1 90px;font-size:16px;font-weight:700">
+      <select id="nuUnit" class="vtx-inp" onchange="nuUnitChange()" style="flex:2 1 150px">${units.map(u=>`<option value="${esc(u)}"${u===unit?' selected':''}>${u==='g'?'gramos':esc(u)}</option>`).join('')}</select>
+    </div>
+    <div id="nuPrev" style="margin-bottom:14px"></div>
+    ${mealSel?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--m)">Comida ${mealSel}</div>`:''}
+    <button class="btn-p" onclick="nuConfirm()">${edit?'Guardar cambios':'Agregar'}</button>`;
+}
+function nuUnitChange(){
+  const f=NU.sh?.sel, u=hlEl('nuUnit')?.value, q=hlEl('nuQty'); if(!f||!q) return;
+  q.value=u==='g'?(f.s.find(s=>s[1])?.[1]?hlR(f.s.find(s=>s[1])[1],1):100):1;   // jump to a sensible default for the new unit
+  nuPortionPaint();
+}
+function nuPortionPaint(){
+  const f=NU.sh?.sel, el=hlEl('nuPrev'); if(!f||!el) return;
+  const v=nuCalc(f,hlEl('nuQty').value,hlEl('nuUnit').value), T=nuTargets(HL.profile);
+  const cell=(l,x,u,col,t)=>`<div style="background:var(--bg3);border-radius:10px;padding:9px 4px;text-align:center"><div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:${col}">${x}</div><div style="font-size:9px;color:var(--m)">${l}${u}${t?` · ${Math.round(t)}%`:''}</div></div>`;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${cell('kcal',hlK(v.kcal),'','var(--t)',T&&v.kcal/T.kcal*100)}${cell('prot',hlG(v.prot),' g','var(--gr)',T&&v.prot/T.p*100)}${cell('carb',hlG(v.carb),' g','var(--am)',T&&T.c&&v.carb/T.c*100)}${cell('grasa',hlG(v.fat),' g','var(--bl)',T&&v.fat/T.f*100)}</div>
+    ${v.fiber!=null||v.sugar!=null||v.sodium!=null?`<div style="font-size:10px;color:var(--m);margin-top:8px;text-align:center">${[v.fiber!=null?`fibra ${hlG(v.fiber)} g`:'',v.sugar!=null?`azúcar ${hlG(v.sugar)} g`:'',v.sodium!=null?`sodio ${hlK(v.sodium)} mg`:'',v.satfat!=null?`grasa sat. ${hlG(v.satfat)} g`:''].filter(Boolean).join(' · ')}</div>`:''}
+    ${T?'<div style="font-size:9px;color:var(--m);margin-top:4px;text-align:center">% de tu meta diaria</div>':''}`;
+}
+async function nuConfirm(){
+  const s=NU.sh, f=s?.sel; if(!f) return;
+  const qty=+hlEl('nuQty').value, unit=hlEl('nuUnit').value;
+  if(!(qty>0)){ phiToast('Escribe una cantidad',{icon:'⚠️'}); return; }
+  const v=nuCalc(f,qty,unit);
+  if(s.recipe){ s.recipe.items.push({n:f.n,g:v.grams,k:v.kcal,p:v.prot,c:v.carb,f:v.fat,fi:v.fiber||0,su:v.sugar||0,na:v.sodium||0,sf:v.satfat||0}); s.sel=null; s.tab='builder'; nuSheet(); return; }
+  const row={date:s.edit?s.edit.date:NU.day,meal:s.meal,name:f.n.slice(0,120),brand:f.b||null,qty:hlR(qty,2),unit,...v,source:f.src||'local',ref:f.ref||null};
+  try{
+    if(s.edit){ const r=await sbPatch('food_log',s.edit.id,row); const i=HL.log.findIndex(x=>+x.id===+s.edit.id); if(i>=0) HL.log[i]=r[0]||{...HL.log[i],...row}; renderNutri(); nuClose(); phiToast('Actualizado',{icon:'✓'}); }
+    else{ await nuAddEntries([row]); phiToast(`${f.n.slice(0,40)} · ${hlK(v.kcal)} kcal`,{icon:'✓'}); s.sel=null; nuSheet(); setTimeout(()=>hlEl('nuQ')?.select(),30); }
+  }catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function nuQuickAdd(){
+  const s=NU.sh, n=(hlEl('nuQkN').value||'').trim()||'Registro rápido', v={kcal:hlNum(hlEl('nuQkK').value),prot:hlNum(hlEl('nuQkP').value),carb:hlNum(hlEl('nuQkC').value),fat:hlNum(hlEl('nuQkF').value)};
+  if(!v.kcal&&(v.prot||v.carb||v.fat)) v.kcal=Math.round(v.prot*4+v.carb*4+v.fat*9);
+  if(!v.kcal){ phiToast('Escribe al menos las calorías',{icon:'⚠️'}); return; }
+  if(s.recipe){ s.recipe.items.push({n,g:0,k:v.kcal,p:v.prot,c:v.carb,f:v.fat,fi:0,su:0,na:0,sf:0}); s.tab='builder'; nuSheet(); return; }
+  try{ await nuAddEntries([{date:NU.day,meal:s.meal,name:n.slice(0,120),qty:1,unit:'porción',grams:0,...v,source:'quick'}]); phiToast(`${n} · ${hlK(v.kcal)} kcal`,{icon:'✓'}); nuTab('quick'); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+
+// Custom foods
+function nuFoodForm(pre={}){ nuScanStop(); NU.sh.form={per:'100',...pre}; nuSheet(); }
+function nuFoodFormHtml(p){
+  const i=(id,l,ph,v='',ty='number')=>`<div class="fi"><label>${l}</label><input id="${id}" type="${ty}" ${ty==='number'?'inputmode="decimal" step="any"':''} placeholder="${ph}" value="${esc(v)}"></div>`;
+  return `<div class="hl-form">${i('nuFfN','Nombre *','Ej: Avena Quaker','', 'text')}
+    <div class="hl-row2">${i('nuFfB','Marca','Opcional','','text')}${i('nuFfCode','Código de barras','Opcional',p.code||'','text')}</div>
+    <div class="fi"><label>Los valores de la etiqueta son por</label><div style="display:flex;gap:6px;align-items:center"><select id="nuFfPer" class="vtx-inp" style="flex:1" onchange="hlEl('nuFfSvW').style.display=this.value==='sv'?'flex':'none'"><option value="100">100 g / 100 ml</option><option value="sv">Una porción de…</option></select>
+      <div id="nuFfSvW" style="display:none;align-items:center;gap:4px;flex:1"><input id="nuFfSvG" class="vtx-inp" type="number" inputmode="decimal" placeholder="g"><span style="font-size:11px;color:var(--m)">g</span></div></div></div>
+    <div class="hl-row2">${i('nuFfK','Calorías *','0')}${i('nuFfP','Proteína (g)','0')}</div>
+    <div class="hl-row2">${i('nuFfC','Carbohidratos (g)','0')}${i('nuFfF','Grasa (g)','0')}</div>
+    <div class="hl-row3">${i('nuFfFi','Fibra (g)','')}${i('nuFfSu','Azúcar (g)','')}${i('nuFfNa','Sodio (mg)','')}</div>
+    <div class="hl-row2">${i('nuFfSvN','Nombre de la porción','Ej: paquete','', 'text')}${i('nuFfSvQ','Gramos de esa porción','Ej: 40')}</div>
+    <button class="btn-p" onclick="nuFoodSave()">Guardar alimento</button></div>`;
+}
+async function nuFoodSave(){
+  const v=id=>hlEl(id)?.value||'', name=v('nuFfN').trim(), kc=hlOpt(v('nuFfK'));
+  if(!name||kc==null){ phiToast('Nombre y calorías son obligatorios',{icon:'⚠️'}); return; }
+  const svG=hlOpt(v('nuFfSvG')), per=v('nuFfPer')==='sv';
+  if(per&&!(svG>0)){ phiToast('Escribe cuántos gramos tiene la porción',{icon:'⚠️'}); return; }
+  const m=per?100/svG:1, o=x=>{ const n=hlOpt(x); return n==null?null:hlR(n*m,2); };
+  const servings=[]; const sn=v('nuFfSvN').trim(), sq=hlOpt(v('nuFfSvQ'));
+  if(sn&&sq>0) servings.push([sn,sq]); else if(per) servings.push(['porción',svG]);
+  const row={name:name.slice(0,120),brand:v('nuFfB').trim()||null,barcode:v('nuFfCode').trim()||null,kcal:o(kc),prot:o(v('nuFfP'))||0,carb:o(v('nuFfC'))||0,fat:o(v('nuFfF'))||0,fiber:o(v('nuFfFi')),sugar:o(v('nuFfSu')),sodium:o(v('nuFfNa')),servings,source:'custom'};
+  try{ const r=await sbPost('custom_foods',row); HL.foods.unshift(r[0]); NU.sh.form=null; NU.sh.sel=nuFromCustom(r[0]); nuSheet(); phiToast('Alimento guardado',{icon:'✓'}); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function nuFoodDel(id){
+  const f=HL.foods.find(x=>+x.id===+id); if(!f) return;
+  if(!await phiConfirm({icon:'🗑',title:'Borrar alimento',msg:`¿Borrar “${esc(f.name)}” de tus alimentos? Lo que ya registraste no cambia.`,confirmText:'Borrar',danger:true})) return;
+  if(await sbDelete('custom_foods',id)){ HL.foods=HL.foods.filter(x=>+x.id!==+id); nuSheet(); }
+}
+
+// Recipes
+function nuRecipeNew(){ NU.sh.recipe={id:null,name:'',servings:1,items:[]}; NU.sh.tab='builder'; nuSheet(); }
+function nuRecipeEdit(id){ const r=HL.recipes.find(x=>+x.id===+id); if(!r) return; NU.sh.recipe={id:r.id,name:r.name,servings:+r.servings||1,items:[...(r.items||[])]}; NU.sh.tab='builder'; nuSheet(); }
+function nuRecipeHtml(){
+  const r=NU.sh.recipe, t=nuRecipeTotals(r), sv=Math.max(1,+r.servings||1);
+  return `<div class="hl-form"><div class="hl-row2"><div class="fi"><label>Nombre</label><input id="nuRcN" value="${esc(r.name)}" placeholder="Ej: Bowl de pollo" oninput="NU.sh.recipe.name=this.value"></div>
+    <div class="fi"><label>Porciones que rinde</label><input id="nuRcS" type="number" inputmode="decimal" min="1" value="${esc(r.servings)}" oninput="NU.sh.recipe.servings=this.value;nuRecipePaint()"></div></div>
+    <div class="hl-grp" style="margin-top:0">Ingredientes</div>
+    <div class="hl-list" style="max-height:none">${r.items.length?r.items.map((it,i)=>`<div class="hl-item"><div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.n)}</div><div style="font-size:10px;color:var(--m)">${it.g?hlG(it.g)+' g · ':''}P ${hlG(it.p)} · C ${hlG(it.c)} · G ${hlG(it.f)}</div></div><b style="font-size:12px;color:var(--t)">${hlK(it.k)}</b><button class="btn-sm" onclick="NU.sh.recipe.items.splice(${i},1);nuSheet()" style="padding:4px 8px">✕</button></div>`).join(''):'<div class="hl-empty">Agrega los ingredientes con sus cantidades.</div>'}</div>
+    <button class="btn-sm" onclick="nuTab('search')" style="margin:10px 0;color:var(--ac2);font-weight:600">+ Agregar ingrediente</button>
+    <div id="nuRcTot" style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px"><button class="btn-p" onclick="nuRecipeSave()" style="flex:1">Guardar receta</button>${r.id?`<button class="btn-sm" onclick="nuRecipeDel(${+r.id})" style="color:var(--rd)">Borrar</button>`:''}<button class="btn-sm" onclick="NU.sh.recipe=null;nuTab('recipes')">Cancelar</button></div></div>`;
+}
+function nuRecipePaint(){
+  const el=hlEl('nuRcTot'), r=NU.sh?.recipe; if(!el||!r) return;
+  const t=nuRecipeTotals(r), sv=Math.max(1,hlNum(r.servings)||1);
+  el.innerHTML=r.items.length?`Total <b style="color:var(--t)">${hlK(t.k)} kcal</b>${t.g?` · ${hlG(t.g)} g`:''}<br>Por porción: <b style="color:var(--t)">${hlK(t.k/sv)} kcal</b> · P ${hlG(t.p/sv)} g · C ${hlG(t.c/sv)} g · G ${hlG(t.f/sv)} g`:'';
+}
+async function nuRecipeSave(){
+  const r=NU.sh.recipe, name=(r.name||'').trim();
+  if(!name||!r.items.length){ phiToast('Ponle nombre y al menos un ingrediente',{icon:'⚠️'}); return; }
+  const body={name:name.slice(0,120),servings:Math.max(1,hlNum(r.servings)||1),items:r.items};
+  try{
+    if(r.id){ const x=await sbPatch('recipes',r.id,body); const i=HL.recipes.findIndex(y=>+y.id===+r.id); HL.recipes[i]=x[0]||{...HL.recipes[i],...body}; }
+    else{ const x=await sbPost('recipes',body); HL.recipes.unshift(x[0]); }
+    NU.sh.recipe=null; nuTab('recipes'); phiToast('Receta guardada',{icon:'⭐'});
+  }catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function nuRecipeDel(id){
+  if(!await phiConfirm({icon:'🗑',title:'Borrar receta',msg:'Lo que ya registraste con ella no cambia.',confirmText:'Borrar',danger:true})) return;
+  if(await sbDelete('recipes',id)){ HL.recipes=HL.recipes.filter(x=>+x.id!==+id); NU.sh.recipe=null; nuTab('recipes'); }
+}
+
+// ── Escáner de código de barras: BarcodeDetector nativo, ZXing como respaldo (iOS) ──
+const ZXING_URL='https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js';
+let _zxingP=null;
+const nuLoadZxing=()=>_zxingP||(_zxingP=new Promise((ok,ko)=>{ const s=document.createElement('script'); s.src=ZXING_URL; s.onload=()=>ok(window.ZXingBrowser); s.onerror=()=>{ _zxingP=null; ko(new Error('zxing')); }; document.head.appendChild(s); }));
+async function nuScanStart(){
+  const msg=t=>hlSet('nuScanMsg',t), vid=hlEl('nuVid'); if(!vid) return;
+  if(!navigator.mediaDevices?.getUserMedia){ msg('Este navegador no da acceso a la cámara. Escribe el código abajo.'); return; }
+  const sc=NU.scan={stream:null,timer:null,ctrl:null,done:false};
+  try{
+    sc.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    if(NU.scan!==sc){ sc.stream.getTracks().forEach(t=>t.stop()); return; }
+    vid.srcObject=sc.stream; await vid.play().catch(()=>{});
+    const hit=code=>{ if(sc.done) return; sc.done=true; nuScanStop(); nuBarcode(code); };
+    let fmts=[]; try{ fmts=window.BarcodeDetector?await BarcodeDetector.getSupportedFormats():[]; }catch{}
+    if(fmts.includes('ean_13')){
+      const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e'].filter(f=>fmts.includes(f))});
+      sc.timer=setInterval(async()=>{ if(vid.readyState<2) return; try{ const r=await det.detect(vid); if(r[0]?.rawValue) hit(r[0].rawValue); }catch{} },250);
+    }else{
+      msg('Cargando lector…');
+      const ZX=await nuLoadZxing(); if(NU.scan!==sc) return;
+      sc.ctrl=await new ZX.BrowserMultiFormatReader().decodeFromStream(sc.stream,vid,res=>{ if(res) hit(res.getText()); });
+      if(NU.scan!==sc){ try{ sc.ctrl.stop(); }catch{} return; }   // stopped while the reader was starting
+    }
+    if(NU.scan===sc) msg('Apunta al código de barras del empaque.');
+  }catch(e){
+    msg(e?.name==='NotAllowedError'?'Sin permiso para la cámara. Actívalo en el navegador o escribe el código abajo.':'No se pudo abrir la cámara. Escribe el código abajo.');
+    nuScanStop();
+  }
+}
+function nuScanStop(){
+  const sc=NU.scan; if(!sc) return; NU.scan=null;
+  clearInterval(sc.timer); try{ sc.ctrl?.stop(); }catch{}
+  sc.stream?.getTracks().forEach(t=>t.stop());
+}
+async function nuBarcode(raw){
+  const code=String(raw||'').replace(/\D/g,''); if(code.length<6){ phiToast('Código no válido',{icon:'⚠️'}); return; }
+  const own=HL.foods.find(f=>f.barcode===code);
+  if(own){ if(NU.sh){ NU.sh.sel=nuFromCustom(own); nuSheet(); } return; }
+  hlSet('nuScanMsg','Buscando '+code+'…');
+  try{
+    const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=code,product_name,brands,nutriments,serving_size,serving_quantity`);
+    const j=r.ok?await r.json():null, food=j?.status===1?nuFromOff({...j.product,code}):null;
+    if(!NU.sh) return;
+    if(!food){ phiToast('Producto no encontrado: créalo con los datos de la etiqueta',{icon:'🔎'}); nuFoodForm({code}); return; }
+    // Cache it in "Mis alimentos" so the next scan is instant and works offline
+    try{ const c=await sbPost('custom_foods',{name:food.n.slice(0,120),brand:food.b||null,barcode:code,kcal:hlR(food.k,2),prot:hlR(food.p,2),carb:hlR(food.c,2),fat:hlR(food.f,2),fiber:food.fi,sugar:food.su,sodium:food.na,satfat:food.sf,servings:food.s,source:'off'}); HL.foods.unshift(c[0]); }catch{}
+    NU.sh.sel=food; nuSheet();
+  }catch{ hlSet('nuScanMsg','Sin conexión con Open Food Facts. Intenta de nuevo.'); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  SUEÑO
+// ══════════════════════════════════════════════════════════
+const SL_FACTORS=[['cafeina','☕ Cafeína tarde'],['alcohol','🍷 Alcohol'],['pantallas','📱 Pantallas'],['ejercicio','🏃 Ejercicio'],['estres','😰 Estrés'],['siesta','😴 Siesta'],['comida_tarde','🍔 Comida tarde']];
+const SL_FACES=['😫','😕','😐','🙂','😴'];
+const SL={edit:null,q:0,f:new Set()};
+const slMin=t=>{ const m=/^(\d{1,2}):(\d{2})/.exec(t||''); return m?(+m[1])*60+(+m[2]):null; };
+const slHM=m=>{ m=((Math.round(m)%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); };
+const slDurTxt=m=>`${Math.floor(m/60)} h ${String(Math.round(m%60)).padStart(2,'0')} min`;
+const slGoal=()=>hlNum(HL.profile?.sleep_goal)||8;
+// Minutes in bed (crosses midnight), minutes actually asleep, efficiency
+function slCalc(n){
+  const b=slMin(n.bed), w=slMin(n.wake); if(b==null||w==null) return null;
+  const inBed=((w-b)+1440)%1440||1440, asleep=Math.max(0,inBed-(+n.latency||0)-(+n.awake_min||0));
+  return {inBed,asleep,eff:asleep/inBed};
+}
+// Bedtime as minutes after 18:00 so 23:30 and 00:30 sit next to each other
+const slBedPos=t=>{ const m=slMin(t); return m==null?null:(m-1080+1440)%1440; };
+function slStats(nights,goal){
+  const c=nights.map(n=>({n,...slCalc(n)})).filter(x=>x.inBed);
+  if(!c.length) return null;
+  const asleep=ST.mean(c.map(x=>x.asleep)), eff=ST.mean(c.map(x=>x.eff)), q=c.filter(x=>x.n.quality).map(x=>+x.n.quality);
+  const bedSd=c.length>=3?ST.sd(c.map(x=>slBedPos(x.n.bed))):null, wakeSd=c.length>=3?ST.sd(c.map(x=>(slMin(x.n.wake)-180+1440)%1440)):null;
+  const cons=bedSd==null?null:Math.max(0,100-((bedSd+wakeSd)/2)*1.2);
+  const durS=Math.min(1,asleep/(goal*60))*100, effS=Math.min(1,Math.max(0,(eff-0.7)/0.25))*100, qS=q.length?(ST.mean(q)-1)/4*100:null;
+  const parts=[[durS,40],[effS,20],[qS,25],[cons,15]].filter(p=>p[0]!=null), w=ST.sum(parts.map(p=>p[1]));
+  return {n:c.length,asleep,eff,q:q.length?ST.mean(q):null,bedSd,wakeSd,cons,score:Math.round(ST.sum(parts.map(p=>p[0]*p[1]))/w),
+    debt:ST.sum(c.map(x=>Math.max(0,goal*60-x.asleep))),bedAvg:ST.mean(c.map(x=>slBedPos(x.n.bed)))+1080,wakeAvg:ST.mean(c.map(x=>slMin(x.n.wake)))};
+}
+function slFormReset(){
+  SL.edit=null; SL.q=0; SL.f=new Set();
+  const set=(id,v)=>{ const e=hlEl(id); if(e) e.value=v; };
+  set('slNight',hlAddDays(localISO(),-1)); set('slLat',''); set('slAwk',''); set('slAwkMin',''); set('slNotes','');
+  // Pre-fill times with the usual schedule from the last nights
+  const last=HL.sleep.slice(-7), st=last.length?slStats(last,slGoal()):null;
+  set('slBed',st?slHM(st.bedAvg):'23:00'); set('slWake',st?slHM(st.wakeAvg):'06:30');
+  slPaintForm();
+}
+function slPaintForm(){
+  hlSet('slQBtns',SL_FACES.map((f,i)=>`<button type="button" class="${SL.q===i+1?'active':''}" onclick="SL.q=${i+1};slPaintForm()" title="${['Muy mala','Mala','Normal','Buena','Excelente'][i]}">${f}</button>`).join(''));
+  hlSet('slFactors',SL_FACTORS.map(([k,l])=>`<button type="button" class="chip${SL.f.has(k)?' hl-on':''}" onclick="slToggleF('${k}')">${l}</button>`).join(''));
+  const c=slCalc({bed:hlEl('slBed')?.value,wake:hlEl('slWake')?.value,latency:hlEl('slLat')?.value,awake_min:hlEl('slAwkMin')?.value});
+  hlSet('slDurPrev',c?`Dormiste <b style="color:var(--t)">${slDurTxt(c.asleep)}</b> de ${slDurTxt(c.inBed)} en cama · eficiencia ${Math.round(c.eff*100)}%`:'');
+  const t=hlEl('slSaveBtn'); if(t) t.textContent=SL.edit?'Guardar cambios':'Guardar noche';
+  const cx=hlEl('slCancel'); if(cx) cx.style.display=SL.edit?'':'none';
+}
+function slToggleF(k){ SL.f.has(k)?SL.f.delete(k):SL.f.add(k); slPaintForm(); }
+async function slSave(){
+  const v=id=>hlEl(id)?.value||'';
+  const row={night:v('slNight'),bed:v('slBed'),wake:v('slWake'),latency:Math.round(hlNum(v('slLat'))),awakenings:Math.round(hlNum(v('slAwk'))),awake_min:Math.round(hlNum(v('slAwkMin'))),quality:SL.q||null,factors:[...SL.f],notes:v('slNotes').trim().slice(0,300)||null};
+  if(!row.night||!slCalc(row)){ phiToast('Completa la fecha y las horas',{icon:'⚠️'}); return; }
+  const c=slCalc(row); if(c.inBed>16*60&&!await phiConfirm({icon:'🛏',title:'¿Más de 16 horas en cama?',msg:'Revisa la hora de acostarte y de despertar.',confirmText:'Guardar igual'})) return;
+  // One entry per night: saving a night that already exists updates it
+  const ex=SL.edit||HL.sleep.find(n=>n.night===row.night);
+  try{
+    if(ex){ const r=await sbPatch('sleep_log',ex.id,row); const i=HL.sleep.findIndex(n=>+n.id===+ex.id); HL.sleep[i]=r[0]||{...ex,...row}; }
+    else{ const r=await sbPost('sleep_log',row); HL.sleep.push(r[0]); }
+    HL.sleep.sort((a,b)=>a.night.localeCompare(b.night));
+    phiToast(`Noche guardada · ${slDurTxt(c.asleep)}`,{icon:'🌙'}); document.activeElement?.blur?.(); slFormReset(); renderSleep();
+  }catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+function slEdit(id){
+  const n=HL.sleep.find(x=>+x.id===+id); if(!n) return;
+  SL.edit=n; SL.q=+n.quality||0; SL.f=new Set(Array.isArray(n.factors)?n.factors:[]);
+  const set=(k,v)=>{ const e=hlEl(k); if(e) e.value=v??''; };
+  set('slNight',n.night); set('slBed',n.bed); set('slWake',n.wake); set('slLat',n.latency||''); set('slAwk',n.awakenings||''); set('slAwkMin',n.awake_min||''); set('slNotes',n.notes||'');
+  slPaintForm(); hlEl('slForm')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function slDel(id){
+  const n=HL.sleep.find(x=>+x.id===+id); if(!n) return;
+  if(!await sbDelete('sleep_log',id)){ phiToast('No se pudo borrar',{icon:'⚠️'}); return; }
+  HL.sleep=HL.sleep.filter(x=>+x.id!==+id); if(SL.edit&&+SL.edit.id===+id) slFormReset(); renderSleep();
+  const {id:_,created_at,user_id,...copy}=n;
+  phiToast('Noche borrada',{icon:'🗑',actionText:'Deshacer',onAction:async()=>{ try{ const r=await sbPost('sleep_log',copy); HL.sleep.push(r[0]); HL.sleep.sort((a,b)=>a.night.localeCompare(b.night)); renderSleep(); }catch(e){ phiToast(e.message,{icon:'⚠️'}); } }});
+}
+async function slSaveGoal(v){
+  const g=hlOpt(v); if(!(g>=4&&g<=12)){ phiToast('La meta debe estar entre 4 y 12 horas',{icon:'⚠️'}); return; }
+  try{ await hlSaveProfile({sleep_goal:g}); renderSleep(); }catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+
+function renderSleep(){
+  const main=hlEl('slMain'); if(!main) return;
+  if(HL.st!=='ok'){ hlSet('slSetup',hlSetupHtml()); main.style.display='none'; return; }
+  hlSet('slSetup',''); main.style.display='';
+  const form=hlEl('slForm');
+  if(form&&!form.dataset.init){ form.dataset.init='1'; slFormReset(); }
+  else if(form&&!form.contains(document.activeElement)) slPaintForm();
+  const gi=hlEl('slGoal'); if(gi&&document.activeElement!==gi) gi.value=slGoal();
+  const goal=slGoal(), all=HL.sleep, last7=all.slice(-7), prev7=all.slice(-14,-7), s=slStats(last7,goal), sp=prev7.length?slStats(prev7,goal):null;
+  const kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
+  if(!s){
+    hlSet('slKpis','<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">Registra tu primera noche para ver tu puntaje, duración y consistencia.</div>');
+    ['slInsights','slHist'].forEach(id=>hlSet(id,'')); ['cSlDur','cSlBed'].forEach(id=>{ if(CH[id]){ CH[id].destroy(); delete CH[id]; } });
+    return;
+  }
+  const trend=sp?s.score-sp.score:null;
+  hlSet('slKpis',
+    kp('Puntaje de sueño',s.score,`últimas ${s.n} noches${trend!=null?` · ${trend>=0?'▲':'▼'} ${Math.abs(trend)} vs anteriores`:''}`,s.score>=80?'var(--gr)':s.score>=60?'var(--am)':'var(--rd)')+
+    kp('Duración promedio',slDurTxt(s.asleep),`meta ${String(goal).replace('.',',')} h · ${Math.round(s.asleep/(goal*60)*100)}%`,s.asleep>=goal*60*0.95?'var(--gr)':'var(--am)')+
+    kp('Eficiencia',Math.round(s.eff*100)+'%','tiempo dormido / en cama',s.eff>=0.85?'var(--gr)':'var(--am)')+
+    kp('Deuda de sueño',s.debt?slDurTxt(s.debt):'0 h','acumulada en estas noches',s.debt>120?'var(--rd)':s.debt>0?'var(--am)':'var(--gr)'));
+  // Charts: last 30 nights
+  const n30=all.slice(-30), lbl=n30.map(n=>new Date(n.night+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'}).replace('.',''));
+  const hrs=n30.map(n=>hlR((slCalc(n)?.asleep||0)/60,2));
+  mkCh('cSlDur',{type:'bar',data:{labels:lbl,datasets:[
+    {type:'bar',label:'Horas dormidas',data:hrs,backgroundColor:hrs.map(h=>h<goal-1?cssVar('--rd'):h<goal?cssVar('--am'):cssVar('--ac-fill')),borderRadius:4,maxBarThickness:22,yAxisID:'y',order:2},
+    {type:'line',label:'Meta',data:hrs.map(()=>goal),borderColor:cssVar('--gr'),borderWidth:1.5,borderDash:[5,4],pointRadius:0,yAxisID:'y',order:1},
+    {type:'line',label:'Calidad (1–5)',data:n30.map(n=>n.quality?+n.quality:null),borderColor:cssVar('--ac2'),borderWidth:2,pointRadius:3,spanGaps:true,tension:.3,yAxisID:'y1',order:0},
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y1'?`Calidad: ${c.parsed.y}`:`${c.dataset.label}: ${slDurTxt(c.parsed.y*60)}`}}},
+    scales:{x:{...xO,ticks:{...xO.ticks,maxRotation:0,autoSkip:true,maxTicksLimit:8}},y:{...yO,min:0,suggestedMax:Math.max(10,goal+1),ticks:{...yO.ticks,callback:v=>v+' h'}},y1:{position:'right',min:0,max:5,grid:{display:false},ticks:{...yO.ticks,stepSize:1,callback:v=>v}}}}});
+  mkCh('cSlBed',{type:'line',data:{labels:lbl,datasets:[
+    {label:'Hora de acostarte',data:n30.map(n=>slBedPos(n.bed)),borderColor:cssVar('--ac2'),backgroundColor:cssVar('--ac2'),borderWidth:2,pointRadius:3,tension:.25},
+    {label:'Hora de despertar',data:n30.map(n=>slBedPos(n.wake)),borderColor:cssVar('--am'),backgroundColor:cssVar('--am'),borderWidth:2,pointRadius:3,tension:.25},
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${slHM(c.parsed.y+1080)}`}}},
+    scales:{x:{...xO,ticks:{...xO.ticks,maxRotation:0,autoSkip:true,maxTicksLimit:8}},y:{...yO,reverse:true,ticks:{...yO.ticks,stepSize:60,callback:v=>slHM(v+1080)}}}}});
+  // Insights
+  const out=[];
+  out.push(`Te acuestas en promedio a las <b style="color:var(--t)">${slHM(s.bedAvg)}</b> y te levantas a las <b style="color:var(--t)">${slHM(s.wakeAvg)}</b>.`);
+  if(s.bedSd!=null) out.push(s.bedSd>40?`Tu hora de dormir varía ±${Math.round(s.bedSd)} min. Un horario más fijo (±30 min) suele mejorar la calidad.`:`Horario consistente: tu hora de dormir varía solo ±${Math.round(s.bedSd)} min.`);
+  if(s.asleep<goal*60) out.push(`Para llegar a tu meta te faltan unos <b style="color:var(--t)">${Math.round(goal*60-s.asleep)} min</b> por noche: acostarte a las ${slHM(s.bedAvg-(goal*60-s.asleep))} lo resolvería.`);
+  const rated=all.slice(-60).filter(n=>n.quality&&slCalc(n));
+  SL_FACTORS.forEach(([k,l])=>{
+    const yes=rated.filter(n=>(n.factors||[]).includes(k)), no=rated.filter(n=>!(n.factors||[]).includes(k));
+    if(yes.length<3||no.length<3) return;
+    const dq=ST.mean(yes.map(n=>+n.quality))-ST.mean(no.map(n=>+n.quality)), dd=(ST.mean(yes.map(n=>slCalc(n).asleep))-ST.mean(no.map(n=>slCalc(n).asleep)));
+    if(Math.abs(dq)>=0.4||Math.abs(dd)>=20) out.push(`${l}: con este factor tu calidad es <b style="color:${dq<0?'var(--rd)':'var(--gr)'}">${dq>0?'+':''}${dq.toFixed(1).replace('.',',')}</b> y duermes ${dd>=0?'+':''}${Math.round(dd)} min (${yes.length} vs ${no.length} noches).`);
+  });
+  if(rated.length>=5){ const r=ST.pearson(rated.map(n=>slCalc(n).asleep),rated.map(n=>+n.quality)); if(isFinite(r)&&Math.abs(r)>=0.3) out.push(`Correlación duración–calidad: r = ${r.toFixed(2).replace('.',',')} (${r>0?'dormir más se siente mejor':'dormir más no te deja mejor'}).`); }
+  if(all.length>=5){ const ws=[...all].map(n=>({n,c:slCalc(n)})).filter(x=>x.c), best=ws.reduce((a,b)=>b.c.asleep>a.c.asleep?b:a), worst=ws.reduce((a,b)=>b.c.asleep<a.c.asleep?b:a);
+    const d=x=>new Date(x.n.night+'T12:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
+    out.push(`Mejor noche: ${d(best)} (${slDurTxt(best.c.asleep)}). Peor: ${d(worst)} (${slDurTxt(worst.c.asleep)}).`); }
+  hlSet('slInsights','<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'+out.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd);font-size:12px;color:var(--m);line-height:1.6">${t}</li>`).join('')+'</ul><div style="font-size:10px;color:var(--m);margin-top:10px;line-height:1.6">Puntaje: duración 40% · calidad 25% · eficiencia 20% · consistencia 15%. Orientativo, no es un diagnóstico.</div>');
+  // History
+  hlSet('slHist',[...all].reverse().slice(0,21).map(n=>{ const c=slCalc(n); return `<div class="hl-item">
+    <div style="width:22px;text-align:center;font-size:16px">${n.quality?SL_FACES[n.quality-1]:'·'}</div>
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="slEdit(${+n.id})"><div style="font-size:12px;color:var(--t)">${new Date(n.night+'T12:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'})} · ${esc(n.bed)} → ${esc(n.wake)}</div>
+      <div style="font-size:10px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c?slDurTxt(c.asleep)+' · '+Math.round(c.eff*100)+'%':''}${(n.factors||[]).length?' · '+(n.factors||[]).map(f=>(SL_FACTORS.find(x=>x[0]===f)||['',''])[1].split(' ')[0]).join(' '):''}${n.notes?' · '+esc(n.notes):''}</div></div>
+    <b style="font-size:12px;color:${c&&c.asleep>=goal*60?'var(--gr)':'var(--t)'}">${c?hlR(c.asleep/60,1).toLocaleString('es-CO')+' h':''}</b>
+    <button class="btn-sm" onclick="slDel(${+n.id})" style="padding:4px 8px">✕</button></div>`; }).join(''));
+}
+
 // ── Section groups: only one group of sections is shown at a time ──
 // Splits the long single-page scroll into a few "pages". goTo() switches group
 // automatically, so nav links, the mobile tab bar, ⌘K and the AI panel keep working.
@@ -6441,6 +7565,7 @@ const NAV_GROUPS=[
   {id:'cuentas', label:'💳 Cuentas',  secs:['overview','tarjetas','deudas','renta']},
   {id:'analisis',label:'📊 Análisis', secs:['flujo','gastos','lab','mercado','insights']},
   {id:'futuro',  label:'🚀 Futuro',   secs:['proyeccion','perfecto','montecarlo','calculator','predictor']},
+  {id:'salud',   label:'💪 Salud',    secs:['nutricion','sueno']},
 ];
 let _navGroup=null;
 const groupOf=id=>NAV_GROUPS.find(g=>g.secs.includes(id))?.id;
@@ -6496,10 +7621,10 @@ window.addEventListener('scroll',()=>{
     home:'home',diario:'diario',overview:'overview',tarjetas:'tarjetas',deudas:'deudas',flujo:'flujo',
     gastos:'gastos',historial:'historial',proyeccion:'proyeccion',perfecto:'mes_perfecto',
     montecarlo:'montecarlo',calculator:'calculator',
-    predictor:'predictor',lab:'lab',mercado:'mercado',renta:'renta',insights:'insights'
+    predictor:'predictor',lab:'lab',mercado:'mercado',renta:'renta',insights:'insights',nutricion:'nutricion',sueno:'sueno'
   };
   const DOM_ORDER=['home','diario','overview','tarjetas','deudas','renta','flujo','gastos','historial','proyeccion',
-                   'perfecto','montecarlo','calculator','predictor','lab','mercado','insights'];
+                   'perfecto','montecarlo','calculator','predictor','lab','mercado','insights','nutricion','sueno'];
   let activeId='home';
   DOM_ORDER.forEach(id=>{
     const el=document.getElementById(id);
@@ -7623,12 +8748,15 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 // ─────────────────────────────────────────────────────────────────────────
 
+// ── Salud (nutrición + sueño) ──
+Object.assign(window,{hlCopySql,loadHealth,hlEl,nuShift,nuSetRange,nuEdit,nuDel,nuOpen,nuClose,nuCopyYesterday,nuMealToRecipe,renderNuGoals,nuTargets,nuPreview,nuSaveProfile,nuTab,nuPick,nuBack,nuSearch,nuFoodForm,nuFoodDel,nuFoodSave,nuRecipeNew,nuRecipeEdit,nuRecipeSave,nuRecipeDel,nuRecipePaint,nuSheet,nuQuickAdd,nuBarcode,nuUnitChange,nuPortionPaint,nuConfirm,slToggleF,slPaintForm,slSave,slEdit,slDel,slSaveGoal,slFormReset,NU,SL,HL});
+
 })(); // end IIFE
 </script>
 
 <script>
 (function(){
-  const CURRENT_V = '20261022-048';
+  const CURRENT_V = '20261022-049';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
@@ -7730,6 +8858,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 </div>
 
 <!-- ══ VOICE TRANSACTION — CONFIRM MODAL ══════════════════════════ -->
+<div id="nuOv" class="cfm-overlay hl-ov" style="display:none" onclick="if(event.target===this)nuClose()"><div class="cfm-box hl-box" id="nuBox"></div></div>
 <div id="vtxOverlay" class="cfm-overlay" onclick="if(event.target===this)closeVoiceTxModal()" style="display:none">
   <div class="cfm-box" style="max-width:390px;text-align:left;padding:24px 22px 20px">
 

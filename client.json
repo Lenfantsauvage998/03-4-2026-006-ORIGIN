@@ -163,6 +163,14 @@
       "enabled": true,
       "label": "Rendimientos"
     },
+    "nutricion": {
+      "enabled": true,
+      "label": "Nutrición"
+    },
+    "sueno": {
+      "enabled": true,
+      "label": "Sueño"
+    },
     "predictor": {
       "enabled": false,
       "label": "Predictor"
@@ -193,6 +201,6 @@
   },
 
   "nav": {
-    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "lab", "mercado", "renta", "insights"]
+    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "lab", "mercado", "renta", "nutricion", "sueno", "insights"]
   }
 }
