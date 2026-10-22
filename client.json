@@ -35,7 +35,8 @@
         "kpi_salary": true,
         "kpi_interests": true,
         "kpi_shopping": true,
-        "goal_progress_bar": true
+        "goal_progress_bar": true,
+        "portfolio_breakdown": true
       }
     },
     "overview": {

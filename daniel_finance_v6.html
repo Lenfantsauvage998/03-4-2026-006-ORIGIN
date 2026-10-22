@@ -1129,6 +1129,17 @@ tbody tr{transition:background .15s;}
         <span>$0</span><span id="nwPct" style="color:var(--ac2);font-weight:500">0%</span><span id="nwTargetLabel">$50M</span>
       </div>
     </div>
+    <div class="card" style="margin-top:12px" id="allocCard" data-module="home" data-feature="portfolio_breakdown">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="ct" style="margin:0">Composición de tu portafolio</div>
+        <div id="allocTotal" style="font-size:11px;color:var(--m)"></div>
+      </div>
+      <div id="allocBar" style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--track-bg);margin-bottom:6px"></div>
+      <div id="allocSummary" style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:12px"></div>
+      <div id="allocRows"></div>
+      <div id="allocChips" class="chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"></div>
+      <div style="font-size:10px;color:var(--m);line-height:1.7;margin-top:10px">Reparte tu patrimonio neto entre tus bolsillos (ahorros, ETF, CDT…). La tasa E.A. de cada uno es opcional y sirve para calcular tu tasa ponderada en Rendimientos. Se guarda solo en este dispositivo.</div>
+    </div>
   </div>
 </div>
 
@@ -2196,7 +2207,7 @@ const TAB_META = {
 const DEFAULT_CFG = {
   client:{id:'default',name:'Usuario',branding:{app_title:'DFG Finance OS',initials:'FO',hero_name:'Finance Usuario',goal_amount:50000000,budget_limit:400000,optimal_budget:232000}},
   modules:{
-    home:{enabled:true,features:{kpi_networth:true,kpi_salary:true,kpi_interests:true,kpi_shopping:true,goal_progress_bar:true}},
+    home:{enabled:true,features:{kpi_networth:true,kpi_salary:true,kpi_interests:true,kpi_shopping:true,goal_progress_bar:true,portfolio_breakdown:true}},
     overview:{enabled:true,features:{networth_chart:true,salary_timeline:true}},
     tarjetas:{enabled:true,features:{card_form:true,card_list:true}},
     deudas:{enabled:true,features:{debt_form:true,debt_list:true}},
@@ -2492,6 +2503,7 @@ function renderAll() {
   if(M.predictor?.enabled!==false)    renderPredictor();
   if(M.lab?.enabled!==false){ try{ renderLab(); }catch(e){ console.error('renderLab',e); } }
   if(M.mercado?.enabled!==false){ try{ renderMercado(); }catch(e){ console.error('renderMercado',e); } }
+  if(M.home?.enabled!==false){ try{ renderAlloc(); }catch(e){ console.error('renderAlloc',e); } }
   if(M.renta?.enabled!==false){ try{ renderRenta(); }catch(e){ console.error('renderRenta',e); } }
   document.getElementById('footerTs').textContent = new Date().toLocaleString('es-CO');
 }
@@ -6264,7 +6276,7 @@ function renderRenta(inputsOnly){
   const p=rentaPlan(), b=mktBase(), kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
   const note=(id,h)=>{ const e=document.getElementById(id); if(e) e.innerHTML=h; };
   note('rtSince',cfg.since?`vigente desde el ${new Date(cfg.since+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'})}`:'cámbiala cuando cambie tu tasa');
-  note('rtCapLine',`Patrimonio neto <b style="color:var(--t)">${fmtF(p.netWorth)}</b>${cfg.netDebt?(p.debt?` (ya con ${fmtF(p.debt)} de deudas descontadas)`:''):` + ${fmtF(p.debt)} de deudas que no se descuentan = <b style="color:var(--t)">${fmtF(p.total)}</b>`} · rinde el ${cfg.pct}% → capital productivo <b style="color:var(--t)">${fmtF(p.capital)}</b>.`);
+  note('rtCapLine',`Patrimonio neto <b style="color:var(--t)">${fmtF(p.netWorth)}</b>${cfg.netDebt?(p.debt?` (ya con ${fmtF(p.debt)} de deudas descontadas)`:''):` + ${fmtF(p.debt)} de deudas que no se descuentan = <b style="color:var(--t)">${fmtF(p.total)}</b>`} · rinde el ${cfg.pct}% → capital productivo <b style="color:var(--t)">${fmtF(p.capital)}</b>.`+allocRentaLine(p));
   if(p.total<=0){
     kEl.innerHTML='<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center">Tu patrimonio neto es cero o negativo, así que todavía no hay rendimiento del cual vivir. Cada peso que ingreses al portafolio empieza a construirlo.</div>';
     ['rtMonth','rtReading','rtHistNote','rtProjNote','rtCaps'].forEach(id=>note(id,''));
@@ -6341,6 +6353,84 @@ function renderRenta(inputsOnly){
   if(b.medExp&&cover<100) out.push(`Mientras tanto, gastar solo el rendimiento exige vivir con <b style="color:var(--t)">${fmtF(p.allow)}</b>, es decir ${fmtF(b.medExp-p.allow)} menos de lo que gastas hoy.`);
   out.push(`Cada $1 millón que sumes al portafolio agrega unos <b style="color:var(--t)">${fmtF(1e6*p.g)}</b> al mes de rendimiento.`);
   note('rtReading','<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'+out.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd)">${t}</li>`).join('')+'</ul><div style="font-size:10px;margin-top:10px;line-height:1.6">Estimación educativa. Supone que el rendimiento E.A. se retira mes a mes y no incluye impuestos ni comisiones.</div>');
+}
+
+// ══════════════════════════════════════════════════════════
+//  COMPOSICIÓN DEL PORTAFOLIO — reparte el patrimonio neto en bolsillos
+//  (ahorros, ETF, CDT…). Cada bolsillo puede tener su tasa E.A.; la tasa
+//  ponderada alimenta Vivir de rendimientos.
+// ══════════════════════════════════════════════════════════
+const ALLOC_KEY='dfg_alloc';
+const ALLOC_PRESETS=['Ahorros','ETF','CDT','FIC','Acciones','Cripto','Efectivo'];
+const ALLOC_COLS=['--ac2','--am','--gr','--rd','--bl','--tl','--m2'];   // ordered so neighbours contrast in every theme
+const allocGet=()=>{ const a=lsGet(ALLOC_KEY); return Array.isArray(a)?a:[]; };
+const allocNum=v=>{ const n=parseFloat(String(v??'').replace(',','.')); return isFinite(n)&&n>0?n:0; };
+function allocStats(){
+  const items=allocGet(), total=Math.max(0,DB.curBal||0), sum=items.reduce((s,i)=>s+allocNum(i.amt),0);
+  const rated=items.filter(i=>allocNum(i.rate)&&allocNum(i.amt)), ratedAmt=rated.reduce((s,i)=>s+allocNum(i.amt),0);
+  const wRate=ratedAmt?rated.reduce((s,i)=>s+allocNum(i.amt)*allocNum(i.rate),0)/ratedAmt:0;
+  return {items,total,sum,free:total-sum,ratedAmt,wRate,base:Math.max(total,sum)};
+}
+function renderAlloc(){
+  const rEl=document.getElementById('allocRows'); if(!rEl) return;
+  // Don't rebuild the inputs under the user's cursor (renderAll can fire mid-typing)
+  if(!rEl.contains(document.activeElement)){
+    const inp='background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;padding:7px 9px;min-width:0;-webkit-appearance:none';
+    rEl.innerHTML=allocGet().map((it,i)=>`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--row-divider)">
+      <span style="width:10px;height:10px;border-radius:3px;flex-shrink:0;background:var(${ALLOC_COLS[i%ALLOC_COLS.length]})"></span>
+      <input value="${esc(it.name)}" placeholder="Nombre" oninput="allocEdit('${it.id}','name',this.value)" style="${inp};flex:1 1 90px">
+      <div style="display:flex;align-items:center;flex:1 1 130px;${inp};padding:0 9px"><span style="color:var(--m)">$</span><input type="number" inputmode="numeric" min="0" value="${esc(it.amt||'')}" placeholder="0" oninput="allocEdit('${it.id}','amt',this.value)" onchange="allocCommit()" style="border:none;background:transparent;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;padding:7px 4px;width:100%;min-width:0;-webkit-appearance:none"></div>
+      <div style="display:flex;align-items:center;width:78px;${inp};padding:0 8px" title="Tasa E.A. (opcional)"><input type="number" inputmode="decimal" step="0.05" min="0" value="${esc(it.rate||'')}" placeholder="E.A." oninput="allocEdit('${it.id}','rate',this.value)" onchange="allocCommit()" style="border:none;background:transparent;color:var(--t);font-family:var(--font-body);font-size:12px;outline:none;padding:7px 2px;width:100%;min-width:0;-webkit-appearance:none"><span style="color:var(--m)">%</span></div>
+      <span id="allocPct-${it.id}" style="width:42px;text-align:right;font-size:11px;color:var(--m);font-variant-numeric:tabular-nums"></span>
+      <button class="btn-sm alloc-fill" onclick="allocFill('${it.id}')" title="Asignar aquí lo que falta por repartir">+ resto</button>
+      <button class="btn-sm" onclick="allocDel('${it.id}')" title="Quitar" style="padding:6px 9px">✕</button>
+    </div>`).join('');
+  }
+  const cEl=document.getElementById('allocChips');
+  if(cEl){ const have=new Set(allocGet().map(i=>(i.name||'').trim().toLowerCase()));
+    cEl.innerHTML=ALLOC_PRESETS.filter(n=>!have.has(n.toLowerCase())).map(n=>`<button class="btn-sm" onclick="allocAdd('${n}')">+ ${n}</button>`).join('')+`<button class="btn-sm" onclick="allocAdd('')">+ Otro</button>`; }
+  allocPaint();
+}
+function allocPaint(){
+  const s=allocStats(), bar=document.getElementById('allocBar'); if(!bar) return;
+  bar.innerHTML=s.items.map((it,i)=>{ const v=allocNum(it.amt); return v&&s.base?`<div title="${esc(it.name||'Sin nombre')}: ${fmtF(v)}" style="width:${(v/s.base*100).toFixed(2)}%;background:var(${ALLOC_COLS[i%ALLOC_COLS.length]})"></div>`:''; }).join('');
+  s.items.forEach(it=>{ const e=document.getElementById('allocPct-'+it.id); if(e) e.textContent=s.base?(allocNum(it.amt)/s.base*100).toFixed(1).replace('.',',')+'%':'—'; });
+  document.querySelectorAll('#allocRows .alloc-fill').forEach(b=>{ b.disabled=s.free<1; b.style.opacity=s.free<1?'.4':''; });
+  const t=document.getElementById('allocTotal'); if(t) t.innerHTML=`Patrimonio neto <b style="color:var(--t)">${fmtF(s.total)}</b>`;
+  const sm=document.getElementById('allocSummary'); if(!sm) return;
+  if(!s.items.length){ sm.innerHTML='Agrega tus bolsillos con los botones de abajo para ver cómo está repartido tu dinero.'; return; }
+  const gap=Math.abs(s.free)<1?'<span style="color:var(--gr)">Todo tu patrimonio está repartido.</span>'
+    :s.free>0?`Asignado ${fmtF(s.sum)} · <span style="color:var(--am)">sin asignar ${fmtF(s.free)} (${(s.total?s.free/s.total*100:0).toFixed(1).replace('.',',')}%)</span>`
+    :`<span style="color:var(--rd)">Tus bolsillos suman ${fmtF(-s.free)} más que tu patrimonio neto.</span>`;
+  sm.innerHTML=gap+(s.ratedAmt?` · Tasa ponderada <b style="color:var(--t)">${s.wRate.toFixed(2).replace('.',',')}% E.A.</b>`:'');
+}
+function allocSet(items){ lsSet(ALLOC_KEY,items); }
+function allocEdit(id,f,v){ const items=allocGet(), it=items.find(i=>i.id===id); if(!it) return; it[f]=v; allocSet(items); allocPaint(); }
+function allocCommit(){ try{ renderRenta(); }catch(e){ console.error('renderRenta',e); } }
+function allocAdd(name){
+  const items=allocGet();
+  if(name&&items.some(i=>(i.name||'').trim().toLowerCase()===name.toLowerCase())) return;
+  items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,amt:'',rate:''});
+  allocSet(items); renderAlloc();
+  if(!name){ const r=document.getElementById('allocRows'), ins=r&&r.lastElementChild?.querySelector('input'); ins?.focus(); }
+}
+function allocDel(id){ allocSet(allocGet().filter(i=>i.id!==id)); document.activeElement?.blur?.(); renderAlloc(); allocCommit(); }
+function allocFill(id){
+  const s=allocStats(), it=s.items.find(i=>i.id===id); if(!it||s.free<1) return;
+  it.amt=String(Math.floor(allocNum(it.amt)+s.free)); allocSet(s.items); document.activeElement?.blur?.(); renderAlloc(); allocCommit();
+}
+// Rendimientos: use the portfolio's weighted rate and productive share
+function allocRentaLine(p){
+  const s=allocStats(); if(!s.ratedAmt||p.total<=0) return '';
+  const pct=Math.min(100,Math.round(s.ratedAmt/p.total*100));
+  return `<br>Según tu composición, ${pct}% rinde en promedio <b style="color:var(--t)">${s.wRate.toFixed(2).replace('.',',')}% E.A.</b> <button class="btn-sm" onclick="allocApplyRate()" style="margin-left:4px">Usar estos valores</button>`;
+}
+function allocApplyRate(){
+  const s=allocStats(), p=rentaPlan(), rt=document.getElementById('rtRate'), pc=document.getElementById('rtPct');
+  if(!s.ratedAmt||!rt||!pc) return;
+  rt.value=s.wRate.toFixed(2).replace(/\.?0+$/,'');
+  pc.value=String(Math.min(100,Math.round(p.total?s.ratedAmt/p.total*100:100)));
+  rentaSave();
 }
 
 // ── Section groups: only one group of sections is shown at a time ──
@@ -7475,6 +7565,12 @@ window.mktMacroSave       = mktMacroSave;
 window.mktFilter          = mktFilter;
 window.rentaSave          = rentaSave;
 window.rentaStep          = rentaStep;
+window.allocEdit          = allocEdit;
+window.allocCommit        = allocCommit;
+window.allocAdd           = allocAdd;
+window.allocDel           = allocDel;
+window.allocFill          = allocFill;
+window.allocApplyRate     = allocApplyRate;
 window.addCard            = addCard;
 window.toggleCardForm     = toggleCardForm;
 window.toggleCardTx       = toggleCardTx;
@@ -7532,7 +7628,7 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 <script>
 (function(){
-  const CURRENT_V = '20261001-047';
+  const CURRENT_V = '20261022-048';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
