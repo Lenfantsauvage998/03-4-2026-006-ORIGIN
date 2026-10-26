@@ -812,6 +812,35 @@ input[type=range]{width:100%;accent-color:var(--ac2);cursor:pointer;height:20px;
 .hl-q button{flex:1;font-size:22px;padding:8px 0;border-radius:10px;border:1px solid var(--b2);background:var(--bg3);cursor:pointer;opacity:.55;transition:all .15s;}
 .hl-q button.active{opacity:1;border-color:var(--ac2);background:var(--ac-bg);transform:scale(1.05);}
 .chip.hl-on{background:var(--ac-bg);border-color:var(--ac2);color:var(--ac2);font-weight:600;}
+/* Alma */
+.al-scale{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;}
+.al-scale button{padding:9px 0;border-radius:8px;border:1px solid var(--b2);background:var(--bg3);color:var(--m);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font-body);}
+.al-scale button.active{background:var(--mc);border-color:var(--mc);color:#fff;transform:scale(1.08);}
+.chips.al-wrap{flex-wrap:wrap;overflow:visible;}
+.al-grat{display:flex;flex-direction:column;gap:6px;}
+.fi textarea{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:12px;color:var(--t);font-family:var(--font-body);font-size:13px;line-height:1.6;outline:none;resize:vertical;}
+.fi textarea:focus{border-color:var(--focus-bd);box-shadow:0 0 0 4px var(--ac-glow);}
+.al-q-src{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac2);margin-bottom:12px;}
+.al-q-txt{font-family:Georgia,'Times New Roman',serif;font-size:19px;line-height:1.6;color:var(--t);margin:0;padding-left:14px;border-left:2px solid var(--ac2);}
+.al-q-ask{margin-top:14px;font-size:13px;color:var(--m);line-height:1.6;}
+.al-ai-out{font-size:13px;line-height:1.75;color:var(--t);}
+.al-care{border-color:var(--am)!important;}
+.al-lines{display:grid;gap:8px;margin:12px 0;}
+@media(min-width:600px){.al-lines{grid-template-columns:1fr 1fr;}}
+.al-lines a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--b2);background:var(--bg3);text-decoration:none;}
+.al-lines b{color:var(--t);font-size:14px;}
+.al-lines span{color:var(--m);font-size:11px;line-height:1.5;}
+.fe-habs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.fe-hab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:12px;border:1px solid var(--b2);background:var(--bg3);color:var(--m);cursor:pointer;font-size:22px;font-family:var(--font-body);transition:all .15s;}
+.fe-hab b{font-size:12px;font-weight:600;}
+.fe-hab.on{border-color:var(--gr);background:color-mix(in srgb,var(--gr) 14%,transparent);color:var(--t);}
+.fe-heat{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;max-width:420px;}
+.fe-heat i,.fe-key{display:block;aspect-ratio:1;border-radius:3px;background:var(--bg3);}
+.fe-key{display:inline-block;width:10px;vertical-align:-1px;margin-right:3px;}
+.fe-heat .l1,.fe-key.l1{background:color-mix(in srgb,var(--ac2) 35%,var(--bg3));}
+.fe-heat .l2,.fe-key.l2{background:color-mix(in srgb,var(--ac2) 65%,var(--bg3));}
+.fe-heat .l3,.fe-key.l3{background:var(--ac2);}
+.fe-heat i.today{outline:1px solid var(--t);outline-offset:1px;}
 #slFactors{flex-wrap:wrap;overflow:visible;}
 /* Voice TX modal — extends cfm-box */
 .vtx-field{margin-bottom:13px;}
@@ -1114,6 +1143,9 @@ tbody tr{transition:background .15s;}
       <button class="nl" data-nav-module="mercado" onclick="goTo('mercado')">Mercado</button>
       <button class="nl" data-nav-module="nutricion" onclick="goTo('nutricion')">Nutrición</button>
       <button class="nl" data-nav-module="sueno" onclick="goTo('sueno')">Sueño</button>
+      <button class="nl" data-nav-module="reflexion" onclick="goTo('reflexion')">Reflexión</button>
+      <button class="nl" data-nav-module="diario_alma" onclick="goTo('diario_alma')">Mi diario</button>
+      <button class="nl" data-nav-module="fe" onclick="goTo('fe')">Fe</button>
       <button class="nl" data-nav-module="insights" onclick="goTo('insights')">Alertas</button>
     </div>
     <div id="navMoreWrap">
@@ -1122,7 +1154,7 @@ tbody tr{transition:background .15s;}
     </div>
     <div class="nav-tools">
       <button class="nav-tool" onclick="openPalette()" title="Buscar y navegar (Ctrl+K)">🔍<span class="nt-lbl">Buscar</span><kbd>⌘K</kbd></button>
-      <button class="nav-tool" id="ai_assistant" onclick="openAiPanel()" title="Asistente IA local">🧠<span class="ai-dot" id="aiDot"></span></button>
+      <button class="nav-tool" id="ai_assistant" onclick="openAiPanel()" title="Asistente IA">🧠<span class="ai-dot" id="aiDot"></span></button>
       <div style="position:relative">
         <button class="nav-tool" id="themeBtn" onclick="toggleThemePop()" title="Cambiar tema">🎨</button>
         <div class="theme-pop" id="themePop"></div>
@@ -1988,6 +2020,90 @@ tbody tr{transition:background .15s;}
   </div>
 </div>
 
+<div class="section" id="reflexion" data-module="reflexion">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">16</span><h2 class="stitle">Reflexión del día</h2></div>
+    <p class="ssub">Una palabra para empezar el día: la Biblia, Marco Aurelio, Séneca, Epicteto. Léela despacio y responde la pregunta en tu diario.</p>
+    <div id="alCare"></div>
+    <div class="g64" style="margin-bottom:12px">
+      <div class="card al-quote" id="alQuote" data-module="reflexion" data-feature="quote"></div>
+      <div class="card" style="align-self:start" data-module="reflexion" data-feature="ai_reflection">
+        <div class="ct">Reflexión guiada</div>
+        <div id="alAi"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="diario_alma" data-module="diario_alma">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">17</span><h2 class="stitle">Mi diario</h2></div>
+    <p class="ssub">Un minuto al día para ponerle nombre a lo que sientes. Con el tiempo vas a ver qué te sube el ánimo, qué te lo baja y cuánto te cuestan tus emociones.</p>
+    <div id="alSetup"></div>
+    <div id="alMain" style="display:none">
+      <div id="alCareD"></div>
+      <div class="kpi-grid" id="alKpis" data-module="diario_alma" data-feature="soul_kpis"></div>
+      <div class="g64" style="margin-bottom:12px">
+        <div class="card" id="alForm" style="border-color:var(--ac-bd)" data-module="diario_alma" data-feature="soul_form">
+          <div class="ct" id="alFormTitle">¿Cómo estás hoy?</div>
+          <div class="fi"><label>Día</label><input id="alDay" type="date" onchange="alFormLoad(this.value)"></div>
+          <div class="fi"><label>Ánimo <span id="alMoodLbl" style="color:var(--ac2)"></span></label><div class="al-scale" id="alMoodBtns"></div></div>
+          <div class="fi"><label>Energía</label><div class="hl-q" id="alEnergyBtns"></div></div>
+          <div class="fi"><label>Emociones</label><div class="chips al-wrap" id="alEmos"></div></div>
+          <div class="fi"><label>Hoy doy gracias por…</label>
+            <div class="al-grat"><input id="alG1" type="text" maxlength="200" placeholder="1."><input id="alG2" type="text" maxlength="200" placeholder="2."><input id="alG3" type="text" maxlength="200" placeholder="3."></div></div>
+          <div class="fi"><label>Diario</label><textarea id="alJournal" rows="7" maxlength="8000" oninput="alDraftSave()"></textarea></div>
+          <button class="btn-p" id="alSaveBtn" onclick="alSaveEntry()">Guardar día</button>
+          <div style="font-size:10px;color:var(--m);margin-top:10px;line-height:1.6">🔒 Se guarda en tu Supabase y solo tu usuario puede leerlo.</div>
+        </div>
+        <div class="card" style="align-self:start" data-module="diario_alma" data-feature="soul_insights">
+          <div class="ct">Lo que dicen tus días</div>
+          <div id="alInsights"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:12px" data-module="diario_alma" data-feature="soul_chart">
+        <div class="ct">Ánimo y gasto (últimos 30 días)</div>
+        <div class="chart-wrap" style="height:230px"><canvas id="cAlMood"></canvas></div>
+      </div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="card" data-module="diario_alma" data-feature="emo_spend">
+          <div class="ct">Gasto emocional</div>
+          <div id="alEmo"></div>
+        </div>
+        <div class="card" style="align-self:start" data-module="diario_alma" data-feature="soul_history">
+          <div class="ct">Historial</div>
+          <div id="alHist"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="fe" data-module="fe">
+  <div class="wrap">
+    <div class="section-header"><span class="snum">18</span><h2 class="stitle">Mi camino con Dios</h2></div>
+    <p class="ssub">Oración, lectura y las peticiones que llevas en el corazón. Sin presión: lo que cuenta es volver cada día.</p>
+    <div id="feSetup"></div>
+    <div id="feMain" style="display:none">
+      <div class="kpi-grid" id="feKpis" data-module="fe" data-feature="faith_kpis"></div>
+      <div class="g64" style="margin-bottom:12px">
+        <div class="card" style="border-color:var(--ac-bd)" data-module="fe" data-feature="faith_today">
+          <div class="ct">Hoy</div>
+          <div id="feToday"></div>
+        </div>
+        <div class="card" style="align-self:start" data-module="fe" data-feature="faith_heatmap">
+          <div class="ct">Últimas 12 semanas</div>
+          <div id="feHeat"></div>
+        </div>
+      </div>
+      <div class="card" data-module="fe" data-feature="prayers">
+        <div class="ct">Peticiones de oración</div>
+        <div id="fePrayers"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="section" id="insights">
   <div class="wrap">
     <div class="section-header"><span class="snum">09</span><h2 class="stitle">Alertas & Análisis</h2></div>
@@ -2293,6 +2409,7 @@ const MODULE_SECTION = {
   montecarlo:'montecarlo', calculator:'calculator', insights:'insights',
   predictor:'predictor', historial:'historial', lab:'lab', mercado:'mercado', renta:'renta',
   nutricion:'nutricion', sueno:'sueno',
+  reflexion:'reflexion', diario_alma:'diario_alma', fe:'fe',
 };
 
 // Icon + short label + scroll-target for every possible tab.
@@ -2316,6 +2433,9 @@ const TAB_META = {
   renta:        { icon:'↻',  label:'Renta',      to:'renta'       },
   nutricion:    { icon:'🍽', label:'Nutrición',  to:'nutricion'   },
   sueno:        { icon:'☾',  label:'Sueño',      to:'sueno'       },
+  reflexion:    { icon:'✦',  label:'Reflexión',  to:'reflexion'   },
+  diario_alma:  { icon:'✎',  label:'Mi diario',  to:'diario_alma' },
+  fe:           { icon:'✝',  label:'Fe',         to:'fe'          },
   historial:    { icon:'☰',  label:'History',    to:'historial'   },
 };
 
@@ -2340,6 +2460,9 @@ const DEFAULT_CFG = {
     renta:{enabled:true},
     nutricion:{enabled:true,features:{day_summary:true,meals:true,goals:true,trends:true}},
     sueno:{enabled:true,features:{sleep_form:true,sleep_kpis:true,sleep_insights:true,sleep_charts:true,sleep_history:true}},
+    reflexion:{enabled:true,features:{quote:true,ai_reflection:true}},
+    diario_alma:{enabled:true,features:{soul_kpis:true,soul_form:true,soul_insights:true,soul_chart:true,emo_spend:true,soul_history:true}},
+    fe:{enabled:true,features:{faith_kpis:true,faith_today:true,faith_heatmap:true,prayers:true}},
     historial:{enabled:true,features:{history:true,csv_export:true}},
   },
   future_modules:{
@@ -2349,7 +2472,7 @@ const DEFAULT_CFG = {
     ai_summary:{enabled:false},
     ai_assistant:{enabled:true},
   },
-  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','lab','mercado','renta','nutricion','sueno','insights']},
+  nav:{mobile_tabs:['home','overview','tarjetas','deudas','flujo','gastos','historial','proyeccion','diario','mes_perfecto','montecarlo','calculator','lab','mercado','renta','nutricion','sueno','reflexion','diario_alma','fe','insights']},
 };
 
 // Feature flag helper — returns true unless explicitly set to false
@@ -2561,6 +2684,7 @@ async function loadAll() {
     renderAll();  // recalcBalance called inside renderAll
     aiAutoInit();
     loadHealth();   // health tables load on their own: if they're missing, finances still work
+    loadAlma();     // same for the Alma tables
     setProgress(100);
     setTimeout(()=>setProgress(0),800);
     document.getElementById('splashScreen').style.display='none';
@@ -2624,6 +2748,7 @@ function renderAll() {
   if(M.home?.enabled!==false){ try{ renderAlloc(); }catch(e){ console.error('renderAlloc',e); } }
   if(M.renta?.enabled!==false){ try{ renderRenta(); }catch(e){ console.error('renderRenta',e); } }
   if(M.nutricion?.enabled!==false||M.sueno?.enabled!==false) renderHealth();
+  if(M.reflexion?.enabled!==false||M.diario_alma?.enabled!==false||M.fe?.enabled!==false) renderAlma();
   document.getElementById('footerTs').textContent = new Date().toLocaleString('es-CO');
 }
 
@@ -7557,6 +7682,656 @@ function renderSleep(){
     <button class="btn-sm" onclick="slDel(${+n.id})" style="padding:4px 8px">✕</button></div>`; }).join(''));
 }
 
+// ══════════════════════════════════════════════════════════
+//  ALMA — reflexión del día, diario emocional, camino con Dios
+// ══════════════════════════════════════════════════════════
+// Biblioteca de reflexiones. Biblia: Reina-Valera 1909 (dominio público, ortografía modernizada).
+// Marco Aurelio, Séneca y Epicteto: traducción propia al español desde las versiones de dominio
+// público de George Long, Richard Gummere y Elizabeth Carter.
+// t = temas (para elegir según cómo vienes), q = pregunta para escribir en el diario.
+const ALMA_LIB=[
+  // ── Salmos ──
+  {s:'Salmo 34:18',x:'Cercano está Jehová a los quebrantados de corazón; y salvará a los contritos de espíritu.',t:['consuelo','soledad'],q:'¿Qué parte de tu corazón está quebrantada hoy? Díselo a Dios con tus propias palabras.'},
+  {s:'Salmo 23:1-3',x:'Jehová es mi pastor; nada me faltará. En lugares de delicados pastos me hará yacer: junto a aguas de reposo me pastoreará. Confortará mi alma.',t:['consuelo','fe','dinero'],q:'¿Qué sientes que te falta hoy? ¿Y qué ya tienes que olvidas agradecer?'},
+  {s:'Salmo 23:4',x:'Aunque ande en valle de sombra de muerte, no temeré mal alguno; porque tú estarás conmigo: tu vara y tu cayado me infundirán aliento.',t:['consuelo','ansiedad','esperanza'],q:'¿Cuál es tu valle de sombra ahora mismo? ¿Cómo sería atravesarlo acompañado?'},
+  {s:'Salmo 46:1',x:'Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.',t:['consuelo','fe'],q:'¿En qué o en quién has buscado refugio últimamente? ¿Te dio paz de verdad?'},
+  {s:'Salmo 46:10',x:'Estad quietos, y conoced que yo soy Dios.',t:['ansiedad','fe'],q:'Quédate cinco minutos en silencio sin el teléfono. ¿Qué apareció en tu mente?'},
+  {s:'Salmo 55:22',x:'Echa sobre Jehová tu carga, y él te sustentará; no dejará para siempre caído al justo.',t:['ansiedad','consuelo'],q:'Escribe la carga más pesada que llevas. Luego escribe: "Señor, te la entrego".'},
+  {s:'Salmo 147:3',x:'Él sana a los quebrantados de corazón, y liga sus heridas.',t:['consuelo','relaciones'],q:'¿Qué herida sigues tocando una y otra vez? ¿Qué necesitaría para empezar a sanar?'},
+  {s:'Salmo 51:10',x:'Crea en mí, oh Dios, un corazón limpio; y renueva un espíritu recto dentro de mí.',t:['perdon','fe','disciplina'],q:'¿Qué te gustaría que Dios renovara en ti esta semana?'},
+  {s:'Salmo 42:11',x:'¿Por qué te abates, oh alma mía, y por qué te conturbas en mí? Espera a Dios; porque aún le tengo de alabar: es él la salud de mi rostro, y el Dios mío.',t:['consuelo','esperanza','tristeza'],q:'Pregúntale a tu alma, como el salmista, por qué está abatida. ¿Qué responde?'},
+  {s:'Salmo 30:5',x:'Por la tarde durará el lloro, y a la mañana vendrá la alegría.',t:['esperanza','tristeza'],q:'Recuerda una noche difícil que ya pasó. ¿Qué te enseñó la mañana que vino después?'},
+  {s:'Salmo 90:12',x:'Enséñanos de tal modo a contar nuestros días, que traigamos al corazón sabiduría.',t:['tiempo','proposito'],q:'Si contaras tus días con sabiduría, ¿qué harías distinto mañana?'},
+  {s:'Salmo 37:4-5',x:'Pon asimismo tu delicia en Jehová, y él te dará las peticiones de tu corazón. Encomienda a Jehová tu camino, y espera en él; y él hará.',t:['fe','proposito'],q:'¿Qué deseo de tu corazón quieres encomendar hoy en vez de controlarlo?'},
+  {s:'Salmo 37:7',x:'Calla a Jehová, y espera en él: no te alteres con motivo del que prospera en su camino.',t:['ansiedad','dinero','comparacion'],q:'¿A quién te has estado comparando? ¿Qué te roba esa comparación?'},
+  {s:'Salmo 37:16',x:'Mejor es lo poco del justo, que las riquezas de muchos pecadores.',t:['dinero','gratitud'],q:'¿Qué es "lo poco" que tienes y que vale más que cualquier riqueza?'},
+  {s:'Salmo 62:10',x:'Si se aumentare la hacienda, no pongáis el corazón en ella.',t:['dinero','soltar'],q:'¿Dónde está puesto tu corazón: en tu cuenta, en una persona, en Dios?'},
+  {s:'Salmo 118:24',x:'Este es el día que hizo Jehová; nos gozaremos y alegraremos en él.',t:['gratitud','esperanza'],q:'Nombra una cosa pequeña de hoy que merece alegría.'},
+  {s:'Salmo 121:1-2',x:'Alzaré mis ojos a los montes, de donde vendrá mi socorro. Mi socorro viene de Jehová, que hizo los cielos y la tierra.',t:['fe','consuelo'],q:'¿Hacia dónde levantas los ojos cuando te sientes sin salida?'},
+  {s:'Salmo 139:23-24',x:'Examíname, oh Dios, y conoce mi corazón: pruébame y conoce mis pensamientos: y ve si hay en mí camino de perversidad, y guíame en el camino eterno.',t:['fe','disciplina'],q:'Si Dios examinara tus pensamientos de hoy, ¿cuál querrías que te ayudara a cambiar?'},
+  {s:'Salmo 27:1',x:'Jehová es mi luz y mi salvación: ¿de quién temeré? Jehová es la fortaleza de mi vida: ¿de quién he de atemorizarme?',t:['ansiedad','fe'],q:'¿Qué miedo concreto tienes hoy? ¿Cómo se ve a la luz de esta promesa?'},
+  {s:'Salmo 40:1-2',x:'Pacientemente esperé a Jehová, y se inclinó a mí, y oyó mi clamor. E hízome sacar de un lago de miseria, del lodo cenagoso; y puso mis pies sobre peña, y enderezó mis pasos.',t:['esperanza','consuelo'],q:'¿De qué lodo quieres salir? ¿Qué primer paso firme puedes dar?'},
+  {s:'Salmo 103:12',x:'Cuanto está lejos el oriente del occidente, hizo alejar de nosotros nuestras rebeliones.',t:['perdon'],q:'¿Hay algo por lo que sigues castigándote aunque ya lo pediste perdonar?'},
+  {s:'Salmo 119:105',x:'Lámpara es a mis pies tu palabra, y lumbrera a mi camino.',t:['fe','proposito'],q:'¿Qué decisión tienes por delante que necesita luz?'},
+  {s:'Salmo 16:11',x:'Me mostrarás la senda de la vida: hartura de alegrías hay con tu rostro; deleites en tu diestra para siempre.',t:['fe','gratitud'],q:'¿Dónde has buscado alegría que no te llenó? ¿Dónde sí la encontraste?'},
+  {s:'Salmo 4:8',x:'En paz me acostaré, y asimismo dormiré; porque sólo tú, Jehová, me harás estar confiado.',t:['ansiedad','consuelo'],q:'Antes de dormir: ¿qué preocupación vas a dejar en manos de Dios esta noche?'},
+  {s:'Salmo 32:8',x:'Te haré entender, y te enseñaré el camino en que debes andar: sobre ti fijaré mis ojos.',t:['proposito','fe'],q:'¿En qué área de tu vida necesitas que alguien te enseñe el camino?'},
+  {s:'Salmo 73:26',x:'Mi carne y mi corazón desfallecen: mas la roca de mi corazón y mi porción es Dios para siempre.',t:['consuelo','tristeza'],q:'¿Qué te hace sentir débil hoy? ¿Qué permanece firme aunque tú no lo estés?'},
+  // ── Proverbios / Eclesiastés ──
+  {s:'Proverbios 3:5-6',x:'Fíate de Jehová de todo tu corazón, y no estribes en tu prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.',t:['fe','ansiedad','proposito'],q:'¿Qué estás intentando resolver solo, a fuerza de pensar y pensar?'},
+  {s:'Proverbios 4:23',x:'Sobre toda cosa guardada guarda tu corazón; porque de él mana la vida.',t:['relaciones','disciplina'],q:'¿A quién o a qué le has dado acceso a tu corazón sin cuidarlo?'},
+  {s:'Proverbios 16:32',x:'Mejor es el que tarde se aíra que el fuerte; y el que se enseñorea de su espíritu, que el que toma una ciudad.',t:['ira','disciplina'],q:'¿Cuándo fue la última vez que tus emociones decidieron por ti?'},
+  {s:'Proverbios 21:20',x:'Tesoro codiciable y pingüe hay en la casa del sabio; mas el hombre insensato lo disipará.',t:['dinero','disciplina'],q:'¿Qué gasto de este mes fue para tapar algo que sentías?'},
+  {s:'Proverbios 22:7',x:'El rico se enseñoreará de los pobres; y el que toma prestado, siervo es del que empresta.',t:['dinero','disciplina'],q:'¿Qué deuda o compromiso te quita libertad? ¿Cuál es tu plan para soltarlo?'},
+  {s:'Proverbios 13:11',x:'Las riquezas de vanidad disminuirán: mas el que allega con su mano las aumenta.',t:['dinero','disciplina'],q:'¿Qué hábito pequeño y constante te acerca a tu meta?'},
+  {s:'Proverbios 13:20',x:'El que anda con los sabios, sabio será; mas el que se allega a los necios, será quebrantado.',t:['relaciones'],q:'¿Las personas con las que más tiempo pasas te hacen mejor?'},
+  {s:'Proverbios 12:25',x:'El cuidado congojoso en el corazón del hombre lo abate; mas la buena palabra lo alegra.',t:['ansiedad','relaciones'],q:'¿A quién podrías llamar hoy para decirle lo que te está pesando?'},
+  {s:'Proverbios 14:30',x:'El corazón apacible es vida de las carnes: mas la envidia, pudrimiento de huesos.',t:['comparacion','ansiedad'],q:'¿Qué envidias en otros? ¿Qué te dice eso de lo que realmente deseas?'},
+  {s:'Proverbios 15:1',x:'La blanda respuesta quita la ira: mas la palabra áspera hace subir el furor.',t:['ira','relaciones'],q:'¿Con quién necesitas hablar con más suavidad?'},
+  {s:'Proverbios 17:22',x:'El corazón alegre produce buena disposición: mas el espíritu triste seca los huesos.',t:['tristeza','gratitud'],q:'¿Qué te hacía reír antes y has dejado de hacer?'},
+  {s:'Proverbios 27:17',x:'Hierro con hierro se aguza; y el hombre aguza el rostro de su amigo.',t:['relaciones','soledad'],q:'¿Quién es ese amigo que te afila? Si no lo tienes, ¿dónde podrías encontrarlo?'},
+  {s:'Proverbios 31:30',x:'Engañosa es la gracia, y vana la hermosura: la mujer que teme a Jehová, ésa será alabada.',t:['relaciones','soltar'],q:'¿Qué te atrajo de alguien que te lastimó? ¿Qué valores quieres buscar la próxima vez?'},
+  {s:'Proverbios 24:16',x:'Porque siete veces cae el justo, y se torna a levantar.',t:['esperanza','perdon','disciplina'],q:'¿De qué caída te estás levantando? ¿Qué te dirías si fueras tu mejor amigo?'},
+  {s:'Proverbios 23:4-5',x:'No trabajes por ser rico; pon coto a tu prudencia. ¿Has de poner tus ojos en las riquezas, siendo ningunas? Porque se harán alas, como alas de águila, y volarán al cielo.',t:['dinero','soltar'],q:'¿Para qué quieres llegar a tu meta financiera? ¿Qué paz esperas comprar con ella?'},
+  {s:'Proverbios 16:9',x:'El corazón del hombre piensa su camino: mas Jehová endereza sus pasos.',t:['proposito','fe'],q:'Escribe tu plan para esta semana y entrégale a Dios el resultado.'},
+  {s:'Proverbios 28:13',x:'El que encubre sus pecados, no prosperará: mas el que los confiesa y se aparta, alcanzará misericordia.',t:['perdon'],q:'¿Qué llevas escondido que pesa más por estar escondido?'},
+  {s:'Eclesiastés 3:1',x:'Todo tiene su tiempo, y todo lo que se quiere debajo del cielo, tiene su hora.',t:['soltar','tiempo','relaciones'],q:'¿Qué etapa de tu vida necesitas aceptar que ya terminó?'},
+  {s:'Eclesiastés 5:10',x:'El que ama el dinero, no se hartará de dinero; y el que ama el mucho tener, no sacará fruto.',t:['dinero'],q:'¿Cuánto sería "suficiente" para ti? Escríbelo con número y con palabras.'},
+  {s:'Eclesiastés 4:9-10',x:'Mejores son dos que uno; porque tienen mejor paga de su trabajo. Porque si cayeren, el uno levantará a su compañero; mas ¡ay del solo! que cuando cayere, no habrá segundo que lo levante.',t:['soledad','relaciones'],q:'¿Quién te levanta cuando caes? ¿A quién levantas tú?'},
+  {s:'Eclesiastés 7:8',x:'Mejor es el fin del negocio que su principio; mejor es el sufrido de espíritu que el altivo de espíritu.',t:['disciplina','tiempo'],q:'¿Qué empezaste con entusiasmo y necesitas terminar con paciencia?'},
+  // ── Profetas y Ley ──
+  {s:'Isaías 40:31',x:'Mas los que esperan a Jehová tendrán nuevas fuerzas; levantarán las alas como águilas, correrán, y no se cansarán, caminarán, y no se fatigarán.',t:['esperanza','fe'],q:'¿En qué área estás agotado? ¿Qué significaría esperar en vez de forzar?'},
+  {s:'Isaías 41:10',x:'No temas, que yo soy contigo; no desmayes, que yo soy tu Dios que te esfuerzo: siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.',t:['ansiedad','consuelo','soledad'],q:'Lee el versículo en voz alta poniendo tu nombre. ¿Qué sientes?'},
+  {s:'Isaías 43:18-19',x:'No os acordéis de las cosas pasadas, ni traigáis a memoria las cosas antiguas. He aquí que yo hago cosa nueva: presto saldrá a luz: ¿no la sabréis?',t:['soltar','esperanza','relaciones'],q:'¿Qué recuerdo repasas que te impide ver lo nuevo?'},
+  {s:'Jeremías 29:11',x:'Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.',t:['esperanza','proposito'],q:'¿Qué futuro esperas? ¿Lo estás construyendo desde la paz o desde el miedo?'},
+  {s:'Lamentaciones 3:22-23',x:'Por la misericordia de Jehová no hemos sido consumidos, porque nunca decayeron sus misericordias. Nuevas son cada mañana; grande es tu fidelidad.',t:['esperanza','perdon'],q:'Hoy es una mañana nueva. ¿Qué quieres dejar en el día de ayer?'},
+  {s:'Josué 1:9',x:'Mira que te mando que te esfuerces y seas valiente: no temas ni desmayes, porque Jehová tu Dios será contigo en donde quiera que fueres.',t:['ansiedad','disciplina'],q:'¿Qué acto de valentía, aunque sea pequeño, puedes hacer hoy?'},
+  {s:'Deuteronomio 31:8',x:'Y Jehová es el que va delante de ti; él será contigo, no te dejará, ni te desamparará: no temas, ni te intimides.',t:['soledad','consuelo'],q:'¿En qué momento te has sentido más solo? ¿Estabas realmente solo?'},
+  {s:'Miqueas 6:8',x:'Oh hombre, él te ha declarado qué sea lo bueno, y qué pida de ti Jehová: solamente hacer juicio, y amar misericordia, y humillarte para andar con tu Dios.',t:['proposito','fe'],q:'Justicia, misericordia, humildad: ¿cuál de las tres te cuesta más hoy?'},
+  {s:'Sofonías 3:17',x:'Jehová en medio de ti, poderoso, él salvará; gozarse ha sobre ti con alegría, callará de amor, se regocijará sobre ti con cánticos.',t:['consuelo','soledad'],q:'¿Te cuesta creer que Dios se alegra por ti? ¿Por qué?'},
+  {s:'Nehemías 8:10',x:'No os entristezcáis, porque el gozo de Jehová es vuestra fortaleza.',t:['tristeza','esperanza'],q:'¿De dónde sacas fuerzas cuando no tienes ganas de nada?'},
+  // ── Evangelios ──
+  {s:'Mateo 6:19-21',x:'No os hagáis tesoros en la tierra, donde la polilla y el orín corrompe... mas haceos tesoros en el cielo. Porque donde estuviere vuestro tesoro, allí estará vuestro corazón.',t:['dinero','proposito'],q:'Mira tus últimos gastos: ¿qué dicen de dónde está tu corazón?'},
+  {s:'Mateo 6:24',x:'Ninguno puede servir a dos señores; porque o aborrecerá al uno y amará al otro, o se llegará al uno y menospreciará al otro: no podéis servir a Dios y a las riquezas.',t:['dinero','fe'],q:'¿Hay algo que se ha vuelto tu "señor" sin que te dieras cuenta?'},
+  {s:'Mateo 6:33',x:'Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.',t:['fe','proposito','dinero'],q:'¿Qué buscas primero cada mañana? ¿El teléfono, el dinero, Dios?'},
+  {s:'Mateo 6:34',x:'Así que, no os congojéis por el día de mañana; que el día de mañana traerá su fatiga: basta al día su afán.',t:['ansiedad','tiempo'],q:'¿Qué preocupación de mañana puedes soltar hoy?'},
+  {s:'Mateo 11:28-30',x:'Venid a mí todos los que estáis trabajados y cargados, que yo os haré descansar. Llevad mi yugo sobre vosotros, y aprended de mí, que soy manso y humilde de corazón; y hallaréis descanso para vuestras almas.',t:['consuelo','ansiedad'],q:'¿Qué cansancio llevas que no es del cuerpo sino del alma?'},
+  {s:'Mateo 7:7',x:'Pedid, y se os dará; buscad, y hallaréis; llamad, y se os abrirá.',t:['fe','esperanza'],q:'¿Qué no te has atrevido a pedir, ni a Dios ni a otras personas?'},
+  {s:'Mateo 5:4',x:'Bienaventurados los que lloran: porque ellos recibirán consolación.',t:['tristeza','consuelo'],q:'¿Te permites llorar lo que perdiste? ¿Qué duelo tienes pendiente?'},
+  {s:'Mateo 5:44',x:'Amad a vuestros enemigos, bendecid a los que os maldicen, haced bien a los que os aborrecen, y orad por los que os ultrajan y os persiguen.',t:['perdon','relaciones','ira'],q:'¿Por quién te cuesta orar? Intenta una oración corta por esa persona.'},
+  {s:'Mateo 18:21-22',x:'Señor, ¿cuántas veces perdonaré a mi hermano que pecare contra mí? ¿hasta siete? Jesús le dice: No te digo hasta siete, mas aun hasta setenta veces siete.',t:['perdon','relaciones'],q:'¿Qué resentimiento sigues alimentando? ¿Qué te cuesta guardarlo?'},
+  {s:'Lucas 12:15',x:'Mirad, y guardaos de toda avaricia; porque la vida del hombre no consiste en la abundancia de los bienes que posee.',t:['dinero','proposito'],q:'¿En qué consiste tu vida, si no en lo que tienes?'},
+  {s:'Lucas 15:20',x:'Y levantándose, vino a su padre. Y como aun estuviese lejos, viole su padre, y fue movido a misericordia, y corrió, y echóse sobre su cuello, y besóle.',t:['perdon','dinero','esperanza'],q:'El hijo pródigo malgastó todo y aun así fue recibido. ¿Qué te impide volver?'},
+  {s:'Lucas 16:10',x:'El que es fiel en lo muy poco, también en lo más es fiel: y el que en lo muy poco es injusto, también en lo más es injusto.',t:['disciplina','dinero'],q:'¿En qué "muy poco" puedes ser fiel hoy?'},
+  {s:'Juan 14:27',x:'La paz os dejo, mi paz os doy: no como el mundo la da, yo os la doy. No se turbe vuestro corazón, ni tenga miedo.',t:['ansiedad','consuelo'],q:'¿Qué paz te ofrece el mundo que al final no dura?'},
+  {s:'Juan 16:33',x:'En el mundo tendréis aflicción: mas confiad, yo he vencido al mundo.',t:['esperanza','consuelo'],q:'¿Qué aflicción estás esperando que desaparezca para estar en paz?'},
+  {s:'Juan 8:32',x:'Y conoceréis la verdad, y la verdad os libertará.',t:['perdon','relaciones'],q:'¿Qué verdad sobre ti o sobre esa relación te cuesta aceptar?'},
+  {s:'Juan 15:5',x:'Yo soy la vid, vosotros los pámpanos: el que está en mí, y yo en él, éste lleva mucho fruto; porque sin mí nada podéis hacer.',t:['fe','proposito'],q:'¿De qué te has desconectado últimamente que te daba vida?'},
+  // ── Cartas ──
+  {s:'Romanos 8:28',x:'Y sabemos que a los que a Dios aman, todas las cosas les ayudan a bien, es a saber, a los que conforme al propósito son llamados.',t:['esperanza','fe'],q:'¿Qué experiencia dolorosa terminó trayendo algo bueno a tu vida?'},
+  {s:'Romanos 8:38-39',x:'Por lo cual estoy cierto que ni la muerte, ni la vida... ni lo presente, ni lo por venir... nos podrá apartar del amor de Dios, que es en Cristo Jesús Señor nuestro.',t:['consuelo','soledad'],q:'¿Sientes que algo de tu pasado te separa del amor de Dios?'},
+  {s:'Romanos 12:2',x:'Y no os conforméis a este siglo; mas reformaos por la renovación de vuestro entendimiento.',t:['disciplina','comparacion'],q:'¿Qué patrón del mundo (consumo, apariencia, redes) estás copiando sin pensarlo?'},
+  {s:'Romanos 5:3-4',x:'Nos gloriamos en las tribulaciones, sabiendo que la tribulación produce paciencia; y la paciencia, prueba; y la prueba, esperanza.',t:['esperanza','disciplina'],q:'¿Qué está formando en ti la dificultad que vives hoy?'},
+  {s:'1 Corintios 10:13',x:'No os ha tomado tentación, sino humana: mas fiel es Dios, que no os dejará ser tentados más de lo que podéis llevar; antes dará también juntamente con la tentación la salida.',t:['disciplina','dinero'],q:'¿Cuál es tu tentación más frecuente? ¿Cuál es tu salida concreta?'},
+  {s:'1 Corintios 13:4-5',x:'La caridad es sufrida, es benigna; la caridad no tiene envidia, la caridad no hace sinrazón, no se ensancha; no es injuriosa, no busca lo suyo, no se irrita, no piensa el mal.',t:['relaciones'],q:'Compara esa relación que te costó tanto con esta descripción del amor. ¿Qué ves?'},
+  {s:'2 Corintios 5:17',x:'De modo que si alguno está en Cristo, nueva criatura es: las cosas viejas pasaron; he aquí todas son hechas nuevas.',t:['perdon','esperanza','soltar'],q:'¿Qué parte de tu "yo viejo" quieres dejar atrás?'},
+  {s:'2 Corintios 12:9',x:'Bástate mi gracia; porque mi potencia en la flaqueza se perfecciona.',t:['consuelo','perdon'],q:'¿Qué debilidad tuya te avergüenza? ¿Cómo podría ser un lugar de gracia?'},
+  {s:'Gálatas 5:22-23',x:'Mas el fruto del Espíritu es: caridad, gozo, paz, tolerancia, benignidad, bondad, fe, mansedumbre, templanza.',t:['disciplina','fe'],q:'De esa lista, ¿cuál fruto quieres pedir para esta semana?'},
+  {s:'Gálatas 6:9',x:'No nos cansemos, pues, de hacer bien; que a su tiempo segaremos, si no hubiéremos desmayado.',t:['disciplina','esperanza'],q:'¿Qué esfuerzo sientes que no está dando fruto? ¿Vale la pena seguir?'},
+  {s:'Efesios 4:26',x:'Airaos, y no pequéis; no se ponga el sol sobre vuestro enojo.',t:['ira','relaciones'],q:'¿Con qué enojo te vas a dormir? ¿Qué harías para soltarlo antes de la noche?'},
+  {s:'Efesios 4:32',x:'Antes sed los unos con los otros benignos, misericordiosos, perdonándoos los unos a los otros, como también Dios os perdonó en Cristo.',t:['perdon','relaciones'],q:'¿Hay alguien, incluido tú, a quien necesites perdonar?'},
+  {s:'Filipenses 4:6-7',x:'Por nada estéis afanosos; sino sean notorias vuestras peticiones delante de Dios en toda oración y ruego, con hacimiento de gracias. Y la paz de Dios, que sobrepuja todo entendimiento, guardará vuestros corazones.',t:['ansiedad','fe','gratitud'],q:'Convierte tu ansiedad en una petición concreta y una gracia concreta.'},
+  {s:'Filipenses 4:8',x:'Todo lo que es verdadero, todo lo honesto, todo lo justo, todo lo puro, todo lo amable, todo lo que es de buen nombre... en esto pensad.',t:['ansiedad','disciplina'],q:'¿En qué pensamientos se te fue el día? ¿Cuáles quieres alimentar mañana?'},
+  {s:'Filipenses 4:11-13',x:'He aprendido a contentarme con lo que tengo. Sé estar humillado, y sé tener abundancia... Todo lo puedo en Cristo que me fortalece.',t:['dinero','gratitud'],q:'¿Puedes estar en paz con lo que tienes hoy, mientras trabajas por más?'},
+  {s:'Filipenses 3:13-14',x:'Una cosa hago: olvidando ciertamente lo que queda atrás, y extendiéndome a lo que está delante, prosigo al blanco.',t:['soltar','proposito'],q:'¿Qué "queda atrás" que todavía cargas? ¿Qué está delante?'},
+  {s:'Colosenses 3:23',x:'Y todo lo que hagáis, hacedlo de ánimo, como al Señor, y no a los hombres.',t:['proposito','disciplina'],q:'¿Para quién trabajas de verdad? ¿Para impresionar, o por algo más grande?'},
+  {s:'1 Timoteo 6:6-8',x:'Gran granjería es la piedad con contentamiento. Porque nada hemos traído a este mundo, y sin duda nada podremos sacar. Así que, teniendo sustento y con qué cubrirnos, seamos contentos con esto.',t:['dinero','gratitud'],q:'¿Qué compraste buscando sentirte bien? ¿Duró ese sentimiento?'},
+  {s:'1 Timoteo 6:10',x:'Porque el amor del dinero es la raíz de todos los males: el cual codiciando algunos, se descaminaron de la fe, y fueron traspasados de muchos dolores.',t:['dinero'],q:'¿Tu relación con el dinero te acerca o te aleja de lo que importa?'},
+  {s:'2 Timoteo 1:7',x:'Porque no nos ha dado Dios el espíritu de temor, sino el de fortaleza, y de amor, y de templanza.',t:['ansiedad','disciplina'],q:'¿Dónde está actuando el miedo en tus decisiones?'},
+  {s:'Hebreos 12:1',x:'Dejando todo el peso del pecado que nos rodea, corramos con paciencia la carrera que nos es propuesta.',t:['soltar','disciplina'],q:'¿Qué peso te frena en tu carrera? ¿Una persona, un hábito, un gasto?'},
+  {s:'Hebreos 13:5',x:'Sean las costumbres vuestras sin avaricia; contentos de lo presente; porque él dijo: No te desampararé, ni te dejaré.',t:['dinero','soledad'],q:'¿Gastas para no sentirte solo? ¿Qué pasaría si no estuvieras solo?'},
+  {s:'Santiago 1:2-4',x:'Hermanos míos, tened por sumo gozo cuando cayereis en diversas tentaciones; sabiendo que la prueba de vuestra fe obra paciencia.',t:['esperanza','disciplina'],q:'¿Qué prueba estás viviendo? ¿Qué virtud está entrenando en ti?'},
+  {s:'Santiago 1:5',x:'Y si alguno de vosotros tiene falta de sabiduría, demándela a Dios, el cual da a todos abundantemente, y no zahiere; y le será dada.',t:['proposito','fe'],q:'¿Sobre qué decisión necesitas sabiduría? Pídela hoy, con detalle.'},
+  {s:'Santiago 1:19',x:'Todo hombre sea pronto para oír, tardío para hablar, tardío para airarse.',t:['ira','relaciones'],q:'¿En qué conversación reciente hablaste antes de escuchar?'},
+  {s:'1 Pedro 5:7',x:'Echando toda vuestra solicitud en él, porque él tiene cuidado de vosotros.',t:['ansiedad','consuelo'],q:'Haz una lista de tus preocupaciones y ora por cada una en una sola frase.'},
+  {s:'1 Juan 1:9',x:'Si confesamos nuestros pecados, él es fiel y justo para que nos perdone nuestros pecados, y nos limpie de toda maldad.',t:['perdon'],q:'¿Qué necesitas confesar para quitarte ese peso?'},
+  {s:'1 Juan 4:18',x:'En el amor no hay temor; mas el perfecto amor echa fuera el temor.',t:['ansiedad','relaciones'],q:'¿Qué miedo se coló en tus relaciones? ¿Cómo se vería amar sin miedo?'},
+  // ── Marco Aurelio ──
+  {s:'Marco Aurelio, Meditaciones 2.1',x:'Al amanecer, dite a ti mismo: hoy me encontraré con gente entrometida, ingrata, arrogante, envidiosa. Nada de eso puede dañarme, porque nadie puede arrastrarme a lo vergonzoso.',t:['relaciones','ira','disciplina'],q:'¿Qué persona o situación de hoy podría sacarte de tu centro? ¿Cómo vas a responder?'},
+  {s:'Marco Aurelio, Meditaciones 4.3',x:'Los hombres buscan retiros en el campo, en la costa, en las montañas. Pero en ningún lugar se retira uno con más tranquilidad que dentro de su propia alma.',t:['ansiedad','consuelo'],q:'¿Cómo es tu lugar de calma interior? Descríbelo para volver a él.'},
+  {s:'Marco Aurelio, Meditaciones 5.1',x:'Cuando te cueste levantarte por la mañana, ten presente: me levanto para hacer el trabajo de un ser humano. ¿Acaso nací para quedarme calentito bajo las cobijas?',t:['disciplina','proposito'],q:'¿Para qué te levantas? Escribe tu "trabajo de ser humano" de hoy.'},
+  {s:'Marco Aurelio, Meditaciones 6.6',x:'La mejor venganza es no parecerte a quien te hizo daño.',t:['relaciones','perdon','ira'],q:'¿En qué te estás volviendo parecido a quien te lastimó?'},
+  {s:'Marco Aurelio, Meditaciones 4.7',x:'Quita la opinión, y se quita el "me han hecho daño". Quita el "me han hecho daño", y se quita el daño.',t:['soltar','relaciones'],q:'¿Qué historia te cuentas sobre lo que te hicieron? ¿Hay otra forma de contarla?'},
+  {s:'Marco Aurelio, Meditaciones 8.47',x:'Si algo externo te aflige, no es eso lo que te perturba, sino tu juicio sobre ello. Y está en tu poder borrar ese juicio ahora mismo.',t:['ansiedad','soltar'],q:'¿Qué juicio sobre tu situación podrías cambiar hoy?'},
+  {s:'Marco Aurelio, Meditaciones 7.69',x:'La perfección del carácter es esta: vivir cada día como si fuera el último, sin agitación, sin pereza, sin fingir.',t:['tiempo','disciplina'],q:'Si hoy fuera tu último día, ¿qué no harías? ¿Qué sí?'},
+  {s:'Marco Aurelio, Meditaciones 10.16',x:'No pierdas más tiempo discutiendo cómo debe ser un hombre bueno. Sé uno.',t:['disciplina','proposito'],q:'¿Qué acción concreta haría hoy el hombre que quieres ser?'},
+  {s:'Marco Aurelio, Meditaciones 4.49',x:'Sé como el promontorio contra el que rompen sin cesar las olas: se mantiene firme, y el agua hirviente se calma a su alrededor.',t:['ansiedad','disciplina'],q:'¿Qué olas te golpean ahora? ¿Qué te mantiene firme?'},
+  {s:'Marco Aurelio, Meditaciones 5.16',x:'Tal como sean tus pensamientos habituales, así será tu mente; porque el alma se tiñe del color de sus pensamientos.',t:['disciplina','ansiedad'],q:'¿De qué color está teñida tu alma esta semana?'},
+  {s:'Marco Aurelio, Meditaciones 4.17',x:'No vivas como si fueras a vivir diez mil años. La muerte está sobre ti. Mientras vives, mientras puedes, sé bueno.',t:['tiempo','proposito'],q:'¿Qué estás posponiendo como si tuvieras tiempo infinito?'},
+  {s:'Marco Aurelio, Meditaciones 9.40',x:'Uno reza: "que no pierda a mi hijo". Tú reza: "que no tenga miedo de perderlo".',t:['ansiedad','fe','soltar'],q:'Cambia una de tus oraciones: en vez de pedir controlar el resultado, pide paz ante él.'},
+  {s:'Marco Aurelio, Meditaciones 12.4',x:'Me asombra a menudo que cada uno se ame más que a los demás, y sin embargo valore menos su propia opinión de sí mismo que la de los demás.',t:['comparacion','relaciones'],q:'¿A quién intentaste impresionar con dinero o apariencia? ¿Qué buscabas en realidad?'},
+  {s:'Marco Aurelio, Meditaciones 8.36',x:'No te perturbe imaginar tu vida entera. No pienses en todas las dificultades que puedan venir. Pregúntate ante cada una: ¿qué hay aquí que sea insoportable?',t:['ansiedad','tiempo'],q:'¿Qué hay en este momento, solo en este, que sea insoportable?'},
+  {s:'Marco Aurelio, Meditaciones 6.13',x:'Ante los platos finos, piensa: esto es pescado muerto, esto es el cadáver de un ave. Así hay que hacer con todo lo que parece digno de estima: desnudarlo y ver qué es.',t:['dinero','soltar'],q:'Toma algo que deseas comprar y descríbelo sin adornos. ¿Sigue valiendo lo mismo?'},
+  {s:'Marco Aurelio, Meditaciones 7.59',x:'Mira hacia dentro. Dentro está la fuente del bien, y siempre puede brotar si sigues cavando.',t:['esperanza','proposito'],q:'¿Qué bien hay en ti que has olvidado?'},
+  {s:'Marco Aurelio, Meditaciones 8.59',x:'Los hombres existen los unos para los otros. Enséñales, entonces, o sopórtalos.',t:['relaciones','ira'],q:'¿A quién te toca enseñar con paciencia? ¿A quién simplemente soportar con amor?'},
+  {s:'Marco Aurelio, Meditaciones 2.4',x:'Recuerda cuánto tiempo llevas posponiendo esto, y cuántas veces los dioses te han dado plazo y no lo has aprovechado.',t:['disciplina','tiempo'],q:'¿Qué llevas posponiendo demasiado tiempo? ¿Cuál es el primer paso de 5 minutos?'},
+  {s:'Marco Aurelio, Meditaciones 4.24',x:'"Haz pocas cosas, si quieres tener paz." Mejor aún: haz solo lo necesario. Así tendrás la tranquilidad de hacer menos cosas y hacerlas bien.',t:['ansiedad','disciplina'],q:'¿Qué puedes quitar de tu agenda, o de tus gastos, para tener paz?'},
+  {s:'Marco Aurelio, Meditaciones 7.22',x:'Es propio del ser humano amar incluso a los que tropiezan. Esto sucede si recuerdas que son tus parientes, que pecan por ignorancia y sin querer.',t:['perdon','relaciones'],q:'¿Puedes ver a quien te hirió como alguien que tropezó por ignorancia?'},
+  {s:'Marco Aurelio, Meditaciones 12.1',x:'Todo lo que buscas alcanzar por caminos largos puedes tenerlo ya, si no te lo niegas a ti mismo: deja el pasado, confía el futuro a la providencia, y ordena bien solo el presente.',t:['soltar','tiempo','fe'],q:'Pasado, futuro, presente: ¿en cuál vives la mayor parte del día?'},
+  {s:'Marco Aurelio, Meditaciones 3.4',x:'No gastes lo que te queda de vida en pensamientos sobre otras personas, a menos que sea por el bien común.',t:['relaciones','soltar','tiempo'],q:'¿Cuántos pensamientos le dedicaste hoy a alguien que ya no está en tu vida?'},
+  {s:'Marco Aurelio, Meditaciones 11.18',x:'La amabilidad es invencible, si es sincera y no forzada ni fingida.',t:['relaciones','ira'],q:'¿Con quién podrías ser genuinamente amable hoy?'},
+  {s:'Marco Aurelio, Meditaciones 6.30',x:'Mantente sencillo, bueno, puro, serio, sin afectación, amigo de la justicia, piadoso, afectuoso, firme en tu deber.',t:['disciplina','proposito'],q:'Elige una de esas palabras como lema para hoy.'},
+  {s:'Marco Aurelio, Meditaciones 7.57',x:'Ama solo lo que te sucede y lo que fue tejido con el hilo de tu destino. ¿Qué podría convenirte más?',t:['soltar','fe'],q:'¿Qué parte de tu historia te cuesta aceptar como parte de tu camino?'},
+  // ── Séneca ──
+  {s:'Séneca, Cartas a Lucilio 1.1',x:'Reclama tu derecho sobre ti mismo, y recoge y guarda el tiempo que hasta ahora te arrebataban, te robaban o se te escapaba.',t:['tiempo','disciplina'],q:'¿Qué o quién se está robando tu tiempo?'},
+  {s:'Séneca, Cartas a Lucilio 2.6',x:'No es pobre el que tiene poco, sino el que desea más.',t:['dinero','gratitud'],q:'¿Qué deseas tener que en realidad no necesitas?'},
+  {s:'Séneca, Cartas a Lucilio 13.4',x:'Hay más cosas que nos asustan que cosas que nos aplastan; sufrimos más en la imaginación que en la realidad.',t:['ansiedad'],q:'¿Qué escenario catastrófico te imaginaste esta semana? ¿Pasó?'},
+  {s:'Séneca, Cartas a Lucilio 16.7',x:'Si vives conforme a la naturaleza, nunca serás pobre; si vives conforme a la opinión, nunca serás rico.',t:['dinero','comparacion'],q:'¿Qué gastos haces por la opinión de otros?'},
+  {s:'Séneca, Cartas a Lucilio 5.7',x:'Dejarás de temer cuando dejes de esperar. Ambos van juntos como el prisionero y su guardia: el miedo sigue a la esperanza ansiosa.',t:['ansiedad','soltar'],q:'¿Qué expectativa ansiosa está alimentando tu miedo?'},
+  {s:'Séneca, Cartas a Lucilio 28.2',x:'¿Te sorprende que viajar no te sirva de nada, si te llevas a ti mismo contigo? Lo que te pesa es lo que llevas dentro.',t:['tristeza','soltar'],q:'¿De qué intentas escapar con compras, salidas o distracciones?'},
+  {s:'Séneca, Cartas a Lucilio 18.5',x:'Fija algunos días en los que te contentes con muy poco y comida sencilla, y pregúntate: ¿es esto lo que yo temía?',t:['dinero','disciplina'],q:'¿Te atreverías a un día de gasto cero esta semana? ¿Qué descubrirías?'},
+  {s:'Séneca, Sobre la brevedad de la vida 1',x:'No es que tengamos poco tiempo, sino que perdemos mucho. La vida es bastante larga si se sabe emplear.',t:['tiempo','proposito'],q:'¿En qué perdiste tiempo hoy? ¿En qué lo invertiste bien?'},
+  {s:'Séneca, Cartas a Lucilio 71.3',x:'Si uno no sabe a qué puerto se dirige, ningún viento le es favorable.',t:['proposito'],q:'¿Cuál es tu puerto? No solo financiero: ¿qué clase de vida quieres?'},
+  {s:'Séneca, Cartas a Lucilio 7.8',x:'Retírate en ti mismo cuanto puedas. Trata con quienes puedan hacerte mejor; recibe a quienes tú puedas hacer mejores.',t:['relaciones','soledad'],q:'¿Con quién te hace mejor pasar tiempo? ¿Lo estás buscando?'},
+  {s:'Séneca, Sobre la ira 2.29',x:'El mayor remedio de la ira es la demora.',t:['ira','disciplina','dinero'],q:'¿Qué decisión (o compra) tomarías distinto si esperaras 24 horas?'},
+  {s:'Séneca, Cartas a Lucilio 9.6',x:'Si quieres ser amado, ama.',t:['relaciones','soledad'],q:'¿Cómo puedes dar amor hoy sin esperar nada a cambio?'},
+  {s:'Séneca, Cartas a Lucilio 6.4',x:'Nada me alegrará tanto que no prefiera compartirlo. Ningún bien es agradable de poseer sin compañía.',t:['soledad','relaciones','gratitud'],q:'¿Con quién quisieras compartir algo bueno de hoy?'},
+  {s:'Séneca, Cartas a Lucilio 104.1',x:'A veces, por consideración a los que nos quieren, debemos cuidar nuestra salud y nuestra vida aunque estemos cansados de ella.',t:['consuelo','esperanza'],q:'¿Quién se alegra de que existas? Escribe sus nombres.'},
+  // ── Epicteto ──
+  {s:'Epicteto, Enquiridión 1',x:'De las cosas, unas dependen de nosotros y otras no. Dependen de nosotros el juicio, el deseo, la aversión. No dependen el cuerpo, la riqueza, la reputación.',t:['ansiedad','soltar'],q:'Haz dos columnas: lo que depende de ti y lo que no. ¿Dónde está tu energía?'},
+  {s:'Epicteto, Enquiridión 5',x:'No son las cosas las que perturban a los hombres, sino sus opiniones sobre las cosas.',t:['ansiedad','soltar'],q:'¿Qué opinión tuya sobre lo que pasó te está haciendo sufrir más que el hecho?'},
+  {s:'Epicteto, Enquiridión 8',x:'No pidas que las cosas sucedan como tú quieres; quiere que sucedan como suceden, y vivirás en paz.',t:['soltar','fe'],q:'¿Qué resultado estás exigiendo a la vida?'},
+  {s:'Epicteto, Enquiridión 11',x:'Nunca digas de nada "lo he perdido", sino "lo he devuelto". ¿Murió tu hijo? Fue devuelto. ¿Perdiste tu hacienda? También fue devuelta.',t:['soltar','dinero','relaciones'],q:'¿Qué perdiste que podrías ver como algo que te fue prestado?'},
+  {s:'Epicteto, Enquiridión 20',x:'Si alguien consigue irritarte, sabe que es tu propio juicio el que te irrita. Por eso, no te dejes arrastrar por la primera impresión.',t:['ira','disciplina'],q:'¿Qué te irritó hoy? ¿Qué juicio había detrás?'},
+  {s:'Epicteto, Enquiridión 43',x:'Toda cosa tiene dos asas: una por la que se puede llevar y otra por la que no. Si tu hermano te ofende, no la tomes por el asa de la ofensa, sino por la de "es mi hermano".',t:['relaciones','perdon'],q:'¿Por cuál asa estás tomando el conflicto que tienes?'},
+  {s:'Epicteto, Enquiridión 46',x:'No te llames filósofo ni hables mucho de principios entre la gente: actúa conforme a ellos.',t:['disciplina','proposito'],q:'¿Qué principio tuyo puedes mostrar hoy con hechos y no con palabras?'},
+  {s:'Epicteto, Enquiridión 33',x:'Fíjate desde ya un carácter y una conducta que mantengas, tanto a solas como entre la gente.',t:['disciplina','relaciones'],q:'¿Eres la misma persona cuando nadie te ve? ¿En qué no?'},
+  {s:'Epicteto, Fragmentos',x:'Ningún hombre es libre si no es dueño de sí mismo.',t:['disciplina','dinero'],q:'¿Qué impulso te domina más? ¿Gastar, buscar a alguien, distraerte?'},
+  {s:'Epicteto, Disertaciones 1.1',x:'Debemos ocuparnos de lo que depende de nosotros, y servirnos de lo demás como se presente.',t:['soltar','ansiedad'],q:'¿Qué parte de tu problema sí depende de ti? Empieza por ahí.'},
+];
+const AL={st:'idle',err:'',log:[],prayers:[],emo:[]};
+const ALMA_SQL=`-- DFG Finance OS · Alma: diario emocional, oración y gasto emocional
+create table if not exists soul_log (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  day date not null, mood int, energy int,
+  emotions jsonb default '[]', gratitude jsonb default '[]', journal text,
+  prayed boolean default false, read_bible boolean default false, faith_min int default 0,
+  quote_ref text, ai_reflection text, created_at timestamptz default now(),
+  unique (user_id, day)
+);
+create table if not exists prayer_requests (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  created date not null default current_date, text text not null,
+  answered date, answer_note text, created_at timestamptz default now()
+);
+create table if not exists emo_spend (
+  id bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  tx_id bigint not null, trigger text not null, note text, created_at timestamptz default now(),
+  unique (user_id, tx_id)
+);
+do $$ declare t text; begin
+  foreach t in array array['soul_log','prayer_requests','emo_spend'] loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists own_rows on %I', t);
+    execute format('create policy own_rows on %I for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid())', t);
+  end loop;
+end $$;`;
+// [key, label, valence]: valence feeds the insights (negative vs positive emotions)
+const AL_EMOS=[['ansiedad','😰 Ansiedad',-1],['tristeza','😢 Tristeza',-1],['soledad','🫥 Soledad',-1],['enojo','😠 Enojo',-1],['culpa','😔 Culpa',-1],['estres','😵 Estrés',-1],['vacio','🕳 Vacío',-1],['nostalgia','💭 Nostalgia',-1],
+  ['paz','🕊 Paz',1],['alegria','😊 Alegría',1],['esperanza','🌱 Esperanza',1],['gratitud','🙏 Gratitud',1],['motivacion','🔥 Motivación',1],['amor','❤️ Amor',1]];
+const AL_ENERGY=['🪫','😮‍💨','😐','🙂','⚡'];
+const AL_TRIG=[['soledad','🫥 Soledad'],['ansiedad','😰 Ansiedad / estrés'],['impresionar','✨ Impresionar a alguien'],['relacion','💔 Una relación'],['tristeza','😢 Tristeza'],['aburrimiento','🥱 Aburrimiento'],['celebracion','🎉 Premiarme'],['otro','… Otro']];
+// Phrases that suggest the person may be at risk. Matched on accent-free, lower-case text.
+const AL_RISK=['suicid','matarme','quitarme la vida','no quiero vivir','no quiero seguir viviendo','ganas de morir','quiero morir','hacerme dano','lastimarme','cortarme','mejor muerto','acabar con todo','no vale la pena vivir','desaparecer para siempre'];
+const ALF={day:null,mood:0,energy:0,emo:new Set(),aiTxt:'',aiBusy:false,qOff:0,prTab:'open',prAns:null,careForce:false};
+const alToday=()=>localISO();
+const alRow=day=>AL.log.find(r=>r.day===day);
+const alHasEntry=r=>!!(r&&(r.mood||(r.journal||'').trim()||(Array.isArray(r.gratitude)&&r.gratitude.some(Boolean))));
+const alFmtDay=d=>new Date(d+'T12:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
+const alMoodTxt=m=>m<=2?'Muy mal':m<=4?'Mal':m<=6?'Regular':m<=8?'Bien':'Muy bien';
+const alMoodCol=m=>m<=3?'var(--rd)':m<=6?'var(--am)':'var(--gr)';
+const alDec=(v,d=1)=>hlR(v,d).toLocaleString('es-CO');
+const alLs=(k,v)=>{ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)||'null'); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,JSON.stringify(v)); }catch{ return null; } };
+
+async function loadAlma(){
+  if(AL.st==='loading') return;
+  AL.st='loading'; renderAlma();
+  try{
+    const since=hlAddDays(localISO(),-400);
+    const [log,pr,emo]=await Promise.all([
+      sbGet('soul_log',`select=*&day=gte.${since}&order=day.asc`),
+      sbGet('prayer_requests','select=*&order=created_at.desc'),
+      sbGet('emo_spend','select=*&order=created_at.desc'),
+    ]);
+    Object.assign(AL,{log:log.sort((a,b)=>a.day.localeCompare(b.day)),prayers:pr,emo,st:'ok',err:''});
+  }catch(e){
+    AL.st=/^40[04]/.test(e.message)?'missing':'error'; AL.err=e.message;
+  }
+  renderAlma();
+}
+function alSetupHtml(){
+  if(AL.st==='loading'||AL.st==='idle') return '<div class="card" style="text-align:center;color:var(--m);font-size:12px;padding:28px">Cargando tu diario…</div>';
+  const miss=AL.st==='missing';
+  return `<div class="card" style="border-color:var(--ac-bd)">
+    <div class="ct">${miss?'Falta un paso: crear las tablas de Alma':'No se pudo cargar tu diario'}</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.75;margin-bottom:14px">${miss
+      ?'Tu diario, tus oraciones y tus gastos emocionales se guardan en tu Supabase, y solo tu usuario puede leerlos. Copia el SQL, ábrelo en <b style="color:var(--t)">Supabase → SQL Editor</b>, pégalo y dale <b style="color:var(--t)">Run</b>. Solo se hace una vez. La reflexión del día funciona desde ya.'
+      :`Error: ${esc(AL.err)}. Revisa tu conexión e inténtalo de nuevo.`}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${miss?'<button class="btn-sm" onclick="alCopySql()" style="padding:9px 14px;color:var(--t)">📋 Copiar SQL</button>':''}<button class="btn-sm" onclick="loadAlma()" style="padding:9px 14px">↻ Reintentar</button></div>
+    ${miss?`<textarea class="al-sqlbox" readonly style="display:none;width:100%;height:180px;margin-top:12px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:10px;color:var(--t);font-family:monospace;font-size:10px;padding:10px">${esc(ALMA_SQL)}</textarea>`:''}
+  </div>`;
+}
+async function alCopySql(){
+  try{ await navigator.clipboard.writeText(ALMA_SQL); phiToast('SQL copiado. Pégalo en Supabase → SQL Editor',{icon:'📋'}); }
+  catch{ document.querySelectorAll('.al-sqlbox').forEach(t=>{ t.style.display='block'; t.select(); }); phiToast('Copia el SQL del cuadro',{icon:'📋'}); }
+}
+// One row per day. Writes go through a queue so quick taps (oré + leí) never race into two inserts.
+// patch may be a function of the current row, evaluated when its turn comes (toggles, +minutes).
+let _alQ=Promise.resolve();
+function alSaveDay(day,patch){
+  const run=async()=>{
+    const ex=alRow(day), p=typeof patch==='function'?patch(ex||{}):patch;
+    if(ex){ const r=await sbPatch('soul_log',ex.id,p); if(!r[0]) throw new Error('el día ya no existe, recarga'); Object.assign(ex,r[0]); return ex; }
+    const r=await sbPost('soul_log',{day,...p}); if(!r[0]) throw new Error('Supabase no devolvió la fila');
+    AL.log.push(r[0]); AL.log.sort((a,b)=>a.day.localeCompare(b.day)); return r[0];
+  };
+  const p=_alQ.then(run); _alQ=p.catch(()=>{}); return p;
+}
+// Consecutive days (ending today, or yesterday if today isn't logged yet) that satisfy pred
+function alStreak(pred){
+  const s=new Set(AL.log.filter(pred).map(r=>r.day));
+  let d=alToday(); if(!s.has(d)) d=hlAddDays(d,-1);
+  let n=0; while(s.has(d)){ n++; d=hlAddDays(d,-1); }
+  return n;
+}
+function alEmoRows(){
+  const byId=new Map((DB.all||[]).map(t=>[+t.id,t]));
+  return AL.emo.map(e=>({...e,tx:byId.get(+e.tx_id)}));
+}
+
+// ── Reflexión del día ──
+function alHash(s){ let h=2166136261; for(const c of s){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+// Themes that fit how the last entry went: low mood → comfort, anxiety → peace, emotional spending → money…
+function alWantedThemes(){
+  const y=AL.log.filter(r=>alHasEntry(r)&&r.day<alToday()).slice(-1)[0], want=new Set();
+  if(y&&y.day>=hlAddDays(alToday(),-3)){
+    if(y.mood&&y.mood<=4) ['consuelo','esperanza'].forEach(t=>want.add(t));
+    const em=Array.isArray(y.emotions)?y.emotions:[];
+    if(em.includes('ansiedad')||em.includes('estres')) want.add('ansiedad');
+    if(em.includes('soledad')) want.add('soledad');
+    if(em.includes('tristeza')||em.includes('vacio')) want.add('tristeza');
+    if(em.includes('enojo')) want.add('ira');
+    if(em.includes('culpa')) want.add('perdon');
+  }
+  const wk=hlAddDays(alToday(),-7);
+  if(alEmoRows().some(e=>e.tx&&e.tx.date>=wk)) ['dinero','soltar'].forEach(t=>want.add(t));
+  return want;
+}
+function alQuote(){
+  const day=alToday(), want=alWantedThemes();
+  let pool=ALMA_LIB;
+  if(want.size){ const p=ALMA_LIB.filter(e=>e.t.some(t=>want.has(t))); if(p.length>=5) pool=p; }
+  const saved=alLs('dfg_alma_q'), off=saved?.day===day?+saved.off||0:0;
+  return pool[(alHash(day)+off)%pool.length];
+}
+function alNextQuote(){
+  const day=alToday(), s=alLs('dfg_alma_q'), off=(s?.day===day?+s.off||0:0)+1;
+  alLs('dfg_alma_q',{day,off}); ALF.aiTxt=''; renderReflexion(); alPaintForm();
+}
+async function alSaveQuote(){
+  const q=alQuote();
+  try{ await alSaveDay(alToday(),{quote_ref:q.s}); phiToast('Guardada en tu diario de hoy',{icon:'🔖'}); renderAlma(); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+function alWriteNow(){
+  goTo('diario_alma');
+  if(AL.st!=='ok') return;
+  if(ALF.day!==alToday()) alFormLoad(alToday());
+  setTimeout(()=>hlEl('alJournal')?.focus({preventScroll:true}),350);
+}
+function renderReflexion(){
+  const box=hlEl('alQuote'); if(!box) return;
+  if(AL.st==='idle'||AL.st==='loading'){ box.innerHTML='<div style="text-align:center;color:var(--m);font-size:12px;padding:20px">Preparando tu reflexión…</div>'; return; }
+  const q=alQuote(), tr=alRow(alToday()), saved=tr?.quote_ref===q.s;
+  const dl=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+  box.innerHTML=`<div class="al-q-src">${esc(dl)} · ${esc(q.s)}</div>
+    <blockquote class="al-q-txt">${esc(q.x)}</blockquote>
+    <div class="al-q-ask">✍️ ${esc(q.q)}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center">
+      <button class="btn-p" onclick="alWriteNow()" style="flex:1;min-width:160px">Escribir en mi diario</button>
+      <button class="btn-sm" onclick="alNextQuote()" style="padding:10px 14px">↻ Otra</button>
+      ${AL.st==='ok'?`<button class="btn-sm" onclick="alSaveQuote()" style="padding:10px 14px" ${saved?'disabled':''}>${saved?'✓ Guardada hoy':'🔖 Guardar'}</button>`:''}
+    </div>
+    <div style="font-size:10px;color:var(--m);margin-top:12px;line-height:1.6">Biblia: Reina-Valera 1909. Marco Aurelio, Séneca y Epicteto: traducciones libres al español. <button class="btn-sm" onclick="ALF.careForce=true;alRenderCare();hlEl('alCare')?.scrollIntoView({behavior:'smooth',block:'center'})" style="margin-left:4px;padding:3px 8px">💛 Líneas de apoyo</button></div>`;
+  const ai=hlEl('alAi'); if(!ai) return;
+  if(!aiEnabled()){
+    ai.innerHTML=`<div style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:10px">Activa la IA (🧠 → Claude) y recibe una reflexión sobre la cita de hoy y lo que escribiste. Funciona en el celular.</div><button class="btn-sm" onclick="openAiPanel()" style="padding:9px 14px">🧠 Activar IA</button>`;
+    return;
+  }
+  const txt=ALF.aiTxt||tr?.ai_reflection||'';
+  ai.innerHTML=`${txt?`<div class="al-ai-out">${esc(txt).replace(/\n/g,'<br>')}</div>`:''}
+    <button class="btn-sm" onclick="alAiReflect()" ${ALF.aiBusy?'disabled':''} style="margin-top:${txt?12:0}px;padding:9px 14px">${ALF.aiBusy?'Pensando…':txt?'✨ Otra reflexión':'✨ Reflexionar con IA'}</button>
+    <div style="font-size:10px;color:var(--m);margin-top:8px;line-height:1.6">${aiLocal()?'Corre en tu dispositivo.':'Se envía a Claude (Anthropic) a través de tu Supabase; no se usa para entrenar.'} Puede equivocarse y no reemplaza a un pastor, consejero o psicólogo.</div>`;
+}
+// The small local models often wrap or truncate the JSON: take what's usable
+function alParseAi(raw){
+  const s=String(raw||'').trim(); if(!s) return '';
+  const m=s.match(/\{[\s\S]*\}/);
+  if(m){ try{ const j=JSON.parse(m[0]), r=String(j.reflexion||'').trim(), p=String(j.pregunta||'').trim(); if(r||p) return r+(p?`\n\n✍️ ${p}`:''); }catch{} }
+  return s.replace(/^\s*\{?\s*"?reflexi[oó]n"?\s*:\s*"?/i,'').replace(/["}\s]+$/,'').slice(0,800);
+}
+async function alAiReflect(){
+  if(ALF.aiBusy||!aiEnabled()) return;
+  const q=alQuote(), tr=alRow(alToday());
+  const draft=ALF.day===alToday()?(hlEl('alJournal')?.value||'').trim():'';
+  const journal=(draft||tr?.journal||'').slice(0,500);
+  const emos=(Array.isArray(tr?.emotions)?tr.emotions:[]).map(k=>(AL_EMOS.find(e=>e[0]===k)||['',k])[1].replace(/^\S+\s/,'')).join(', ');
+  ALF.aiBusy=true; renderReflexion();
+  const sys='Eres un acompañante cristiano, cálido y sereno, que ayuda a Daniel a reflexionar. Comentas SOLO la cita que recibes: no cites otros versículos ni frases y no inventes referencias. No das diagnósticos ni consejos médicos. Si notas angustia fuerte o ideas de hacerse daño, le pides con cariño que hable hoy con alguien de confianza o llame a la Línea 192 opción 4. Responde SOLO con JSON: {"reflexion":"máximo 80 palabras, en español, en segunda persona","pregunta":"una pregunta corta para escribir"}';
+  const user=`Cita (${q.s}): "${q.x}"\nÁnimo hoy: ${tr?.mood?tr.mood+'/10':'sin registrar'}. Emociones: ${emos||'—'}.\nLo que escribió hoy: ${journal||'(nada aún)'}`;
+  try{
+    const txt=alParseAi(await aiChat(sys,user));
+    if(!txt) throw new Error('respuesta vacía');
+    ALF.aiTxt=txt;
+    if(AL.st==='ok') alSaveDay(alToday(),{ai_reflection:txt.slice(0,2000)}).catch(()=>{});
+  }catch(e){ phiToast('La IA no respondió: '+e.message,{icon:'⚠️'}); }
+  ALF.aiBusy=false; renderReflexion();
+}
+
+// ── Mi diario ──
+const alDraft=()=>{ const d=alLs('dfg_alma_draft'); return d?.day===alToday()?String(d.txt||''):''; };
+function alDraftSave(){ if(ALF.day===alToday()) alLs('dfg_alma_draft',{day:ALF.day,txt:hlEl('alJournal')?.value||''}); }
+function alFormLoad(day){
+  day=day||alToday(); ALF.day=day;
+  const r=alRow(day), g=Array.isArray(r?.gratitude)?r.gratitude:[];
+  ALF.mood=+r?.mood||0; ALF.energy=+r?.energy||0; ALF.emo=new Set(Array.isArray(r?.emotions)?r.emotions:[]);
+  const set=(id,v)=>{ const e=hlEl(id); if(e) e.value=v??''; };
+  set('alDay',day); set('alG1',g[0]); set('alG2',g[1]); set('alG3',g[2]);
+  set('alJournal',r?.journal||(day===alToday()?alDraft():''));
+  alPaintForm();
+}
+function alPaintForm(){
+  if(!hlEl('alForm')) return;
+  hlSet('alMoodBtns',Array.from({length:10},(_,i)=>i+1).map(m=>`<button type="button" class="${ALF.mood===m?'active':''}" style="--mc:${alMoodCol(m)}" onclick="ALF.mood=${m};alPaintForm()">${m}</button>`).join(''));
+  hlSet('alMoodLbl',ALF.mood?`· ${alMoodTxt(ALF.mood)}`:'');
+  hlSet('alEnergyBtns',AL_ENERGY.map((f,i)=>`<button type="button" class="${ALF.energy===i+1?'active':''}" onclick="ALF.energy=${i+1};alPaintForm()" title="Energía ${i+1} de 5">${f}</button>`).join(''));
+  hlSet('alEmos',AL_EMOS.map(([k,l])=>`<button type="button" class="chip${ALF.emo.has(k)?' hl-on':''}" onclick="alToggleEmo('${k}')">${l}</button>`).join(''));
+  const j=hlEl('alJournal'); if(j) j.placeholder=(ALF.day===alToday()?alQuote().q+' ':'')+'O escribe lo que sientes, sin filtro.';
+  const b=hlEl('alSaveBtn'); if(b) b.textContent=alHasEntry(alRow(ALF.day))?'Guardar cambios':'Guardar día';
+  const t=hlEl('alFormTitle'); if(t) t.textContent=ALF.day===alToday()?'¿Cómo estás hoy?':'¿Cómo estuviste el '+alFmtDay(ALF.day)+'?';
+}
+function alToggleEmo(k){ ALF.emo.has(k)?ALF.emo.delete(k):ALF.emo.add(k); alPaintForm(); }
+async function alSaveEntry(){
+  const v=id=>(hlEl(id)?.value||'').trim();
+  const day=v('alDay')||alToday();
+  if(day>alToday()){ phiToast('No puedes escribir en un día futuro',{icon:'⚠️'}); return; }
+  const row={mood:ALF.mood||null,energy:ALF.energy||null,emotions:[...ALF.emo],gratitude:[v('alG1'),v('alG2'),v('alG3')].filter(Boolean).map(s=>s.slice(0,200)),journal:v('alJournal').slice(0,8000)||null};
+  if(!row.mood&&!row.journal&&!row.gratitude.length&&!row.emotions.length){ phiToast('Marca tu ánimo o escribe algo',{icon:'✍️'}); return; }
+  try{
+    await alSaveDay(day,row); ALF.day=day;
+    if(day===alToday()) alLs('dfg_alma_draft',null);
+    phiToast(day===alToday()?'Día guardado. Gracias por darte este momento':'Día guardado',{icon:'📖'});
+    document.activeElement?.blur?.(); renderAlma();
+  }catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+function alEdit(day){ alFormLoad(day); hlEl('alForm')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+async function alDelDay(id){
+  const r=AL.log.find(x=>+x.id===+id); if(!r) return;
+  if(!await sbDelete('soul_log',id)){ phiToast('No se pudo borrar',{icon:'⚠️'}); return; }
+  AL.log=AL.log.filter(x=>+x.id!==+id); if(ALF.day===r.day) alFormLoad(r.day); renderAlma();
+  const {id:_,created_at,user_id,...copy}=r;
+  phiToast('Día borrado',{icon:'🗑',actionText:'Deshacer',onAction:async()=>{ try{ const x=await sbPost('soul_log',copy); AL.log.push(x[0]); AL.log.sort((a,b)=>a.day.localeCompare(b.day)); if(ALF.day===r.day) alFormLoad(r.day); renderAlma(); }catch(e){ phiToast(e.message,{icon:'⚠️'}); } }});
+}
+// Daily spending (real expenses) and the emotionally-tagged part of it, by date
+function alSpendByDay(){
+  const emoIds=new Set(AL.emo.map(e=>+e.tx_id)), all={}, emo={};
+  (DB.real_exp||[]).forEach(t=>{ const d=String(t.date||'').slice(0,10), a=+t.amount||0; all[d]=(all[d]||0)+a; if(emoIds.has(+t.id)) emo[d]=(emo[d]||0)+a; });
+  return {all,emo};
+}
+function renderDiarioAlma(){
+  const main=hlEl('alMain'); if(!main) return;
+  if(AL.st!=='ok'){ hlSet('alSetup',alSetupHtml()); main.style.display='none'; return; }
+  hlSet('alSetup',''); main.style.display='';
+  const form=hlEl('alForm');
+  if(form&&!form.dataset.init){ form.dataset.init='1'; alFormLoad(alToday()); }
+  else if(form&&!form.contains(document.activeElement)) alPaintForm();
+  const today=alToday(), ent=AL.log.filter(alHasEntry), moods=d0=>AL.log.filter(r=>r.mood&&r.day>=d0);
+  const kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
+  if(!ent.length){
+    hlSet('alKpis','<div style="color:var(--m);font-size:12px;padding:20px;grid-column:1/-1;text-align:center;line-height:1.7">Tu primera entrada no tiene que ser perfecta. Marca cómo te sientes y escribe una línea.</div>');
+    ['alInsights','alHist'].forEach(id=>hlSet(id,''));
+  }else{
+    const m7=moods(hlAddDays(today,-6)).map(r=>+r.mood), p7=AL.log.filter(r=>r.mood&&r.day>=hlAddDays(today,-13)&&r.day<hlAddDays(today,-6)).map(r=>+r.mood), m30=moods(hlAddDays(today,-29)).map(r=>+r.mood);
+    const a7=m7.length?ST.mean(m7):null, ap=p7.length?ST.mean(p7):null, a30=m30.length?ST.mean(m30):null;
+    const cnt={}; AL.log.filter(r=>r.day>=hlAddDays(today,-29)).forEach(r=>(Array.isArray(r.emotions)?r.emotions:[]).forEach(k=>cnt[k]=(cnt[k]||0)+1));
+    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0], topE=top&&AL_EMOS.find(e=>e[0]===top[0]);
+    const st=alStreak(alHasEntry);
+    hlSet('alKpis',
+      kp('Racha',st+(st===1?' día':' días'),`${ent.length} días escritos en total`,st>=7?'var(--gr)':st>=1?'var(--ac2)':'var(--m)')+
+      kp('Ánimo · 7 días',a7!=null?alDec(a7):'—',a7!=null&&ap!=null?`${a7>=ap?'▲':'▼'} ${alDec(Math.abs(a7-ap))} vs semana anterior`:a7!=null?alMoodTxt(Math.round(a7)):'sin registros esta semana',a7!=null?alMoodCol(a7):'var(--m)')+
+      kp('Ánimo · 30 días',a30!=null?alDec(a30):'—',`${m30.length} días con ánimo`,a30!=null?alMoodCol(a30):'var(--m)')+
+      kp('Emoción frecuente',topE?topE[1].split(' ')[0]:'—',topE?`${topE[1].replace(/^\S+\s/,'')} · ${top[1]} veces en 30 días`:'marca emociones al escribir',topE?(topE[2]<0?'var(--am)':'var(--gr)'):'var(--m)'));
+    alRenderInsights();
+    hlSet('alHist',[...ent].reverse().slice(0,30).map(r=>{
+      const em=(Array.isArray(r.emotions)?r.emotions:[]).map(k=>(AL_EMOS.find(e=>e[0]===k)||['',''])[1].split(' ')[0]).join('');
+      const sn=(r.journal||'').replace(/\s+/g,' ').trim(), g=Array.isArray(r.gratitude)?r.gratitude:[];
+      const sub=sn?sn.slice(0,140):g.length?'Gracias por: '+g.join(', '):'';
+      return `<div class="hl-item">
+        <div style="width:28px;height:28px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:${r.mood?alMoodCol(r.mood):'var(--bg3)'}">${r.mood||'·'}</div>
+        <div style="flex:1;min-width:0;cursor:pointer" data-day="${esc(r.day)}" onclick="alEdit(this.dataset.day)"><div style="font-size:12px;color:var(--t)">${alFmtDay(r.day)}${em?' · '+em:''}${r.prayed?' · 🙏':''}</div>
+          <div style="font-size:10px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sub)}${r.quote_ref?' · 🔖 '+esc(r.quote_ref):''}</div></div>
+        <button class="btn-sm" onclick="alDelDay(${+r.id})" style="padding:4px 8px">✕</button></div>`; }).join(''));
+  }
+  // Mood vs spending, last 30 calendar days
+  const days=Array.from({length:30},(_,i)=>hlAddDays(today,i-29)), sp=alSpendByDay();
+  const lbl=days.map(d=>new Date(d+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'}).replace('.',''));
+  mkCh('cAlMood',{type:'bar',data:{labels:lbl,datasets:[
+    {type:'line',label:'Ánimo (1–10)',data:days.map(d=>alRow(d)?.mood||null),borderColor:cssVar('--ac2'),backgroundColor:cssVar('--ac2'),borderWidth:2,pointRadius:3,spanGaps:true,tension:.3,yAxisID:'y',order:0},
+    {type:'bar',label:'Gasto del día',data:days.map(d=>(sp.all[d]||0)-(sp.emo[d]||0)),backgroundColor:cssVar('--ac-fill'),stack:'g',yAxisID:'y1',order:2,borderRadius:3,maxBarThickness:18},
+    {type:'bar',label:'Gasto emocional',data:days.map(d=>sp.emo[d]||0),backgroundColor:cssVar('--rd'),stack:'g',yAxisID:'y1',order:1,borderRadius:3,maxBarThickness:18},
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{labels:{boxWidth:12,font:{size:10}}},tooltip:{callbacks:{label:c=>c.dataset.yAxisID==='y'?`Ánimo: ${c.parsed.y}/10`:`${c.dataset.label}: ${fmtF(c.parsed.y)}`}}},
+    scales:{x:{...xO,stacked:true,ticks:{...xO.ticks,maxRotation:0,autoSkip:true,maxTicksLimit:8}},y:{...yO,min:0,max:10,ticks:{...yO.ticks,stepSize:2,callback:v=>v}},y1:{position:'right',stacked:true,min:0,grid:{display:false},ticks:{...yO.ticks,callback:v=>fmt(v)}}}}});
+  alRenderEmo();
+}
+function alRenderInsights(){
+  const today=alToday(), rec=AL.log.filter(r=>r.day>=hlAddDays(today,-90)), mo=rec.filter(r=>r.mood), out=[];
+  const avg=a=>ST.mean(a.map(r=>+r.mood));
+  if(mo.length>=10){
+    const wd=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], by={};
+    mo.forEach(r=>{ const k=new Date(r.day+'T12:00:00').getDay(); (by[k]=by[k]||[]).push(r); });
+    const ok=Object.entries(by).filter(([,a])=>a.length>=2).map(([k,a])=>[+k,avg(a)]).sort((a,b)=>b[1]-a[1]);
+    if(ok.length>=3&&ok[0][1]-ok[ok.length-1][1]>=1) out.push(`Tus mejores días suelen ser los <b style="color:var(--t)">${wd[ok[0][0]]}</b> (${alDec(ok[0][1])}) y los más pesados los <b style="color:var(--t)">${wd[ok[ok.length-1][0]]}</b> (${alDec(ok[ok.length-1][1])}). Planea algo que te cuide ese día.`);
+  }
+  AL_EMOS.forEach(([k,l])=>{
+    const y=mo.filter(r=>(r.emotions||[]).includes(k)), n=mo.filter(r=>!(r.emotions||[]).includes(k));
+    if(y.length<3||n.length<3) return;
+    const d=avg(y)-avg(n);
+    if(Math.abs(d)>=1) out.push(`Los días con ${l} tu ánimo es <b style="color:${d<0?'var(--rd)':'var(--gr)'}">${d>0?'+':''}${alDec(d)}</b> puntos ${d<0?'más bajo':'más alto'} (${y.length} días).`);
+  });
+  // Sleep from the night before (Salud → Sueño) vs today's mood
+  if(HL.st==='ok'&&HL.sleep.length){
+    const pairs=mo.map(r=>{ const n=HL.sleep.find(s=>s.night===hlAddDays(r.day,-1)), c=n&&slCalc(n); return c?[c.asleep/60,+r.mood]:null; }).filter(Boolean);
+    const g=pairs.filter(p=>p[0]>=7), b=pairs.filter(p=>p[0]<7);
+    if(g.length>=2&&b.length>=2){ const d=ST.mean(g.map(p=>p[1]))-ST.mean(b.map(p=>p[1])); if(Math.abs(d)>=0.7) out.push(`Cuando duermes 7 h o más, tu ánimo al día siguiente es <b style="color:var(--t)">${alDec(ST.mean(g.map(p=>p[1])))}</b> frente a ${alDec(ST.mean(b.map(p=>p[1])))} cuando duermes menos. Dormir también es cuidar tu mente.`); }
+  }
+  const pr=mo.filter(r=>r.prayed), np=mo.filter(r=>!r.prayed);
+  if(pr.length>=3&&np.length>=3){ const d=avg(pr)-avg(np); if(Math.abs(d)>=0.5) out.push(`Los días en que oras tu ánimo promedio es <b style="color:var(--t)">${alDec(avg(pr))}</b>; los que no, ${alDec(avg(np))}.`); }
+  const gr=mo.filter(r=>(r.gratitude||[]).length), ng=mo.filter(r=>!(r.gratitude||[]).length);
+  if(gr.length>=3&&ng.length>=3){ const d=avg(gr)-avg(ng); if(d>=0.5) out.push(`Los días que escribes gratitud tu ánimo es ${alDec(d)} puntos más alto. Vale la pena el minuto.`); }
+  if(!out.length) out.push(mo.length<7?`Llevas ${mo.length} ${mo.length===1?'día':'días'} con ánimo registrado. Con una o dos semanas empezarás a ver qué te sube y qué te baja.`:'Aún no aparecen patrones claros. Sigue escribiendo: a veces tardan unas semanas en verse.');
+  hlSet('alInsights','<ul style="list-style:none;display:flex;flex-direction:column;gap:8px">'+out.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd);font-size:12px;color:var(--m);line-height:1.6">${t}</li>`).join('')+'</ul><div style="font-size:10px;color:var(--m);margin-top:10px;line-height:1.6">Orientativo, no es un diagnóstico. Si llevas semanas sintiéndote mal, busca a un psicólogo: tu EPS puede darte la cita.</div>');
+}
+
+// ── Gasto emocional ──
+function alRenderEmo(){
+  const box=hlEl('alEmo'); if(!box) return;
+  const today=alToday(), rows=alEmoRows(), tagged=new Set(AL.emo.map(e=>+e.tx_id)), since=hlAddDays(today,-14);
+  const cand=(DB.real_exp||[]).filter(t=>t.date>=since&&!tagged.has(+t.id)).sort((a,b)=>b.date.localeCompare(a.date)||(+b.amount-+a.amount)).slice(0,40);
+  const known=rows.filter(r=>r.tx), mKey=today.slice(0,7), m3=hlAddDays(today,-90);
+  const sum=a=>ST.sum(a.map(r=>+r.tx.amount||0)), month=sum(known.filter(r=>r.tx.date.slice(0,7)===mKey)), q3=sum(known.filter(r=>r.tx.date>=m3));
+  const byT={}; known.filter(r=>r.tx.date>=m3).forEach(r=>byT[r.trigger]=(byT[r.trigger]||0)+(+r.tx.amount||0));
+  const topT=Object.entries(byT).sort((a,b)=>b[1]-a[1])[0], tl=k=>(AL_TRIG.find(t=>t[0]===k)||['',k])[1];
+  // Average total spending on low-mood vs good-mood days (last 90 days)
+  const sp=alSpendByDay(), mo=AL.log.filter(r=>r.mood&&r.day>=m3&&r.day<=today);
+  const lo=mo.filter(r=>r.mood<=4).map(r=>sp.all[r.day]||0), hi=mo.filter(r=>r.mood>=7).map(r=>sp.all[r.day]||0);
+  const ins=[];
+  if(q3) ins.push(`En los últimos 3 meses marcaste <b style="color:var(--t)">${fmtF(q3)}</b> como gasto emocional${topT?`; el detonante principal es <b style="color:var(--t)">${esc(tl(topT[0]))}</b> (${fmt(topT[1])})`:''}.`);
+  if(q3) ins.push(`Ahorrado a una tasa del 10% EA, en 5 años serían unos <b style="color:var(--gr)">${fmt(q3*Math.pow(1.1,5))}</b>.`);
+  if(lo.length>=3&&hi.length>=3) ins.push(`En días de ánimo bajo (≤4) gastas en promedio <b style="color:var(--t)">${fmtF(ST.mean(lo))}</b>; en días buenos (≥7), ${fmtF(ST.mean(hi))}.`);
+  if(!ins.length) ins.push('Cuando un gasto venga de la soledad, la ansiedad o de querer impresionar a alguien, márcalo aquí. Con el tiempo vas a ver el patrón y podrás anticiparlo.');
+  box.innerHTML=`<div style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:12px">No es para juzgarte. Es para ver qué emociones te llevan a gastar y frenar a tiempo.</div>
+    <div class="kpi-grid" style="margin-bottom:12px">
+      <div class="kpi"><div class="kpi-l">Este mes</div><div class="kpi-v" style="color:${month?'var(--rd)':'var(--gr)'}">${fmt(month)}</div><div class="kpi-s">${BUDGET_LIMIT?Math.round(month/BUDGET_LIMIT*100)+'% de tu límite mensual':''}</div></div>
+      <div class="kpi"><div class="kpi-l">3 meses</div><div class="kpi-v">${fmt(q3)}</div><div class="kpi-s">${known.filter(r=>r.tx.date>=m3).length} gastos marcados</div></div>
+    </div>
+    ${cand.length?`<div class="fi"><label>Gasto (últimos 14 días)</label><select id="alEmoTx">${cand.map(t=>`<option value="${+t.id}">${esc(fmtCardDate(t.date))} · ${esc(String(t.description||t.category||'Gasto').slice(0,40))} · ${esc(fmtF(+t.amount||0))}</option>`).join('')}</select></div>
+    <div class="hl-row2"><div class="fi"><label>¿Qué lo provocó?</label><select id="alEmoTrig">${AL_TRIG.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
+      <div class="fi"><label>Nota</label><input id="alEmoNote" type="text" maxlength="140" placeholder="Opcional"></div></div>
+    <button class="btn-p" onclick="alEmoAdd()" style="margin-bottom:12px">Marcar como gasto emocional</button>`:'<div style="font-size:11px;color:var(--m);margin-bottom:12px">No hay gastos sin marcar en los últimos 14 días.</div>'}
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:6px">${ins.map(t=>`<li style="padding-left:12px;border-left:2px solid var(--ac-bd);font-size:12px;color:var(--m);line-height:1.6">${t}</li>`).join('')}</ul>
+    ${rows.slice(0,12).map(r=>`<div class="hl-item"><div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--t)">${r.tx?esc(String(r.tx.description||r.tx.category||'Gasto').slice(0,50)):'Transacción no disponible'}</div>
+      <div style="font-size:10px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(tl(r.trigger))}${r.tx?' · '+esc(fmtCardDate(r.tx.date)):''}${r.note?' · '+esc(r.note):''}</div></div>
+      <b style="font-size:12px;color:var(--rd)">${r.tx?fmt(+r.tx.amount||0):''}</b><button class="btn-sm" onclick="alEmoDel(${+r.id})" style="padding:4px 8px">✕</button></div>`).join('')}`;
+}
+async function alEmoAdd(){
+  const tx=+hlEl('alEmoTx')?.value, trigger=hlEl('alEmoTrig')?.value||'otro', note=(hlEl('alEmoNote')?.value||'').trim().slice(0,140)||null;
+  if(!tx) return;
+  try{ const r=await sbPost('emo_spend',{tx_id:tx,trigger,note}); AL.emo.unshift(r[0]); phiToast('Marcado. Verlo ya es un paso',{icon:'🫶'}); renderAlma(); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function alEmoDel(id){
+  const r=AL.emo.find(x=>+x.id===+id); if(!r) return;
+  if(!await sbDelete('emo_spend',id)){ phiToast('No se pudo borrar',{icon:'⚠️'}); return; }
+  AL.emo=AL.emo.filter(x=>+x.id!==+id); renderAlma();
+  const {id:_,created_at,user_id,...copy}=r;
+  phiToast('Quitado',{icon:'🗑',actionText:'Deshacer',onAction:async()=>{ try{ const x=await sbPost('emo_spend',copy); AL.emo.unshift(x[0]); renderAlma(); }catch(e){ phiToast(e.message,{icon:'⚠️'}); } }});
+}
+
+// ── Mi camino con Dios ──
+// Classic monthly plan: Proverbs chapter = day of month; five psalms spaced 30 apart (day 31 → Psalm 119)
+function feReading(d=new Date()){
+  const n=d.getDate();
+  return n===31?{ps:'Salmo 119',pr:'Proverbios 31'}:{ps:'Salmos '+[0,30,60,90,120].map(k=>n+k).join(', '),pr:'Proverbios '+n};
+}
+async function alFaithToggle(k){
+  try{ await alSaveDay(alToday(),r=>({[k]:!r[k]})); renderAlma(); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+// add=true → v is a delta on top of the saved minutes (the +5/+15/+30 buttons)
+async function alFaithMin(v,add){
+  const clamp=n=>Math.max(0,Math.min(600,Math.round(n)));
+  try{ await alSaveDay(alToday(),r=>({faith_min:clamp((add?(+r.faith_min||0):0)+hlNum(v))})); renderAlma(); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function alPrayerAdd(){
+  const el=hlEl('fePrText'), text=(el?.value||'').trim().slice(0,300);
+  if(!text){ el?.focus(); return; }
+  try{ const r=await sbPost('prayer_requests',{text,created:alToday()}); AL.prayers.unshift(r[0]); el.value=''; ALF.prTab='open'; renderFe(); phiToast('Petición guardada',{icon:'🙏'}); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function alPrayerAnswer(id){
+  const note=(hlEl('fePrNote')?.value||'').trim().slice(0,300)||null;
+  try{ const r=await sbPatch('prayer_requests',id,{answered:alToday(),answer_note:note}); const i=AL.prayers.findIndex(p=>+p.id===+id); if(i>=0) AL.prayers[i]=r[0]||{...AL.prayers[i],answered:alToday(),answer_note:note};
+    ALF.prAns=null; renderFe(); phiToast('Oración respondida. Que no se te olvide',{icon:'✨'}); }
+  catch(e){ phiToast('No se pudo guardar: '+e.message,{icon:'⚠️'}); }
+}
+async function alPrayerDel(id){
+  const p=AL.prayers.find(x=>+x.id===+id); if(!p) return;
+  if(!await phiConfirm({icon:'🙏',title:'¿Borrar esta petición?',msg:esc(p.text.slice(0,120)),confirmText:'Borrar',danger:true})) return;
+  if(!await sbDelete('prayer_requests',id)){ phiToast('No se pudo borrar',{icon:'⚠️'}); return; }
+  AL.prayers=AL.prayers.filter(x=>+x.id!==+id); renderFe();
+}
+function renderFe(){
+  const main=hlEl('feMain'); if(!main) return;
+  if(AL.st!=='ok'){ hlSet('feSetup',alSetupHtml()); main.style.display='none'; return; }
+  hlSet('feSetup',''); main.style.display='';
+  const today=alToday(), tr=alRow(today)||{}, d30=hlAddDays(today,-29), d7=hlAddDays(today,-6);
+  const kp=(l,v,sub,col)=>`<div class="kpi fu" style="--kc:${col}"><div class="kpi-l">${l}</div><div class="kpi-v" style="color:${col}">${v}</div><div class="kpi-s">${sub}</div></div>`;
+  const ps=alStreak(r=>r.prayed), bib=AL.log.filter(r=>r.read_bible&&r.day>=d30).length, min7=ST.sum(AL.log.filter(r=>r.day>=d7).map(r=>+r.faith_min||0));
+  const ans=AL.prayers.filter(p=>p.answered).length;
+  hlSet('feKpis',
+    kp('Racha de oración',ps+(ps===1?' día':' días'),ps?'sigue así, un día a la vez':'hoy es buen día para empezar',ps>=7?'var(--gr)':ps?'var(--ac2)':'var(--m)')+
+    kp('Biblia · 30 días',bib+' días',bib>=20?'constancia que se nota':'leer un poco cada día suma','var(--ac2)')+
+    kp('Tiempo con Dios',min7+' min','últimos 7 días','var(--ac2)')+
+    kp('Oraciones respondidas',ans,`de ${AL.prayers.length} peticiones`,ans?'var(--gr)':'var(--m)'));
+  const rd=feReading();
+  hlSet('feToday',`<div class="fe-habs">
+      <button type="button" class="fe-hab${tr.prayed?' on':''}" onclick="alFaithToggle('prayed')">🙏<b>${tr.prayed?'Oré hoy ✓':'Oré hoy'}</b></button>
+      <button type="button" class="fe-hab${tr.read_bible?' on':''}" onclick="alFaithToggle('read_bible')">📖<b>${tr.read_bible?'Leí la Biblia ✓':'Leí la Biblia'}</b></button>
+    </div>
+    <div class="fi"><label>Minutos con Dios hoy</label><div style="display:flex;gap:6px;align-items:center">
+      <input id="feMin" type="number" inputmode="numeric" min="0" max="600" value="${+tr.faith_min||0}" onchange="alFaithMin(this.value)" style="width:90px">
+      ${[5,15,30].map(m=>`<button class="btn-sm" onclick="alFaithMin(${m},true)" style="padding:9px 12px">+${m}</button>`).join('')}
+    </div></div>
+    <div style="font-size:12px;color:var(--m);line-height:1.7;padding:10px 12px;border-radius:10px;background:var(--bg3)">📖 <b style="color:var(--t)">Lectura sugerida de hoy:</b> ${rd.ps} · ${rd.pr}<br><span style="font-size:10px">Plan mensual: un capítulo de Proverbios y cinco salmos al día.</span></div>`);
+  // Heatmap: 12 weeks, Monday-first columns
+  const dow=(new Date(today+'T12:00:00').getDay()+6)%7, start=hlAddDays(today,-(77+dow)), cells=[];
+  for(let d=start;d<=today;d=hlAddDays(d,1)){
+    const r=alRow(d), lv=!r?0:(r.prayed&&r.read_bible)?((+r.faith_min||0)>=15?3:2):(r.prayed||r.read_bible)?1:0;
+    cells.push(`<i class="l${lv}${d===today?' today':''}" title="${esc(alFmtDay(d))}${r?.prayed?' · oró':''}${r?.read_bible?' · leyó':''}${r?.faith_min?' · '+r.faith_min+' min':''}"></i>`);
+  }
+  hlSet('feHeat',`<div class="fe-heat">${cells.join('')}</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px;font-size:10px;color:var(--m);flex-wrap:wrap">
+      <span><i class="fe-key l1"></i> oración o lectura</span><span><i class="fe-key l2"></i> ambas</span><span><i class="fe-key l3"></i> ambas + 15 min</span></div>`);
+  const open=AL.prayers.filter(p=>!p.answered), done=AL.prayers.filter(p=>p.answered).sort((a,b)=>String(b.answered).localeCompare(String(a.answered)));
+  const ago=d=>{ const n=Math.round((new Date(today+'T12:00:00')-new Date(d+'T12:00:00'))/864e5); return n<=0?'hoy':n===1?'ayer':`hace ${n} días`; };
+  const list=ALF.prTab==='open'?open:done;
+  hlSet('fePrayers',`<div style="display:flex;gap:8px;margin-bottom:12px"><div class="fi" style="flex:1;margin:0"><input id="fePrText" type="text" maxlength="300" placeholder="¿Qué quieres pedirle a Dios?" onkeydown="if(event.key==='Enter')alPrayerAdd()"></div><button class="btn-sm" onclick="alPrayerAdd()" style="padding:9px 14px;color:var(--t)">Agregar</button></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button type="button" class="chip${ALF.prTab==='open'?' hl-on':''}" onclick="ALF.prTab='open';renderFe()">Orando (${open.length})</button>
+      <button type="button" class="chip${ALF.prTab==='done'?' hl-on':''}" onclick="ALF.prTab='done';renderFe()">Respondidas (${done.length})</button></div>
+    ${list.length?list.map(p=>`<div class="hl-item" style="flex-wrap:wrap">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--t);line-height:1.5">${esc(p.text)}</div>
+        <div style="font-size:10px;color:var(--m)">${p.answered?`Respondida el ${esc(fmtCardDate(p.answered))}, tras ${Math.max(0,Math.round((new Date(p.answered+'T12:00:00')-new Date(p.created+'T12:00:00'))/864e5))||0} días de oración`:`Orando desde ${esc(fmtCardDate(p.created))} · ${ago(p.created)}`}</div>
+        ${p.answer_note?`<div style="font-size:11px;color:var(--gr);margin-top:4px;font-style:italic">${esc(p.answer_note)}</div>`:''}</div>
+      ${p.answered?'':`<button class="btn-sm" onclick="ALF.prAns=${ALF.prAns===+p.id?'null':+p.id};renderFe()" style="padding:4px 8px" title="Marcar como respondida">✓</button>`}
+      <button class="btn-sm" onclick="alPrayerDel(${+p.id})" style="padding:4px 8px">✕</button>
+      ${ALF.prAns===+p.id?`<div style="flex-basis:100%;display:flex;gap:8px;margin-top:6px"><div class="fi" style="flex:1;margin:0"><input id="fePrNote" type="text" maxlength="300" placeholder="¿Cómo la respondió Dios? (opcional)"></div><button class="btn-sm" onclick="alPrayerAnswer(${+p.id})" style="padding:9px 12px;color:var(--gr)">Guardar</button></div>`:''}
+    </div>`).join(''):`<div style="font-size:12px;color:var(--m);padding:14px 0;line-height:1.7">${ALF.prTab==='open'?'Escribe lo que llevas en el corazón. Cuando Dios responda, márcala con ✓: con el tiempo esta lista te recordará su fidelidad.':'Todavía no hay respuestas marcadas. Llegarán.'}</div>`}`);
+  if(ALF.prAns) setTimeout(()=>hlEl('fePrNote')?.focus(),30);
+}
+
+// ── Cuidado: aparece si los últimos días han sido muy pesados o si lo escrito suena a riesgo ──
+function alCareReason(){
+  if(AL.st!=='ok') return null;
+  const today=alToday(), recent=AL.log.filter(r=>r.day>=hlAddDays(today,-6));
+  const txt=hlNorm(recent.map(r=>r.journal||'').join(' \n '));
+  if(AL_RISK.some(k=>txt.includes(k))) return 'words';
+  const m=AL.log.filter(r=>r.mood&&r.day>=hlAddDays(today,-4)).slice(-3);
+  if(m.length===3&&m.every(r=>+r.mood<=3)) return 'low';
+  return null;
+}
+function alCareHide(){ ALF.careForce=false; alLs('dfg_alma_care',alToday()); alRenderCare(); }
+function alRenderCare(){
+  const reason=alCareReason(), hidden=alLs('dfg_alma_care')===alToday();
+  const show=ALF.careForce||(reason&&!hidden);
+  const msg=ALF.careForce&&!reason?'Hablar con alguien siempre es una buena idea, no solo en crisis.':reason==='words'?'Lo que escribiste suena muy doloroso, y me importa que estés bien.':'Tus últimos días han sido muy pesados.';
+  const html=show?`<div class="card al-care" style="margin-bottom:12px">
+    <div class="ct">💛 No tienes que cargar esto solo</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.75">${msg} Hablar hoy con alguien puede hacer una diferencia real. Estas líneas son gratuitas y confidenciales:</div>
+    <div class="al-lines">
+      <a href="tel:192"><b>192 · opción 4</b><span>Línea nacional de salud mental (MinSalud) · 24 horas</span></a>
+      <a href="tel:106"><b>106</b><span>Bogotá · «El poder de ser escuchado» · 24 horas</span></a>
+      <a href="https://wa.me/573007548933" target="_blank" rel="noopener"><b>WhatsApp 300 754 8933</b><span>Línea 106 por chat, si prefieres escribir</span></a>
+      <a href="tel:6044444448"><b>(604) 444 4448</b><span>Medellín · Línea Amiga Saludable</span></a>
+      <a href="tel:123"><b>123</b><span>Si estás en peligro inmediato</span></a>
+    </div>
+    <div style="font-size:11px;color:var(--m);line-height:1.7;margin-bottom:12px">También ayuda escribirle hoy a alguien de confianza o a tu pastor, y pedir cita de psicología en tu EPS. Pedir ayuda es un acto de valentía.</div>
+    <button class="btn-sm" onclick="alCareHide()" style="padding:8px 12px">${reason?'Estoy bien por ahora':'Cerrar'}</button>
+  </div>`:'';
+  hlSet('alCare',html); hlSet('alCareD',reason&&show?html:'');
+}
+
+function renderAlma(){
+  try{ renderReflexion(); }catch(e){ console.error('renderReflexion',e); }
+  try{ renderDiarioAlma(); }catch(e){ console.error('renderDiarioAlma',e); }
+  try{ renderFe(); }catch(e){ console.error('renderFe',e); }
+  try{ alRenderCare(); }catch(e){ console.error('alRenderCare',e); }
+}
+
 // ── Section groups: only one group of sections is shown at a time ──
 // Splits the long single-page scroll into a few "pages". goTo() switches group
 // automatically, so nav links, the mobile tab bar, ⌘K and the AI panel keep working.
@@ -7566,6 +8341,7 @@ const NAV_GROUPS=[
   {id:'analisis',label:'📊 Análisis', secs:['flujo','gastos','lab','mercado','insights']},
   {id:'futuro',  label:'🚀 Futuro',   secs:['proyeccion','perfecto','montecarlo','calculator','predictor']},
   {id:'salud',   label:'💪 Salud',    secs:['nutricion','sueno']},
+  {id:'alma',    label:'🕊 Alma',     secs:['reflexion','diario_alma','fe']},
 ];
 let _navGroup=null;
 const groupOf=id=>NAV_GROUPS.find(g=>g.secs.includes(id))?.id;
@@ -7621,10 +8397,12 @@ window.addEventListener('scroll',()=>{
     home:'home',diario:'diario',overview:'overview',tarjetas:'tarjetas',deudas:'deudas',flujo:'flujo',
     gastos:'gastos',historial:'historial',proyeccion:'proyeccion',perfecto:'mes_perfecto',
     montecarlo:'montecarlo',calculator:'calculator',
-    predictor:'predictor',lab:'lab',mercado:'mercado',renta:'renta',insights:'insights',nutricion:'nutricion',sueno:'sueno'
+    predictor:'predictor',lab:'lab',mercado:'mercado',renta:'renta',insights:'insights',nutricion:'nutricion',sueno:'sueno',
+    reflexion:'reflexion',diario_alma:'diario_alma',fe:'fe'
   };
   const DOM_ORDER=['home','diario','overview','tarjetas','deudas','renta','flujo','gastos','historial','proyeccion',
-                   'perfecto','montecarlo','calculator','predictor','lab','mercado','insights','nutricion','sueno'];
+                   'perfecto','montecarlo','calculator','predictor','lab','mercado','insights','nutricion','sueno',
+                   'reflexion','diario_alma','fe'];
   let activeId='home';
   DOM_ORDER.forEach(id=>{
     const el=document.getElementById(id);
@@ -7971,11 +8749,12 @@ let AI=Object.assign({provider:'off',ollamaUrl:'http://localhost:11434',ollamaMo
   (()=>{ try{ return JSON.parse(localStorage.getItem(AI_KEY)||'{}'); }catch(e){ return {}; } })());
 let _llm=null, _llmModelId=null, _llmState='idle', _llmLoading=null;   // idle | loading | ready | error
 function aiSave(){ localStorage.setItem(AI_KEY,JSON.stringify(AI)); }
-function aiEnabled(){ return AI.provider==='webllm'||AI.provider==='ollama'; }
-function aiReady(){ return AI.provider==='ollama' || (AI.provider==='webllm'&&_llmState==='ready'); }
+function aiEnabled(){ return AI.provider==='webllm'||AI.provider==='ollama'||AI.provider==='claude'; }
+function aiReady(){ return AI.provider==='ollama'||AI.provider==='claude' || (AI.provider==='webllm'&&_llmState==='ready'); }
+const aiLocal=()=>AI.provider==='webllm'||AI.provider==='ollama';
 function _aiDot(){
   const d=document.getElementById('aiDot'); if(!d) return;
-  d.className='ai-dot'+(AI.provider==='off'?'':AI.provider==='ollama'?' ready':_llmState==='ready'?' ready':_llmState==='loading'?' loading':_llmState==='error'?' error':'');
+  d.className='ai-dot'+(AI.provider==='off'?'':AI.provider==='ollama'||AI.provider==='claude'?' ready':_llmState==='ready'?' ready':_llmState==='loading'?' loading':_llmState==='error'?' error':'');
 }
 
 // After login: warm up WebLLM only if the weights are already on the device (never auto-download 1 GB).
@@ -8000,7 +8779,7 @@ function openAiPanel(){
 }
 function closeAiPanel(){ const ov=document.getElementById('aiOverlay'); if(!ov||ov.style.display==='none') return; ov.classList.remove('show'); setTimeout(()=>{ov.style.display='none';},200); }
 function _aiPanelSync(){
-  ['off','webllm','ollama'].forEach(p=>{
+  ['off','claude','webllm','ollama'].forEach(p=>{
     document.getElementById('aiOpt'+p[0].toUpperCase()+p.slice(1))?.classList.toggle('active',AI.provider===p);
     document.getElementById('aiSub'+p[0].toUpperCase()+p.slice(1))?.classList.toggle('open',AI.provider===p);
   });
@@ -8020,6 +8799,19 @@ function aiSaveOllama(){
   AI.ollamaUrl=(document.getElementById('aiOllamaUrl').value.trim()||'http://localhost:11434').replace(/\/+$/,'');
   AI.ollamaModel=document.getElementById('aiOllamaModel').value.trim()||'qwen2.5:1.5b';
   aiSave();
+}
+const CLAUDE_FN="// Supabase Edge Function \"claude\": proxy between DFG Finance OS and the Claude API.\n// The Anthropic key lives only in this function's secrets (ANTHROPIC_API_KEY), never in the browser.\n// Deploy: Supabase → Edge Functions → Deploy a new function → Via Editor → name \"claude\" → paste → Deploy.\n// Secrets (both required): ANTHROPIC_API_KEY, and ALLOWED_EMAIL = the only account allowed to use it\n// (the project URL and anon key are public in the app, so anyone could sign up and spend the key otherwise).\nimport Anthropic from \"npm:@anthropic-ai/sdk\";\nimport { createClient } from \"npm:@supabase/supabase-js@2\";\n\nconst MODEL = \"claude-haiku-5-5\";\nconst MAX_INPUT_CHARS = 24000;   // the app sends short prompts; this caps what a stolen session could spend\nconst MAX_OUTPUT_TOKENS = 2000;\n\nconst CORS = {\n  \"Access-Control-Allow-Origin\": \"*\",\n  \"Access-Control-Allow-Headers\": \"authorization, apikey, content-type, x-client-info\",\n  \"Access-Control-Allow-Methods\": \"POST, OPTIONS\",\n};\nconst json = (body: unknown, status = 200) =>\n  new Response(JSON.stringify(body), { status, headers: { ...CORS, \"Content-Type\": \"application/json\" } });\n\nconst anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY\n\nDeno.serve(async (req) => {\n  if (req.method === \"OPTIONS\") return new Response(\"ok\", { headers: CORS });\n  if (req.method !== \"POST\") return json({ error: \"Método no permitido\" }, 405);\n\n  // The anon key alone passes the gateway, so require a real signed-in user of this project\n  const sb = createClient(Deno.env.get(\"SUPABASE_URL\")!, Deno.env.get(\"SUPABASE_ANON_KEY\")!, {\n    global: { headers: { Authorization: req.headers.get(\"Authorization\") ?? \"\" } },\n  });\n  const { data: { user } } = await sb.auth.getUser();\n  if (!user) return json({ error: \"Inicia sesión primero\" }, 401);\n  const allowed = (Deno.env.get(\"ALLOWED_EMAIL\") ?? \"\").trim().toLowerCase();\n  if (!allowed) return json({ error: \"Falta el secreto ALLOWED_EMAIL (tu correo) en Supabase\" }, 500);\n  if ((user.email ?? \"\").toLowerCase() !== allowed) return json({ error: \"Usuario no autorizado\" }, 403);\n  if (!Deno.env.get(\"ANTHROPIC_API_KEY\")) return json({ error: \"Falta el secreto ANTHROPIC_API_KEY en Supabase\" }, 500);\n\n  let body: { system?: unknown; user?: unknown };\n  try { body = await req.json(); } catch { return json({ error: \"JSON inválido\" }, 400); }\n  const system = String(body?.system ?? \"\").trim();\n  const prompt = String(body?.user ?? \"\").trim();\n  if (!prompt) return json({ error: \"Mensaje vacío\" }, 400);\n  if (system.length + prompt.length > MAX_INPUT_CHARS) return json({ error: \"Mensaje demasiado largo\" }, 413);\n\n  try {\n    const msg = await anthropic.messages.create({\n      model: MODEL,\n      max_tokens: MAX_OUTPUT_TOKENS,\n      output_config: { effort: \"low\" },   // short reflections and JSON commands: low effort is enough\n      ...(system ? { system } : {}),\n      messages: [{ role: \"user\", content: prompt }],\n    });\n    if (msg.stop_reason === \"refusal\") return json({ error: \"Claude no respondió a esta solicitud\" }, 422);\n    const text = msg.content\n      .filter((b): b is Anthropic.TextBlock => b.type === \"text\")\n      .map((b) => b.text)\n      .join(\"\")\n      .trim();\n    return json({ text, model: msg.model, usage: msg.usage });\n  } catch (e) {\n    if (e instanceof Anthropic.AuthenticationError) return json({ error: \"API key inválida: revisa ANTHROPIC_API_KEY\" }, 502);\n    if (e instanceof Anthropic.RateLimitError) return json({ error: \"Límite de uso de Claude, intenta en un minuto\" }, 429);\n    if (e instanceof Anthropic.APIError) return json({ error: \"Claude respondió \" + e.status + \": \" + e.message }, 502);\n    return json({ error: \"No se pudo conectar con Claude\" }, 502);\n  }\n});\n";
+async function aiCopyClaudeFn(){
+  try{ await navigator.clipboard.writeText(CLAUDE_FN); phiToast('Código copiado. Pégalo en Supabase → Edge Functions',{icon:'📋'}); }
+  catch{ const t=document.getElementById('aiClaudeFnBox'); if(t){ t.style.display='block'; t.value=CLAUDE_FN; t.select(); } phiToast('Copia el código del cuadro',{icon:'📋'}); }
+}
+async function aiTestClaude(){
+  const st=document.getElementById('aiClaudeStatus'); if(st) st.textContent='Probando…';
+  try{
+    const t0=performance.now(), out=await _withTimeout(aiChat('Responde solo con JSON válido, sin texto extra.','Devuelve {"ok":true,"saludo":"<un saludo corto en español>"}'),45000,'sin respuesta en 45 s');
+    const j=_aiExtractJSON(out);
+    if(st) st.textContent=j?.ok?`✓ Conectado · ${Math.round(performance.now()-t0)} ms · ${String(j.saludo||'').slice(0,60)}`:'Respondió, pero no en JSON: '+out.slice(0,80);
+  }catch(e){ if(st) st.textContent='✗ '+e.message; }
 }
 async function aiTestOllama(){
   aiSaveOllama();
@@ -8102,6 +8894,18 @@ async function aiDeleteWebllm(){
 
 // ── Shared chat call: returns the model's raw text ──────────
 async function aiChat(system,user){
+  if(AI.provider==='claude'){
+    // Supabase Edge Function "claude" holds the Anthropic key; it only answers the signed-in owner.
+    // Read the live session (auto-refreshed) rather than _authToken, which falls back to the anon key.
+    const tok=(await sb.auth.getSession()).data?.session?.access_token;
+    if(!tok) throw new Error('sesión expirada, vuelve a entrar con tu PIN');
+    const r=await fetch(SB_URL+'/functions/v1/claude',{method:'POST',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+tok,'Content-Type':'application/json'},
+      body:JSON.stringify({system,user})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error||(r.status===404?'falta crear la función "claude" en Supabase':'Claude HTTP '+r.status));
+    return String(j.text||'');
+  }
   if(AI.provider==='ollama'){
     const r=await fetch(AI.ollamaUrl+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:AI.ollamaModel,stream:false,format:'json',options:{temperature:0.1,num_predict:220},
@@ -8738,6 +9542,8 @@ window.closeAiPanel      = closeAiPanel;
 window.aiSetProvider     = aiSetProvider;
 window.aiSaveOllama      = aiSaveOllama;
 window.aiTestOllama      = aiTestOllama;
+window.aiTestClaude      = aiTestClaude;
+window.aiCopyClaudeFn    = aiCopyClaudeFn;
 window.aiLoadWebllm      = aiLoadWebllm;
 window.aiDeleteWebllm    = aiDeleteWebllm;
 window.aiToggleSize      = aiToggleSize;
@@ -8750,13 +9556,14 @@ window.aiState           = ()=>({provider:AI.provider,state:_llmState,model:_llm
 
 // ── Salud (nutrición + sueño) ──
 Object.assign(window,{hlCopySql,loadHealth,hlEl,nuShift,nuSetRange,nuEdit,nuDel,nuOpen,nuClose,nuCopyYesterday,nuMealToRecipe,renderNuGoals,nuTargets,nuPreview,nuSaveProfile,nuTab,nuPick,nuBack,nuSearch,nuFoodForm,nuFoodDel,nuFoodSave,nuRecipeNew,nuRecipeEdit,nuRecipeSave,nuRecipeDel,nuRecipePaint,nuSheet,nuQuickAdd,nuBarcode,nuUnitChange,nuPortionPaint,nuConfirm,slToggleF,slPaintForm,slSave,slEdit,slDel,slSaveGoal,slFormReset,NU,SL,HL});
+Object.assign(window,{loadAlma,alCopySql,alNextQuote,alSaveQuote,alWriteNow,alAiReflect,alDraftSave,alFormLoad,alPaintForm,alToggleEmo,alSaveEntry,alEdit,alDelDay,alEmoAdd,alEmoDel,alFaithToggle,alFaithMin,alPrayerAdd,alPrayerAnswer,alPrayerDel,alCareHide,alRenderCare,renderFe,hlEl,ALF,AL});
 
 })(); // end IIFE
 </script>
 
 <script>
 (function(){
-  const CURRENT_V = '20261022-049';
+  const CURRENT_V = '20261025-051';
   const BANNER_ID = 'updateBanner';
 
   // Clean up ?r= cache-bust param from URL after successful update
@@ -8989,12 +9796,27 @@ Object.assign(window,{hlCopySql,loadHealth,hlEl,nuShift,nuSetRange,nuEdit,nuDel,
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
       <span style="font-size:24px">🧠</span>
       <div>
-        <div class="cfm-title" style="text-align:left;margin:0;font-size:15px">Asistente IA local</div>
-        <div style="font-size:10px;color:var(--m);margin-top:2px">Entiende frases como “gasté 75 mil en Uber Eats ayer” y comandos de la app. Nada sale de tu dispositivo.</div>
+        <div class="cfm-title" style="text-align:left;margin:0;font-size:15px">Asistente IA</div>
+        <div style="font-size:10px;color:var(--m);margin-top:2px">Entiende frases como “gasté 75 mil en Uber Eats ayer”, comandos de la app y te da reflexiones en Alma. Elige dónde corre.</div>
       </div>
     </div>
 
     <label class="ai-opt" id="aiOptOff"><input type="radio" name="aiProv" value="off" onchange="aiSetProvider('off')"><div><b>Apagado</b><span>Solo el parser por reglas (actual).</span></div></label>
+
+    <label class="ai-opt" id="aiOptClaude"><input type="radio" name="aiProv" value="claude" onchange="aiSetProvider('claude')"><div><b>En la nube · Claude Haiku</b><span>Funciona en el celular y en el PC. Pasa por tu Supabase, que guarda la API key de Anthropic. Cuesta menos de 1 centavo de dólar al mes con uso diario.</span></div></label>
+    <div class="ai-sub" id="aiSubClaude">
+      <div style="font-size:11px;color:var(--m);line-height:1.7">
+        <b style="color:var(--t)">Configuración (una sola vez, en el PC):</b><br>
+        1. En <b>console.anthropic.com</b> crea una API key (Settings → API Keys) y recarga unos dólares en Billing.<br>
+        2. En Supabase → <b>Edge Functions</b> → Deploy a new function → <b>Via Editor</b>. Nómbrala <code>claude</code>, pega el código y dale Deploy.<br>
+        3. En Edge Functions → <b>Secrets</b> agrega <code>ANTHROPIC_API_KEY</code> con tu key y <code>ALLOWED_EMAIL</code> con el correo con el que inicias sesión en la app. Así nadie más puede gastar tu key.<br>
+        4. Toca <b>Probar conexión</b>.
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="btn-sm" onclick="aiCopyClaudeFn()">📋 Copiar código de la función</button><button class="btn-sm" onclick="aiTestClaude()">Probar conexión</button></div>
+      <textarea id="aiClaudeFnBox" readonly style="display:none;width:100%;height:140px;margin-top:8px;background:var(--bg3);border:0.5px solid var(--b2);border-radius:8px;color:var(--t);font-family:monospace;font-size:9px;padding:8px"></textarea>
+      <div class="ai-status" id="aiClaudeStatus" style="margin-top:6px"></div>
+      <div style="font-size:10px;color:var(--m);margin-top:8px;line-height:1.5">Lo que envías va a Anthropic solo para responderte. Anthropic no entrena sus modelos con lo que llega por la API.</div>
+    </div>
 
     <label class="ai-opt" id="aiOptWebllm"><input type="radio" name="aiProv" value="webllm" onchange="aiSetProvider('webllm')"><div><b>En el navegador · WebLLM</b><span>Qwen2.5 1.5B desde Hugging Face, corre en la GPU del dispositivo (WebGPU). Descarga única ≈ 1 GB, luego funciona offline. Funciona en celular.</span></div></label>
     <div class="ai-sub" id="aiSubWebllm">

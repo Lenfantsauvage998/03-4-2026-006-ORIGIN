@@ -171,6 +171,18 @@
       "enabled": true,
       "label": "Sueño"
     },
+    "reflexion": {
+      "enabled": true,
+      "label": "Reflexión"
+    },
+    "diario_alma": {
+      "enabled": true,
+      "label": "Mi diario"
+    },
+    "fe": {
+      "enabled": true,
+      "label": "Fe"
+    },
     "predictor": {
       "enabled": false,
       "label": "Predictor"
@@ -201,6 +213,6 @@
   },
 
   "nav": {
-    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "lab", "mercado", "renta", "nutricion", "sueno", "insights"]
+    "mobile_tabs": ["home", "overview", "tarjetas", "deudas", "flujo", "gastos", "historial", "proyeccion", "diario", "mes_perfecto", "montecarlo", "calculator", "lab", "mercado", "renta", "nutricion", "sueno", "reflexion", "diario_alma", "fe", "insights"]
   }
 }
